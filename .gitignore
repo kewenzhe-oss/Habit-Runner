@@ -44,3 +44,5 @@ firebase-debug.log*
 firebase-debug.*.log
 *backup*.json
 *.bak
+*.sql
+*.dump
