@@ -54,6 +54,8 @@ import {
   RiMoonLine,             // moon
   RiGoogleFill,           // google (fill — brand logo)
   RiGithubFill,           // github (fill — brand logo)
+  RiDownload2Line,        // download
+  RiUpload2Line,          // upload
 } from "@remixicon/react"
 
 export type IconKeys = keyof typeof icons
@@ -100,6 +102,8 @@ const icons = {
   star: RiStarLine,
   externalLink: RiExternalLinkLine,
   arrowUpRight: RiArrowRightUpLine,
+  download: RiDownload2Line,
+  upload: RiUpload2Line,
 
   // Habit Runner Energy States
   highEnergy: RiFlashlightLine,

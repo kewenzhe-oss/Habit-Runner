@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth"
 import { getCurrentUser } from "@/lib/session"
 import { Shell } from "@/components/layout/shell"
 import { AppearanceForm } from "@/components/settings/appearance-form"
+import { DataBackupCard } from "@/components/settings/data-backup-card"
 import { LanguageForm } from "@/components/settings/language-form"
 import { SettingsPageHeader } from "@/components/settings/settings-page-header"
 import { UserNameForm } from "@/components/user/user-name-form"
@@ -26,6 +27,7 @@ export default async function SettingsPage() {
       <SettingsPageHeader />
       <div className="grid grid-cols-1 gap-6">
         <UserNameForm user={{ id: user.id, name: user.name || "" }} />
+        <DataBackupCard />
         <LanguageForm />
         <AppearanceForm />
       </div>

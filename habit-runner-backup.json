@@ -1,0 +1,532 @@
+{
+  "version": "1.0",
+  "exportedAt": "2026-08-28T18:26:53.423Z",
+  "userEmail": "dwsun396@gmail.com",
+  "categories": [
+    {
+      "name": "身体与健康",
+      "colorCode": "#10B981",
+      "icon": "body",
+      "sortOrder": 0
+    },
+    {
+      "name": "技能与创造",
+      "colorCode": "#F59E0B",
+      "icon": "craft",
+      "sortOrder": 1
+    },
+    {
+      "name": "学习与输入",
+      "colorCode": "#8B5CF6",
+      "icon": "signal",
+      "sortOrder": 2
+    },
+    {
+      "name": "沉思与复盘",
+      "colorCode": "#06B6D4",
+      "icon": "contemplation",
+      "sortOrder": 3
+    },
+    {
+      "name": "生活日常",
+      "colorCode": "#3B82F6",
+      "icon": "life",
+      "sortOrder": 4
+    },
+    {
+      "name": "创造与工作",
+      "colorCode": "#F59E0B",
+      "icon": null,
+      "sortOrder": 1
+    },
+    {
+      "name": "深度思考",
+      "colorCode": "#06B6D4",
+      "icon": null,
+      "sortOrder": 3
+    },
+    {
+      "name": "日常生活",
+      "colorCode": "#3B82F6",
+      "icon": null,
+      "sortOrder": 4
+    }
+  ],
+  "items": [
+    {
+      "title": "每日深度阅读bible",
+      "whyPrompt": "通过 YouTube 渠道阅读圣经。",
+      "type": "HABIT",
+      "layer": "CONTEMPLATION",
+      "customCategory": "Bible Reading",
+      "status": "ACTIVE",
+      "unitType": "TIME",
+      "targetAmount": 40,
+      "unitLabel": "分钟",
+      "frequencyDays": "0,1,2,3,4,5,6",
+      "targetPerWeek": 7,
+      "dueDate": null,
+      "triggerCue": "早上起床； 吃早餐前",
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#8B5CF6",
+      "actionPresets": [
+        {
+          "energyLevel": "HIGH",
+          "actionText": "阅读 45 分钟并摘录 3 条核心观点到笔记",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":40,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "NORMAL",
+          "actionText": "阅读 20 分钟并标记一个有启发的段落",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":40,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "LOW",
+          "actionText": "读 1 段文字并划线（微小行动，绝非失败）",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":40,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "REST",
+          "actionText": "今日有意识休整，不强制阅读",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":40,\"unitLabel\":\"分钟\"}"
+        }
+      ],
+      "toolLinks": [
+        {
+          "title": "打开 ReadSelah",
+          "url": "https://www.readselah.org/workspace",
+          "energyLevel": null,
+          "description": null,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "title": "力量与体态恢复训练",
+      "whyPrompt": "保持充沛精力与身体核心稳定性",
+      "type": "HABIT",
+      "layer": "BODY",
+      "customCategory": "身体与健康",
+      "status": "ACTIVE",
+      "unitType": "TIME",
+      "targetAmount": 30,
+      "unitLabel": "分钟",
+      "frequencyDays": "1,2,3,4,5",
+      "targetPerWeek": 5,
+      "dueDate": null,
+      "triggerCue": "吃完晚饭后; 美股开市前",
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#10B981",
+      "actionPresets": [
+        {
+          "energyLevel": "HIGH",
+          "actionText": "完成 40 分钟全身抗阻训练 + 10 分钟拉伸",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":30,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "NORMAL",
+          "actionText": "完成 15 分钟自重核心训练",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":30,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "LOW",
+          "actionText": "站姿拉伸 3 分钟 + 30 次深蹲",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":30,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "REST",
+          "actionText": "肌肉完全恢复与温水泡澡",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":30,\"unitLabel\":\"分钟\"}"
+        }
+      ],
+      "toolLinks": []
+    },
+    {
+      "title": "自由书写post",
+      "whyPrompt": "整理文章发布在个人的博客(累积观点或者是知识)",
+      "type": "HABIT",
+      "layer": "MEMORY",
+      "customCategory": "深度思考",
+      "status": "ACTIVE",
+      "unitType": "COUNT",
+      "targetAmount": 2,
+      "unitLabel": "post",
+      "frequencyDays": "0,1,2,3,4,5,6",
+      "targetPerWeek": 7,
+      "dueDate": null,
+      "triggerCue": "读完书后，或者使用完社交媒体後， 把看到有价值的想法或者是概念做整理和二次加工",
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#06B6D4",
+      "actionPresets": [
+        {
+          "energyLevel": "HIGH",
+          "actionText": "写三篇完整的深度日记或思考长文 (800+ 字)",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"post\"}"
+        },
+        {
+          "energyLevel": "NORMAL",
+          "actionText": "写兩篇完整的深度日记或思考长文 (800+ 字)",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"post\"}"
+        },
+        {
+          "energyLevel": "LOW",
+          "actionText": "写一篇完整的深度日记或思考长文 (800+ 字)",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"post\"}"
+        },
+        {
+          "energyLevel": "REST",
+          "actionText": "只不过是把概念存储在个人的笔记空間",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"post\"}"
+        }
+      ],
+      "toolLinks": [
+        {
+          "title": "打开Knowledge Garden",
+          "url": "https://www.postsoma-2050.com/",
+          "energyLevel": null,
+          "description": null,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "title": "报纸阅读",
+      "whyPrompt": "保持对于社会和宏观环境的敏锐度",
+      "type": "HABIT",
+      "layer": "SIGNAL",
+      "customCategory": "学习与输入",
+      "status": "ACTIVE",
+      "unitType": "BINARY",
+      "targetAmount": null,
+      "unitLabel": null,
+      "frequencyDays": "0,1,2,3,4,5,6",
+      "targetPerWeek": 7,
+      "dueDate": null,
+      "triggerCue": "吃完早餐后",
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#10B981",
+      "actionPresets": [
+        {
+          "energyLevel": "HIGH",
+          "actionText": "[触发：吃完早餐后] 充沛推进：报纸阅读 (深度完成)",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        },
+        {
+          "energyLevel": "NORMAL",
+          "actionText": "[触发：吃完早餐后] 标准执行：报纸阅读 (标准完成)",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        },
+        {
+          "energyLevel": "LOW",
+          "actionText": "微小连接：报纸阅读 (3分钟微行动)",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        },
+        {
+          "energyLevel": "REST",
+          "actionText": "有意识休整恢复与蓄能",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        }
+      ],
+      "toolLinks": [
+        {
+          "title": "打开news-hub",
+          "url": "https://205077.xyz/",
+          "energyLevel": null,
+          "description": null,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "title": "每个礼拜至少阅读一本书籍",
+      "whyPrompt": "保持长期关注度和对于文字的敏感性 (增加自己的耐心和欣赏能力)",
+      "type": "HABIT",
+      "layer": "SIGNAL",
+      "customCategory": "学习与输入",
+      "status": "ACTIVE",
+      "unitType": "BINARY",
+      "targetAmount": null,
+      "unitLabel": null,
+      "frequencyDays": "0,6",
+      "targetPerWeek": 2,
+      "dueDate": null,
+      "triggerCue": "晚上睡觉前",
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#10B981",
+      "actionPresets": [
+        {
+          "energyLevel": "HIGH",
+          "actionText": "[触发：晚上睡觉前] 充沛推进：每个礼拜至少阅读一本书籍 (深度完成)",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        },
+        {
+          "energyLevel": "NORMAL",
+          "actionText": "[触发：晚上睡觉前] 标准执行：每个礼拜至少阅读一本书籍 (标准完成)",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        },
+        {
+          "energyLevel": "LOW",
+          "actionText": "微小连接：每个礼拜至少阅读一本书籍 (3分钟微行动)",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        },
+        {
+          "energyLevel": "REST",
+          "actionText": "有意识休整恢复与蓄能",
+          "description": "{\"unitType\":\"BINARY\",\"targetAmount\":null,\"unitLabel\":null}"
+        }
+      ],
+      "toolLinks": [
+        {
+          "title": "打开书库",
+          "url": "https://postsomabooks.qzz.io/",
+          "energyLevel": null,
+          "description": null,
+          "sortOrder": 0
+        }
+      ]
+    },
+    {
+      "title": "聆听播客",
+      "whyPrompt": "每天至少欣赏一个人或者一件事情",
+      "type": "HABIT",
+      "layer": "LIFE",
+      "customCategory": null,
+      "status": "ACTIVE",
+      "unitType": "COUNT",
+      "targetAmount": 2,
+      "unitLabel": "个",
+      "frequencyDays": "0,1,2,3,4,5,6",
+      "targetPerWeek": 7,
+      "dueDate": null,
+      "triggerCue": null,
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#10B981",
+      "actionPresets": [
+        {
+          "energyLevel": "HIGH",
+          "actionText": "充沛推进：聆听播客 (2 个)",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"个\"}"
+        },
+        {
+          "energyLevel": "NORMAL",
+          "actionText": "标准执行：聆听播客 (2 个)",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"个\"}"
+        },
+        {
+          "energyLevel": "LOW",
+          "actionText": "微小连接：聆听播客 (1 个)",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"个\"}"
+        },
+        {
+          "energyLevel": "REST",
+          "actionText": "有意识休整恢复与蓄能",
+          "description": "{\"unitType\":\"COUNT\",\"targetAmount\":2,\"unitLabel\":\"个\"}"
+        }
+      ],
+      "toolLinks": []
+    },
+    {
+      "title": "testing",
+      "whyPrompt": null,
+      "type": "HABIT",
+      "layer": "SIGNAL",
+      "customCategory": "身体与健康",
+      "status": "ARCHIVED",
+      "unitType": "TIME",
+      "targetAmount": 20,
+      "unitLabel": "分钟",
+      "frequencyDays": "0,1,2,3,4,5,6",
+      "targetPerWeek": 7,
+      "dueDate": null,
+      "triggerCue": null,
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#10B981",
+      "actionPresets": [
+        {
+          "energyLevel": "HIGH",
+          "actionText": "充沛推进：testing (24 分钟)",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":20,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "NORMAL",
+          "actionText": "标准执行：testing (20 分钟)",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":20,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "LOW",
+          "actionText": "微小连接：testing (6 分钟)",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":20,\"unitLabel\":\"分钟\"}"
+        },
+        {
+          "energyLevel": "REST",
+          "actionText": "有意识休整恢复与蓄能",
+          "description": "{\"unitType\":\"TIME\",\"targetAmount\":20,\"unitLabel\":\"分钟\"}"
+        }
+      ],
+      "toolLinks": []
+    },
+    {
+      "title": "睡前 1 小时不刷短视频与社交媒体",
+      "whyPrompt": "保护多巴胺基线，提升深度睡眠质量",
+      "type": "QUIT_HABIT",
+      "layer": "LIFE",
+      "customCategory": "日常生活",
+      "status": "ACTIVE",
+      "unitType": null,
+      "targetAmount": null,
+      "unitLabel": null,
+      "frequencyDays": null,
+      "targetPerWeek": null,
+      "dueDate": null,
+      "triggerCue": null,
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#EF4444",
+      "actionPresets": [],
+      "toolLinks": []
+    },
+    {
+      "title": "提交阶段性产品设计与架构复盘文档",
+      "whyPrompt": null,
+      "type": "TODO",
+      "layer": "CRAFT",
+      "customCategory": "创造与工作",
+      "status": "COMPLETED",
+      "unitType": null,
+      "targetAmount": null,
+      "unitLabel": null,
+      "frequencyDays": null,
+      "targetPerWeek": null,
+      "dueDate": "2026-08-27",
+      "triggerCue": null,
+      "quitContext": null,
+      "highRiskWindow": null,
+      "todoRecurrence": null,
+      "sortOrder": 0,
+      "colorCode": "#3B82F6",
+      "actionPresets": [],
+      "toolLinks": []
+    }
+  ],
+  "checkIns": [
+    {
+      "itemTitle": "力量与体态恢复训练",
+      "date": "2026-08-28",
+      "status": "COMPLETED",
+      "plannedEnergy": null,
+      "actualEnergy": "NORMAL",
+      "actionText": "完成 15 分钟自重核心训练",
+      "actualAmount": null,
+      "completionRate": null,
+      "restReasonTag": null,
+      "notes": null
+    },
+    {
+      "itemTitle": "睡前 1 小时不刷短视频与社交媒体",
+      "date": "2026-08-28",
+      "status": "KEPT",
+      "plannedEnergy": null,
+      "actualEnergy": null,
+      "actionText": null,
+      "actualAmount": null,
+      "completionRate": null,
+      "restReasonTag": null,
+      "notes": null
+    },
+    {
+      "itemTitle": "每日深度阅读bible",
+      "date": "2026-08-28",
+      "status": "COMPLETED",
+      "plannedEnergy": null,
+      "actualEnergy": "HIGH",
+      "actionText": "阅读 45 分钟并摘录 3 条核心观点到笔记",
+      "actualAmount": null,
+      "completionRate": null,
+      "restReasonTag": null,
+      "notes": null
+    },
+    {
+      "itemTitle": "自由书写post",
+      "date": "2026-08-28",
+      "status": "COMPLETED",
+      "plannedEnergy": null,
+      "actualEnergy": "LOW",
+      "actionText": "在便签上写下此刻最真实的一句话",
+      "actualAmount": null,
+      "completionRate": null,
+      "restReasonTag": null,
+      "notes": null
+    },
+    {
+      "itemTitle": "每个礼拜至少阅读一本书籍",
+      "date": "2026-08-28",
+      "status": "COMPLETED",
+      "plannedEnergy": null,
+      "actualEnergy": "NORMAL",
+      "actionText": "已完成：每个礼拜至少阅读一本书籍",
+      "actualAmount": 1,
+      "completionRate": 100,
+      "restReasonTag": null,
+      "notes": null
+    },
+    {
+      "itemTitle": "聆听播客",
+      "date": "2026-08-28",
+      "status": "COMPLETED",
+      "plannedEnergy": null,
+      "actualEnergy": "LOW",
+      "actionText": "完成 1 个 (50% LOW)",
+      "actualAmount": 1,
+      "completionRate": 50,
+      "restReasonTag": null,
+      "notes": null
+    },
+    {
+      "itemTitle": "报纸阅读",
+      "date": "2026-08-28",
+      "status": "REST",
+      "plannedEnergy": null,
+      "actualEnergy": "REST",
+      "actionText": "今日休整：时间冲突 / 优先它事",
+      "actualAmount": 0,
+      "completionRate": 0,
+      "restReasonTag": "时间冲突 / 优先它事",
+      "notes": null
+    }
+  ],
+  "dailyEnergyStates": [
+    {
+      "date": "2026-08-27",
+      "energyLevel": "HIGH",
+      "note": null
+    },
+    {
+      "date": "2026-08-28",
+      "energyLevel": "HIGH",
+      "note": null
+    }
+  ]
+}
