@@ -112,6 +112,8 @@
     "postponeToastDesc": "合理调整节奏，专注当下优先级。",
     "trendBtn": "趋势",
     "moreOptionsAria": "打开“{title}”更多操作",
+    "openExternalLink": "打开关联工具",
+    "openExternalLinkAria": "打开关联工具：{domain}",
     "viewDetails": "查看过程与长期记录",
     "editSettings": "编辑设置",
     "deleteConfirm": "确定要删除“{title}”吗？"

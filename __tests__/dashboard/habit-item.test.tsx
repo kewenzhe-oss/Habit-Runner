@@ -141,4 +141,56 @@ describe("HabitItem", () => {
     expect(screen.getByText(/12\s*天/)).toBeInTheDocument()
     expect(screen.getByLabelText("This week trace")).toBeInTheDocument()
   })
+
+  test("does not render external link icon when item has no tool links", () => {
+    render(
+      <HabitItem
+        item={mockHabit}
+        onOpenRecord={jest.fn()}
+        onRefresh={jest.fn()}
+      />
+    )
+
+    expect(screen.queryByTitle(/readselah\.org/)).not.toBeInTheDocument()
+    expect(screen.queryByLabelText(/打开关联工具/)).not.toBeInTheDocument()
+  })
+
+  test("renders external tool link icon with domain tooltip and target blank when toolLinks exist", () => {
+    const onOpenRecord = jest.fn()
+    const habitWithTool: TodayItemDTO = {
+      ...mockHabit,
+      toolLinks: [
+        {
+          id: "tl1",
+          itemId: "habit_1",
+          title: "Selah Bible",
+          url: "https://www.readselah.org/workspace",
+          energyLevel: null,
+          description: null,
+          sortOrder: 0,
+        },
+      ],
+    }
+
+    render(
+      <HabitItem
+        item={habitWithTool}
+        onOpenRecord={onOpenRecord}
+        onRefresh={jest.fn()}
+      />
+    )
+
+    const linkEl = screen.getByTitle("Selah Bible (readselah.org)")
+    expect(linkEl).toBeInTheDocument()
+    expect(linkEl).toHaveAttribute(
+      "href",
+      "https://www.readselah.org/workspace"
+    )
+    expect(linkEl).toHaveAttribute("target", "_blank")
+    expect(linkEl).toHaveAttribute("rel", "noopener noreferrer")
+    expect(linkEl).toHaveAttribute(
+      "aria-label",
+      expect.stringContaining("readselah.org")
+    )
+  })
 })

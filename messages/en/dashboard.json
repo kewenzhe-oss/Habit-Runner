@@ -112,6 +112,8 @@
     "postponeToastDesc": "Paced mindfully to protect today's core focus.",
     "trendBtn": "Trend",
     "moreOptionsAria": "Open options for “{title}”",
+    "openExternalLink": "Open Linked Tool",
+    "openExternalLinkAria": "Open linked tool in new tab: {domain}",
     "viewDetails": "View Details & Trend",
     "editSettings": "Edit Settings",
     "deleteConfirm": "Are you sure you want to delete “{title}”?"

@@ -105,12 +105,39 @@ function ThisWeekTraceBar({
   )
 }
 
+function getDomainFromUrl(url: string): string {
+  try {
+    const parsed = new URL(url.startsWith("http") ? url : `https://${url}`)
+    return parsed.hostname.replace(/^www\./, "")
+  } catch {
+    return url.replace(/^https?:\/\//, "").split("/")[0] || url
+  }
+}
+
 export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
   const { dict, format, locale } = useI18n()
   const [isLoading, setIsLoading] = React.useState(false)
   const isCheckedIn = !!item.todayCheckIn
   const checkInStatus = item.todayCheckIn?.status
   const actualEnergy = item.todayCheckIn?.actualEnergy
+
+  const primaryToolLink =
+    item.recommendedTool ||
+    (item.toolLinks && item.toolLinks.length > 0 ? item.toolLinks[0] : null)
+
+  const toolDomain = primaryToolLink?.url
+    ? getDomainFromUrl(primaryToolLink.url)
+    : ""
+  const toolTooltip = primaryToolLink
+    ? primaryToolLink.title && primaryToolLink.title !== toolDomain
+      ? `${primaryToolLink.title} (${toolDomain})`
+      : toolDomain
+    : ""
+  const toolAriaLabel = primaryToolLink
+    ? format(dict.dashboard.habitItem.openExternalLinkAria, {
+        domain: toolDomain,
+      })
+    : ""
 
   const streakCount =
     item.type === "QUIT_HABIT"
@@ -289,19 +316,39 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
 
       {/* Left content: title + trace */}
       <div className="min-w-0 flex-1 space-y-1.5">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Title */}
           <Link
             href={`/items/${item.id}`}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              "text-sm font-medium text-foreground transition-colors hover:text-primary",
+              "truncate text-sm font-medium text-foreground transition-colors hover:text-primary",
               item.status === "COMPLETED" &&
                 "text-muted-foreground line-through decoration-muted-foreground/40"
             )}
           >
             {item.title}
           </Link>
+
+          {/* External Tool Link Shortcut */}
+          {primaryToolLink?.url && (
+            <a
+              href={primaryToolLink.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              aria-label={
+                toolAriaLabel ||
+                (locale === "zh"
+                  ? `打开关联工具：${toolDomain}`
+                  : `Open linked tool: ${toolDomain}`)
+              }
+              title={toolTooltip}
+              className="group/link inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/40 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <Icons.externalLink className="h-3.5 w-3.5 transition-transform group-hover/link:scale-110" />
+            </a>
+          )}
 
           {/* Streak count — unstyled, appears on hover */}
           {item.type !== "TODO" && streakCount > 0 && (
