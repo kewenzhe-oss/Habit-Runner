@@ -87,6 +87,25 @@ export const authOptions: NextAuthOptions = {
   },
   providers,
   callbacks: {
+    async redirect({ url, baseUrl }) {
+      // Allows relative callback URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Allows callback URLs on the same origin or trusted custom domains
+      try {
+        const parsedUrl = new URL(url)
+        const parsedBase = new URL(baseUrl)
+        if (
+          parsedUrl.origin === parsedBase.origin ||
+          parsedUrl.hostname.endsWith("dpdns.org") ||
+          parsedUrl.hostname.endsWith("vercel.app")
+        ) {
+          return url
+        }
+      } catch {
+        // ignore
+      }
+      return baseUrl
+    },
     async session({ token, session }) {
       if (token) {
         session.user.id = token.id
