@@ -96,10 +96,10 @@ export function DataBackupCard() {
       <CardHeader>
         <CardTitle className="text-base font-medium flex items-center gap-2">
           <Icons.download className="h-4 w-4 text-primary" />
-          数据备份与跨端迁移 (Data Backup & Migration)
+          数据备份与恢复 (Data Backup & Recovery)
         </CardTitle>
         <CardDescription className="text-xs">
-          一键导出当前账号的所有习惯设定与打卡历史，或从备份文件导入到云端/生产环境。
+          一键导出当前账号的所有习惯设定与打卡历史，或从备份文件快速恢复数据。
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -142,10 +142,6 @@ export function DataBackupCard() {
             className="hidden"
           />
         </div>
-
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
-          💡 <span className="font-semibold text-foreground">跨环境迁移指南</span>：在本地环境导出 JSON 备份文件，然后打开 Vercel 线上网站的【系统设置】直接点击【导入数据文件】，即可瞬间将本地的所有习惯与历史打卡完整同步到云端！
-        </p>
       </CardContent>
     </Card>
   )

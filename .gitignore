@@ -42,3 +42,5 @@ next-env.d.ts
 *.db-journal
 firebase-debug.log*
 firebase-debug.*.log
+*backup*.json
+*.bak

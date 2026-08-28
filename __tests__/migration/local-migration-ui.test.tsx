@@ -14,14 +14,14 @@ describe("LocalMigrationBanner", () => {
     render(
       <LocalMigrationBanner
         count={3}
-        email="dwsun396@gmail.com"
+        email="user@example.com"
         onMergeNow={onMergeNow}
         onRemindLater={onRemindLater}
       />
     )
 
     expect(screen.getByText(/3 条本地未同步数据/)).toBeInTheDocument()
-    expect(screen.getByText(/dwsun396@gmail\.com/)).toBeInTheDocument()
+    expect(screen.getByText(/user@example\.com/)).toBeInTheDocument()
 
     const mergeBtn = screen.getByRole("button", { name: /立即合并/ })
     await user.click(mergeBtn)
@@ -94,7 +94,7 @@ describe("LocalMigrationDialog", () => {
       <LocalMigrationDialog
         open={true}
         onOpenChange={jest.fn()}
-        email="dwsun396@gmail.com"
+        email="user@example.com"
         isAnalyzing={false}
         isMerging={false}
         step="review"
@@ -142,7 +142,7 @@ describe("LocalMigrationDialog", () => {
       <LocalMigrationDialog
         open={true}
         onOpenChange={jest.fn()}
-        email="dwsun396@gmail.com"
+        email="user@example.com"
         isAnalyzing={false}
         isMerging={false}
         step="completed"

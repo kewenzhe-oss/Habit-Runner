@@ -89,7 +89,7 @@ describe("local-data manager", () => {
   })
 
   it("checks migration eligibility based on account and session dismissal", () => {
-    const userEmail = "dwsun396@gmail.com"
+    const userEmail = "test@example.com"
 
     // Empty storage -> ineligible
     expect(isMigrationEligible(userEmail, localStorage)).toBe(false)
@@ -115,7 +115,7 @@ describe("local-data manager", () => {
   })
 
   it("marks migration as completed and cleans up draft keys", () => {
-    const userEmail = "dwsun396@gmail.com"
+    const userEmail = "test@example.com"
 
     localStorage.setItem(
       PENDING_NEW_ITEM_KEY,
@@ -144,7 +144,7 @@ describe("local-data manager", () => {
 
     // Status store should contain record
     const status = getMigrationStatus(localStorage)
-    expect(status.accounts["dwsun396@gmail.com"]?.itemsCount).toBe(2)
+    expect(status.accounts["test@example.com"]?.itemsCount).toBe(2)
 
     // Should no longer be eligible
     expect(isMigrationEligible(userEmail, localStorage)).toBe(false)
