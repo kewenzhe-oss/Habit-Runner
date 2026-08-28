@@ -68,10 +68,28 @@
     "customCategoryTitle": "自定义分类标签",
     "customCategoryPlaceholder": "或直接输入自定义新分类名称...",
     "toolUrlTitle": "关联外部工具 HTTPS 网址 (可选)",
-    "toolUrlPlaceholder": "例如：https://read.example.com",
+    "toolUrlRecommendationLabel": "推荐链接",
+    "toolUrlEnterHint": "按 Enter 填入",
+    "toolUrlApplied": "已填入推荐链接，可继续编辑",
     "linkAdvancedPage": "前往完整高级配置页 →",
     "saveImmediate": "立即保存",
     "saveChanges": "保存修改"
+  },
+  "pending": {
+    "restoringTitle": "正在找回刚才填写的事项",
+    "restoringDescription": "登录已完成，正在为你继续保存。",
+    "savedTitle": "已为你保存刚才填写的事项",
+    "savedDescription": "“{title}” 已加入你的行动列表。",
+    "expiredTitle": "刚才的填写内容已过期",
+    "expiredDescription": "暂存内容只保留 30 分钟，请重新填写。",
+    "missingTitle": "没有找到待恢复的事项",
+    "missingDescription": "你可以继续新建，不会影响其他记录。",
+    "invalidTitle": "暂存内容无法恢复",
+    "invalidDescription": "请重新填写；无效数据已经安全清除。",
+    "needsAttentionTitle": "保存前还需要调整",
+    "needsAttentionDescription": "刚才的内容已为你预填，请检查提示后再次保存。",
+    "retryTitle": "暂时未能自动保存",
+    "retryDescription": "刚才的内容已为你预填，没有丢失。"
   },
   "layers": {
     "BODY": {

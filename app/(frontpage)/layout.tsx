@@ -14,6 +14,7 @@ export default async function FrontPageLayout({
   return (
     <>
       <Navbar
+        isAuthenticated={Boolean(user?.id)}
         user={{
           name: user?.name,
           image: user?.image,

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
 import { withAuth } from "next-auth/middleware"
 
+import { buildSignInUrl, getSafeRedirectPath } from "@/lib/auth-redirect"
+
 export default withAuth(
   async function middleware(req) {
     const token = await getToken({ req })
@@ -12,7 +14,12 @@ export default withAuth(
 
     if (isAuthPage) {
       if (isAuth) {
-        return NextResponse.redirect(new URL("/dashboard", req.url))
+        return NextResponse.redirect(
+          new URL(
+            getSafeRedirectPath(req.nextUrl.searchParams.get("redirect")),
+            req.url
+          )
+        )
       }
       return null
     }
@@ -22,9 +29,7 @@ export default withAuth(
       if (req.nextUrl.search) {
         from += req.nextUrl.search
       }
-      return NextResponse.redirect(
-        new URL(`/signin?from=${encodeURIComponent(from)}`, req.url)
-      )
+      return NextResponse.redirect(new URL(buildSignInUrl(from), req.url))
     }
   },
   {

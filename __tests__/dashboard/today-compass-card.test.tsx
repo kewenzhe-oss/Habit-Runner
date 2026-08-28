@@ -1,6 +1,7 @@
-import { render, screen } from "@testing-library/react"
-import { TodayCompassCard } from "@/components/dashboard/today-compass-card"
 import { TodayItemDTO } from "@/types"
+import { render, screen } from "@testing-library/react"
+
+import { TodayCompassCard } from "@/components/dashboard/today-compass-card"
 
 describe("TodayCompassCard", () => {
   const mockHabit1: TodayItemDTO = {
@@ -20,7 +21,7 @@ describe("TodayCompassCard", () => {
     id: "h_2",
     title: "深度阅读 15 分钟",
     type: "HABIT",
-    layer: "MIND",
+    layer: "SIGNAL",
     status: "ACTIVE",
     actionStreak: 3,
     rhythmStreak: 3,
@@ -64,7 +65,11 @@ describe("TodayCompassCard", () => {
   test("renders COMPLETED state when all daily habits are checked in", () => {
     const completedHabit1 = {
       ...mockHabit1,
-      todayCheckIn: { id: "c_1", status: "COMPLETED" as const, actualEnergy: "HIGH" as const },
+      todayCheckIn: {
+        id: "c_1",
+        status: "COMPLETED" as const,
+        actualEnergy: "HIGH" as const,
+      },
     }
 
     render(

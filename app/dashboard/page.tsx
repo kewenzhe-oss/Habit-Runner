@@ -34,6 +34,7 @@ export default async function DashboardPage() {
         dailyEnergy={dashboardData.dailyEnergy}
         dailyEnergyNote={dashboardData.dailyEnergyNote}
         dateStr={dashboardData.date}
+        userEmail={user.email}
       />
     </div>
   )

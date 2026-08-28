@@ -1,6 +1,7 @@
 import { cookies } from "next/headers"
-import { getCurrentUser } from "@/lib/session"
+
 import { I18nProvider, Locale } from "@/lib/i18n"
+import { getCurrentUser } from "@/lib/session"
 import Footer from "@/components/layout/footer"
 import Navbar from "@/components/layout/navbar"
 
@@ -19,6 +20,7 @@ export async function AppLayout({ children }: AppLayoutProps) {
     <I18nProvider initialLocale={initialLocale}>
       <div className="flex min-h-screen flex-col bg-background">
         <Navbar
+          isAuthenticated={Boolean(user?.id)}
           user={{
             name: user?.name,
             image: user?.image,

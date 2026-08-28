@@ -1,5 +1,6 @@
-import { deriveGrowthNarrative } from "@/lib/domain/growth-narrative"
 import { LayerGrowthMatrixData } from "@/types"
+
+import { deriveGrowthNarrative } from "@/lib/domain/growth-narrative"
 
 describe("Growth Narrative Domain Logic", () => {
   const mockMatrixData: LayerGrowthMatrixData = {
@@ -38,6 +39,8 @@ describe("Growth Narrative Domain Logic", () => {
           weeklySeries: Array.from({ length: 12 }, (_, i) => ({
             from: `2026-06-${i + 1}`,
             to: `2026-06-${i + 7}`,
+            score: i >= 2 ? 100 : 0,
+            connectedCount: i >= 2 ? 2 : 0,
             opportunityCount: 2,
             hasConnection: i >= 2,
           })),
@@ -69,6 +72,8 @@ describe("Growth Narrative Domain Logic", () => {
           weeklySeries: Array.from({ length: 12 }, (_, i) => ({
             from: `2026-06-${i + 1}`,
             to: `2026-06-${i + 7}`,
+            score: i % 2 === 0 ? 100 : 0,
+            connectedCount: i % 2 === 0 ? 2 : 0,
             opportunityCount: 2,
             hasConnection: i % 2 === 0,
           })),
@@ -100,6 +105,8 @@ describe("Growth Narrative Domain Logic", () => {
           weeklySeries: Array.from({ length: 12 }, (_, i) => ({
             from: `2026-06-${i + 1}`,
             to: `2026-06-${i + 7}`,
+            score: i === 0 || i === 1 ? 100 : 0,
+            connectedCount: i === 0 || i === 1 ? 2 : 0,
             opportunityCount: 2,
             hasConnection: i === 0 || i === 1,
           })),

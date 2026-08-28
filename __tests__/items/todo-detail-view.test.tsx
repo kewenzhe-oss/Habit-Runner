@@ -1,7 +1,8 @@
-import { render, screen } from "@testing-library/react"
-import { TodoDetailView } from "@/components/items/todo-detail-view"
 import { ItemDetailDTO } from "@/types"
+import { render, screen } from "@testing-library/react"
+
 import { getDictionary } from "@/lib/i18n"
+import { TodoDetailView } from "@/components/items/todo-detail-view"
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({
@@ -14,6 +15,7 @@ describe("TodoDetailView", () => {
   const mockTodo: ItemDetailDTO = {
     id: "todo_1",
     userId: "user_1",
+    categoryId: null,
     title: "缴纳本季度物业费",
     whyPrompt: "避免产生滞纳金",
     type: "TODO",
@@ -27,11 +29,16 @@ describe("TodoDetailView", () => {
     targetAmount: null,
     unitLabel: null,
     dueDate: "2026-09-01",
-    recommendedAction: null,
+    triggerCue: null,
+    quitContext: null,
+    highRiskWindow: null,
+    todoRecurrence: "ONCE",
+    sortOrder: 0,
     actionPresets: [],
     toolLinks: [],
     createdAt: new Date("2026-08-20T10:00:00.000Z"),
     updatedAt: new Date("2026-08-20T10:00:00.000Z"),
+    archivedAt: null,
     checkIns: [],
   }
 

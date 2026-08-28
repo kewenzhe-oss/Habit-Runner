@@ -1,23 +1,29 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { User } from "next-auth"
 
 import { siteConfig } from "@/config/site"
-import { cn } from "@/lib/utils"
 import { getDictionary, Locale, useI18n } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 import { QuickAddHabitModal } from "@/components/dashboard/quick-add-habit-modal"
 import { Icons } from "@/components/icons"
 import { UserNavDisplay } from "@/components/user/user-nav-display"
 
 interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
   user: Pick<User, "name" | "image" | "email">
+  isAuthenticated?: boolean
   locale?: Locale
 }
 
-export default function Navbar({ user, locale: explicitLocale }: NavbarProps) {
+export default function Navbar({
+  user,
+  isAuthenticated = Boolean(user.email),
+  locale: explicitLocale,
+}: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const i18n = useI18n()
@@ -33,9 +39,21 @@ export default function Navbar({ user, locale: explicitLocale }: NavbarProps) {
   ]
 
   const mobileLinks = [
-    { title: dict.nav.links.dashboard, href: "/dashboard", icon: "dashboard" as const },
-    { title: dict.nav.links.insights, href: "/insights", icon: "history" as const },
-    { title: dict.nav.links.settings, href: "/settings", icon: "settings" as const },
+    {
+      title: dict.nav.links.dashboard,
+      href: "/dashboard",
+      icon: "dashboard" as const,
+    },
+    {
+      title: dict.nav.links.insights,
+      href: "/insights",
+      icon: "history" as const,
+    },
+    {
+      title: dict.nav.links.settings,
+      href: "/settings",
+      icon: "settings" as const,
+    },
   ]
 
   return (
@@ -45,9 +63,15 @@ export default function Navbar({ user, locale: explicitLocale }: NavbarProps) {
           {/* Brand */}
           <div className="flex items-center gap-6">
             <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary font-bold text-primary-foreground shadow-sm">
-                <Icons.habit className="h-4 w-4" />
-              </div>
+              <Image
+                src="/habit-runner-target-20260828.svg"
+                alt=""
+                aria-hidden="true"
+                width={32}
+                height={32}
+                priority
+                className="h-8 w-8 rounded-lg shadow-sm"
+              />
               <span className="text-base font-bold tracking-tight text-foreground">
                 {dict.nav.brand || siteConfig.name}
               </span>
@@ -80,6 +104,7 @@ export default function Navbar({ user, locale: explicitLocale }: NavbarProps) {
           {/* Right user nav & Quick Add */}
           <div className="flex items-center gap-3">
             <QuickAddHabitModal
+              isAuthenticated={isAuthenticated}
               onSuccess={() => router.refresh()}
               trigger={
                 <button
@@ -92,6 +117,7 @@ export default function Navbar({ user, locale: explicitLocale }: NavbarProps) {
               }
             />
             <UserNavDisplay
+              isAuthenticated={isAuthenticated}
               user={{
                 name: user?.name,
                 image: user?.image,

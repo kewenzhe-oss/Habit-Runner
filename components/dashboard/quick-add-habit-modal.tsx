@@ -2,11 +2,20 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Layer } from "@/types"
 
 import { LAYER_LIST } from "@/config/layers"
-import { cn } from "@/lib/utils"
+import { buildSignInUrl } from "@/lib/auth-redirect"
+import { getDefaultDomainExample } from "@/lib/defaultDomainExamples"
+import {
+  buildQuickAddItemPayload,
+  QuickAddUnitType,
+} from "@/lib/domain/quick-add-item"
 import { useI18n } from "@/lib/i18n"
+import { readPendingNewItem, savePendingNewItem } from "@/lib/pending-new-item"
+import { cn } from "@/lib/utils"
+import { itemCreateSchema } from "@/lib/validations/item"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -21,6 +30,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
+import { RecommendedToolUrlField } from "@/components/items/recommended-tool-url-field"
 
 interface Category {
   id: string
@@ -28,20 +38,25 @@ interface Category {
   colorCode?: string | null
 }
 
-export type HabitUnitType = "TIME" | "COUNT" | "BINARY"
+export type HabitUnitType = QuickAddUnitType
 
 interface QuickAddHabitModalProps {
+  isAuthenticated: boolean
   onSuccess: () => void
   trigger?: React.ReactNode
 }
 
 export function QuickAddHabitModal({
+  isAuthenticated,
   onSuccess,
   trigger,
 }: QuickAddHabitModalProps) {
+  const router = useRouter()
   const { dict, locale } = useI18n()
   const [open, setOpen] = React.useState(false)
-  const [type, setType] = React.useState<"HABIT" | "QUIT_HABIT" | "TODO">("HABIT")
+  const [type, setType] = React.useState<"HABIT" | "QUIT_HABIT" | "TODO">(
+    "HABIT"
+  )
   const [isLoading, setIsLoading] = React.useState(false)
 
   // 1. Core Quick Add Fields (Primary Visual Weight)
@@ -87,8 +102,20 @@ export function QuickAddHabitModal({
   React.useEffect(() => {
     if (open) {
       fetchCategories()
+      const pending = readPendingNewItem()
+      if (pending.status === "expired") {
+        toast({
+          title: dict.form.pending.expiredTitle,
+          description: dict.form.pending.expiredDescription,
+        })
+      } else if (pending.status === "invalid") {
+        toast({
+          title: dict.form.pending.invalidTitle,
+          description: dict.form.pending.invalidDescription,
+        })
+      }
     }
-  }, [fetchCategories, open])
+  }, [dict.form.pending, fetchCategories, open])
 
   // Reset form state
   const resetForm = () => {
@@ -132,27 +159,90 @@ export function QuickAddHabitModal({
       (!targetAmount || targetAmount <= 0)
     ) {
       return toast({
-        title: locale === "zh" ? "请填写有效的目标量数值" : "Please enter a valid target amount",
+        title:
+          locale === "zh"
+            ? "请填写有效的目标量数值"
+            : "Please enter a valid target amount",
         variant: "destructive",
       })
     }
 
     if (toolUrl.trim() && !toolUrl.startsWith("https://")) {
       return toast({
-        title: locale === "zh" ? "关联工具网址必须以 https:// 开头" : "Tool URL must start with https://",
+        title:
+          locale === "zh"
+            ? "关联工具网址必须以 https:// 开头"
+            : "Tool URL must start with https://",
+        variant: "destructive",
+      })
+    }
+
+    const finalCategory =
+      customCatInput.trim() ||
+      selectedCategoryName.trim() ||
+      (locale === "zh" ? "生活日常" : "Daily Life")
+    const initialCategoryId = categories.find(
+      (category) => category.name === finalCategory
+    )?.id
+    const formState = {
+      title,
+      whyPrompt,
+      type,
+      layer: selectedLayer,
+      finalCategory,
+      categoryId: initialCategoryId,
+      unitType,
+      targetAmount,
+      unitLabel,
+      targetFrequency,
+      triggerCue,
+      contextTags,
+      highRiskWindow,
+      dueDate,
+      todoRecurring,
+      toolUrl,
+    }
+    const initialPayload = buildQuickAddItemPayload(formState)
+    const validation = itemCreateSchema.safeParse(initialPayload)
+
+    if (!validation.success) {
+      return toast({
+        title:
+          locale === "zh" ? "有些内容需要调整" : "Some fields need attention",
+        description: validation.error.issues
+          .slice(0, 3)
+          .map((issue) => issue.message)
+          .join(" · "),
         variant: "destructive",
       })
     }
 
     setIsLoading(true)
-    try {
-      // Determine final category
-      const finalCat =
-        customCatInput.trim() || selectedCategoryName.trim() || (locale === "zh" ? "生活日常" : "Daily Life")
-      let categoryId = categories.find(
-        (category) => category.name === finalCat
-      )?.id
 
+    if (!isAuthenticated) {
+      const saved = savePendingNewItem(validation.data)
+      if (!saved) {
+        setIsLoading(false)
+        return toast({
+          title:
+            locale === "zh"
+              ? "暂时无法保存填写内容"
+              : "Unable to keep this draft",
+          description:
+            locale === "zh"
+              ? "请允许浏览器使用本地存储后再试。"
+              : "Allow local browser storage and try again.",
+          variant: "destructive",
+        })
+      }
+
+      setOpen(false)
+      router.push(buildSignInUrl("/items/new?restore=1"))
+      return
+    }
+
+    try {
+      let categoryId = initialCategoryId
       if (customCatInput.trim()) {
         try {
           const categoryResponse = await fetch("/api/categories", {
@@ -164,130 +254,15 @@ export function QuickAddHabitModal({
             const category = await categoryResponse.json()
             categoryId = category.id
           }
-        } catch (e) {
-          // Non-blocking
+        } catch {
+          // A category link is optional; the item still keeps its category text.
         }
       }
 
-      // Base payload
-      const payload: any = {
-        title: title.trim(),
-        whyPrompt: whyPrompt.trim() || undefined,
-        type,
-        layer: selectedLayer,
-        customCategory: finalCat,
+      const payload = buildQuickAddItemPayload({
+        ...formState,
         categoryId,
-        colorCode:
-          type === "QUIT_HABIT"
-            ? "#EA580C"
-            : type === "TODO"
-              ? "#2563EB"
-              : "#10B981",
-      }
-
-      // Type-specific field mapping & preset generation
-      if (type === "HABIT") {
-        const freqMap: Record<string, { days: string; target: number }> = {
-          DAILY: { days: "0,1,2,3,4,5,6", target: 7 },
-          WEEKDAYS: { days: "1,2,3,4,5", target: 5 },
-          "3_4_TIMES": { days: "3_4_DAYS", target: 4 },
-          WEEKENDS: { days: "0,6", target: 2 },
-        }
-        const freqConfig = freqMap[targetFrequency] || freqMap.DAILY
-        payload.frequencyDays = freqConfig.days
-        payload.targetPerWeek = freqConfig.target
-        payload.triggerCue = triggerCue.trim() || null
-
-        // Direct DB Columns
-        payload.unitType = unitType
-        payload.targetAmount =
-          unitType === "BINARY" ? null : Number(targetAmount) || 1
-        payload.unitLabel =
-          unitType === "BINARY"
-            ? null
-            : unitLabel.trim() || (unitType === "TIME" ? "分钟" : "个")
-
-        const triggerPrefix = triggerCue.trim()
-          ? `[触发：${triggerCue.trim()}] `
-          : ""
-
-        const effectiveUnitLabel = payload.unitLabel || (unitType === "TIME" ? "分钟" : "个")
-        const unitConfig = {
-          unitType,
-          targetAmount: payload.targetAmount,
-          unitLabel: effectiveUnitLabel,
-        }
-        const unitMetaStr = JSON.stringify(unitConfig)
-
-        const highTarget =
-          unitType === "BINARY"
-            ? "深度完成"
-            : `${Math.round((targetAmount || 20) * 1.2)} ${effectiveUnitLabel}`
-        const normalTarget =
-          unitType === "BINARY"
-            ? "标准完成"
-            : `${targetAmount || 20} ${effectiveUnitLabel}`
-        const lowTarget =
-          unitType === "BINARY"
-            ? "3分钟微行动"
-            : `${Math.max(1, Math.round((targetAmount || 20) * 0.3))} ${effectiveUnitLabel}`
-
-        payload.actionPresets = [
-          {
-            energyLevel: "HIGH",
-            actionText: `${triggerPrefix}充沛推进：${title.trim()} (${highTarget})`,
-            description: unitMetaStr,
-          },
-          {
-            energyLevel: "NORMAL",
-            actionText: `${triggerPrefix}标准执行：${title.trim()} (${normalTarget})`,
-            description: unitMetaStr,
-          },
-          {
-            energyLevel: "LOW",
-            actionText: `微小连接：${title.trim()} (${lowTarget})`,
-            description: unitMetaStr,
-          },
-          {
-            energyLevel: "REST",
-            actionText: "有意识休整恢复与蓄能",
-            description: unitMetaStr,
-          },
-        ]
-      } else if (type === "QUIT_HABIT") {
-        payload.quitContext = contextTags.trim() || null
-        payload.highRiskWindow = highRiskWindow.trim() || null
-        const contextDesc = contextTags.trim()
-          ? `情境诱因：${contextTags.trim()}`
-          : ""
-        const windowDesc = highRiskWindow.trim()
-          ? `高风险时段：${highRiskWindow.trim()}`
-          : ""
-
-        payload.actionPresets = [
-          { energyLevel: "HIGH", actionText: "全天平稳自律，无冲动发生" },
-          {
-            energyLevel: "NORMAL",
-            actionText: windowDesc
-              ? `重点注意 ${windowDesc}`
-              : "识别诱因并主动远离",
-          },
-          {
-            energyLevel: "LOW",
-            actionText: contextDesc
-              ? `在 ${contextDesc} 中保持觉察与停顿`
-              : "觉察当下冲动，深呼吸暂停",
-          },
-          { energyLevel: "REST", actionText: "身心放松与主动减压" },
-        ]
-      } else if (type === "TODO") {
-        payload.dueDate = dueDate || undefined
-        payload.todoRecurrence = todoRecurring
-      }
-
-      if (toolUrl.trim()) {
-        payload.toolLinks = [{ title: "打开关联工具", url: toolUrl.trim() }]
-      }
+      })
 
       const res = await fetch("/api/items", {
         method: "POST",
@@ -295,7 +270,22 @@ export function QuickAddHabitModal({
         body: JSON.stringify(payload),
       })
 
-      if (!res.ok) throw new Error(dict.common.notifications.saveFailed)
+      if (res.status === 401) {
+        savePendingNewItem(payload)
+        setOpen(false)
+        router.push(buildSignInUrl("/items/new?restore=1"))
+        return
+      }
+      if (!res.ok) {
+        const issues = res.status === 422 ? await res.json() : null
+        const message = Array.isArray(issues)
+          ? issues
+              .slice(0, 3)
+              .map((issue) => issue.message)
+              .join(" · ")
+          : dict.common.notifications.saveFailed
+        throw new Error(message)
+      }
 
       toast({
         title: locale === "zh" ? "已创建新事项" : "Item Created",
@@ -350,7 +340,7 @@ export function QuickAddHabitModal({
                   className={cn(
                     "flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition-all",
                     type === "HABIT"
-                      ? "border border-emerald-500/40 bg-background text-emerald-800 shadow-xs ring-1 ring-emerald-500/30 dark:text-emerald-300"
+                      ? "shadow-xs border border-emerald-500/40 bg-background text-emerald-800 ring-1 ring-emerald-500/30 dark:text-emerald-300"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -364,7 +354,7 @@ export function QuickAddHabitModal({
                   className={cn(
                     "flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition-all",
                     type === "QUIT_HABIT"
-                      ? "border border-amber-500/40 bg-background text-amber-800 shadow-xs ring-1 ring-amber-500/30 dark:text-amber-300"
+                      ? "shadow-xs border border-amber-500/40 bg-background text-amber-800 ring-1 ring-amber-500/30 dark:text-amber-300"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -378,7 +368,7 @@ export function QuickAddHabitModal({
                   className={cn(
                     "flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition-all",
                     type === "TODO"
-                      ? "border border-blue-500/40 bg-background text-blue-800 shadow-xs ring-1 ring-blue-500/30 dark:text-blue-300"
+                      ? "shadow-xs border border-blue-500/40 bg-background text-blue-800 ring-1 ring-blue-500/30 dark:text-blue-300"
                       : "text-muted-foreground hover:text-foreground"
                   )}
                 >
@@ -390,7 +380,10 @@ export function QuickAddHabitModal({
 
             {/* 2. Title Input (Primary Focus) */}
             <div className="space-y-1.5">
-              <Label htmlFor="quick-item-title" className="text-xs font-semibold text-foreground">
+              <Label
+                htmlFor="quick-item-title"
+                className="text-xs font-semibold text-foreground"
+              >
                 {type === "HABIT"
                   ? dict.form.fields.habitName
                   : type === "QUIT_HABIT"
@@ -440,7 +433,7 @@ export function QuickAddHabitModal({
                       className={cn(
                         "rounded-md border py-1.5 text-center text-xs font-medium transition-all",
                         unitType === u.id
-                          ? "border-emerald-600 bg-emerald-600 font-semibold text-white shadow-xs"
+                          ? "shadow-xs border-emerald-600 bg-emerald-600 font-semibold text-white"
                           : "border-border bg-background text-muted-foreground hover:bg-muted"
                       )}
                     >
@@ -470,7 +463,13 @@ export function QuickAddHabitModal({
                         className="h-8 bg-background pr-12 text-xs font-semibold"
                       />
                       <span className="absolute right-2.5 top-1.5 text-xs text-muted-foreground">
-                        {unitType === "TIME" ? (locale === "zh" ? "分钟" : "mins") : (locale === "zh" ? "个" : "items")}
+                        {unitType === "TIME"
+                          ? locale === "zh"
+                            ? "分钟"
+                            : "mins"
+                          : locale === "zh"
+                            ? "个"
+                            : "items"}
                       </span>
                     </div>
                   </div>
@@ -575,7 +574,10 @@ export function QuickAddHabitModal({
               <div className="space-y-3 border-t border-border/50 p-3 pt-2.5">
                 {/* Motivation / Why Prompt */}
                 <div className="space-y-1">
-                  <Label htmlFor="advanced-why" className="text-[11px] font-medium text-foreground">
+                  <Label
+                    htmlFor="advanced-why"
+                    className="text-[11px] font-medium text-foreground"
+                  >
                     {dict.form.fields.whyTitle}
                   </Label>
                   <Input
@@ -595,7 +597,10 @@ export function QuickAddHabitModal({
                 {type === "HABIT" && (
                   <>
                     <div className="space-y-1">
-                      <Label htmlFor="advanced-trigger" className="text-[11px] font-medium text-foreground">
+                      <Label
+                        htmlFor="advanced-trigger"
+                        className="text-[11px] font-medium text-foreground"
+                      >
                         {dict.form.fields.triggerTitle}
                       </Label>
                       <Input
@@ -614,9 +619,18 @@ export function QuickAddHabitModal({
                       <div className="grid grid-cols-4 gap-1">
                         {[
                           { id: "DAILY", label: dict.form.fields.freqDaily },
-                          { id: "WEEKDAYS", label: dict.form.fields.freqWeekdays },
-                          { id: "3_4_TIMES", label: dict.form.fields.freqTimes },
-                          { id: "WEEKENDS", label: dict.form.fields.freqWeekends },
+                          {
+                            id: "WEEKDAYS",
+                            label: dict.form.fields.freqWeekdays,
+                          },
+                          {
+                            id: "3_4_TIMES",
+                            label: dict.form.fields.freqTimes,
+                          },
+                          {
+                            id: "WEEKENDS",
+                            label: dict.form.fields.freqWeekends,
+                          },
                         ].map((f) => (
                           <button
                             key={f.id}
@@ -637,7 +651,10 @@ export function QuickAddHabitModal({
 
                     {unitType !== "BINARY" && (
                       <div className="space-y-1">
-                        <Label htmlFor="advanced-unit-label" className="text-[11px] font-medium text-foreground">
+                        <Label
+                          htmlFor="advanced-unit-label"
+                          className="text-[11px] font-medium text-foreground"
+                        >
                           {dict.form.fields.unitLabel}
                         </Label>
                         <Input
@@ -660,7 +677,10 @@ export function QuickAddHabitModal({
                 {type === "QUIT_HABIT" && (
                   <>
                     <div className="space-y-1">
-                      <Label htmlFor="advanced-context-tags" className="text-[11px] font-medium text-foreground">
+                      <Label
+                        htmlFor="advanced-context-tags"
+                        className="text-[11px] font-medium text-foreground"
+                      >
                         {dict.form.fields.quitContextTitle}
                       </Label>
                       <Input
@@ -673,7 +693,10 @@ export function QuickAddHabitModal({
                     </div>
 
                     <div className="space-y-1">
-                      <Label htmlFor="advanced-risk-window" className="text-[11px] font-medium text-foreground">
+                      <Label
+                        htmlFor="advanced-risk-window"
+                        className="text-[11px] font-medium text-foreground"
+                      >
                         {dict.form.fields.quitRiskWindowTitle}
                       </Label>
                       <Input
@@ -753,18 +776,20 @@ export function QuickAddHabitModal({
                 </div>
 
                 {/* Tool URL */}
-                <div className="space-y-1">
-                  <Label htmlFor="advanced-tool-url" className="text-[11px] font-medium text-foreground">
-                    {dict.form.fields.toolUrlTitle}
-                  </Label>
-                  <Input
-                    id="advanced-tool-url"
-                    value={toolUrl}
-                    onChange={(e) => setToolUrl(e.target.value)}
-                    placeholder={dict.form.fields.toolUrlPlaceholder}
-                    className="h-8 text-xs"
-                  />
-                </div>
+                <RecommendedToolUrlField
+                  id="advanced-tool-url"
+                  label={dict.form.fields.toolUrlTitle}
+                  value={toolUrl}
+                  onValueChange={setToolUrl}
+                  recommendation={getDefaultDomainExample(selectedLayer)}
+                  recommendationLabel={
+                    dict.form.fields.toolUrlRecommendationLabel
+                  }
+                  enterHint={dict.form.fields.toolUrlEnterHint}
+                  appliedMessage={dict.form.fields.toolUrlApplied}
+                  labelClassName="text-[11px] font-medium text-foreground"
+                  inputClassName="h-8 text-xs"
+                />
               </div>
             </details>
           </div>

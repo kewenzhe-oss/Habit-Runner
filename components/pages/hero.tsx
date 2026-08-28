@@ -1,10 +1,16 @@
 import Link from "next/link"
-import { cn } from "@/lib/utils"
+
+import { buildSignInUrl } from "@/lib/auth-redirect"
 import { getDictionary } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 
-export default function HeroHeader() {
+interface HeroHeaderProps {
+  isAuthenticated: boolean
+}
+
+export default function HeroHeader({ isAuthenticated }: HeroHeaderProps) {
   const dict = getDictionary("zh").landing.hero
 
   return (
@@ -17,7 +23,7 @@ export default function HeroHeader() {
         </p>
 
         {/* 主标题 (Headline) */}
-        <h1 className="text-3xl font-extrabold tracking-tight sm:text-5xl md:text-6xl text-foreground">
+        <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl md:text-6xl">
           {dict.title}
         </h1>
 
@@ -29,24 +35,21 @@ export default function HeroHeader() {
         {/* CTA 按钮 */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
           <Link
-            href="/dashboard"
-            className={cn(buttonVariants({ variant: "default", size: "lg" }), "gap-2 shadow-xs")}
+            href={isAuthenticated ? "/dashboard" : buildSignInUrl("/dashboard")}
+            className={cn(
+              buttonVariants({ variant: "default", size: "lg" }),
+              "shadow-xs gap-2"
+            )}
           >
             <span>{dict.ctaPrimary}</span>
             <Icons.next className="h-4 w-4" />
-          </Link>
-          <Link
-            href="/signin"
-            className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
-          >
-            {dict.ctaSecondary}
           </Link>
         </div>
       </div>
 
       {/* 2. Hero Visual 1: Today Compass & Action Surface (Centered Floating Mockup) */}
       <div className="container max-w-4xl px-4 sm:px-6">
-        <div className="relative rounded-2xl border border-border/80 bg-linear-to-b from-card to-card/95 p-4 shadow-2xl shadow-black/5 ring-1 ring-border/40 md:p-6">
+        <div className="bg-linear-to-b relative overflow-hidden rounded-2xl border border-border/80 from-card to-card/95 p-4 shadow-2xl shadow-black/5 ring-1 ring-border/40 md:p-6">
           {/* Subtle Ambient Glow */}
           <div className="pointer-events-none absolute -right-6 -top-6 h-36 w-36 rounded-full bg-emerald-500/10 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-6 -left-6 h-36 w-36 rounded-full bg-blue-500/10 blur-3xl" />
@@ -58,7 +61,9 @@ export default function HeroHeader() {
                 <Icons.check className="h-3 w-3" />
                 <span>✓ 今日日常已达成 · 4/4</span>
               </span>
-              <span className="text-[11px] text-muted-foreground/75">本周还剩 3 天</span>
+              <span className="text-[11px] text-muted-foreground/75">
+                本周还剩 3 天
+              </span>
             </div>
 
             <div className="space-y-0.5">
@@ -72,7 +77,9 @@ export default function HeroHeader() {
 
             {/* Inline Energy Selector Pill Row */}
             <div className="flex items-center gap-1.5 border-t border-border/40 pt-2.5">
-              <span className="mr-1 text-[11px] text-muted-foreground/60">今日能量状态</span>
+              <span className="mr-1 text-[11px] text-muted-foreground/60">
+                今日能量状态
+              </span>
               <span className="rounded-full border border-foreground bg-foreground px-2.5 py-0.5 text-[11px] font-medium text-background">
                 High
               </span>
@@ -118,17 +125,42 @@ export default function HeroHeader() {
               <span className="h-6 w-0.5 shrink-0 rounded-full bg-purple-500 opacity-80" />
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">每日深度阅读</span>
-                  <span className="text-[11px] text-muted-foreground/60">12天</span>
+                  <span className="text-sm font-medium text-foreground">
+                    每日深度阅读
+                  </span>
+                  <span className="text-[11px] text-muted-foreground/60">
+                    12天
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[8px] text-muted-foreground/50">
-                  <span className="flex flex-col items-center gap-0.5"><span>一</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>二</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>三</span><span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/35" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>四</span><span className="h-1.5 w-1.5 rounded-full bg-amber-400" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>五</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>六</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>日</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>一</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>二</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>三</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/35" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>四</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>五</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>六</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>日</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
                 </div>
               </div>
               <span className="h-4 w-4 shrink-0 rounded-full bg-purple-500" />
@@ -139,17 +171,42 @@ export default function HeroHeader() {
               <span className="h-6 w-0.5 shrink-0 rounded-full bg-emerald-500 opacity-80" />
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">力量与体态恢复训练</span>
-                  <span className="text-[11px] text-muted-foreground/60">8天</span>
+                  <span className="text-sm font-medium text-foreground">
+                    力量与体态恢复训练
+                  </span>
+                  <span className="text-[11px] text-muted-foreground/60">
+                    8天
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[8px] text-muted-foreground/50">
-                  <span className="flex flex-col items-center gap-0.5"><span>一</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>二</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>三</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>四</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>五</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>六</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>日</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>一</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>二</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>三</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>四</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>五</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>六</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>日</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
                 </div>
               </div>
               <span className="h-4 w-4 shrink-0 rounded-full bg-emerald-500" />
@@ -160,17 +217,42 @@ export default function HeroHeader() {
               <span className="h-6 w-0.5 shrink-0 rounded-full bg-blue-500 opacity-80" />
               <div className="min-w-0 flex-1 space-y-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">自由书写 post</span>
-                  <span className="text-[11px] text-muted-foreground/60">5天</span>
+                  <span className="text-sm font-medium text-foreground">
+                    自由书写 post
+                  </span>
+                  <span className="text-[11px] text-muted-foreground/60">
+                    5天
+                  </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[8px] text-muted-foreground/50">
-                  <span className="flex flex-col items-center gap-0.5"><span>一</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>二</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>三</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>四</span><span className="h-1.5 w-1.5 rounded-full bg-amber-400" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>五</span><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>六</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
-                  <span className="flex flex-col items-center gap-0.5"><span>日</span><span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" /></span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>一</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>二</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>三</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>四</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>五</span>
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>六</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>日</span>
+                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
+                  </span>
                 </div>
               </div>
               <span className="h-4 w-4 shrink-0 rounded-full bg-blue-500" />

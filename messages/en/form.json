@@ -68,10 +68,28 @@
     "customCategoryTitle": "Category Tag",
     "customCategoryPlaceholder": "or enter custom category name...",
     "toolUrlTitle": "Connected Tool HTTPS URL (Optional)",
-    "toolUrlPlaceholder": "e.g. https://read.example.com",
+    "toolUrlRecommendationLabel": "Suggested link",
+    "toolUrlEnterHint": "Press Enter to fill",
+    "toolUrlApplied": "Suggested link filled. You can keep editing.",
     "linkAdvancedPage": "Go to Full Settings →",
     "saveImmediate": "Save Item",
     "saveChanges": "Save Changes"
+  },
+  "pending": {
+    "restoringTitle": "Restoring your item",
+    "restoringDescription": "You're signed in. We're continuing where you left off.",
+    "savedTitle": "Your item has been saved",
+    "savedDescription": "“{title}” is now in your action list.",
+    "expiredTitle": "Your saved draft has expired",
+    "expiredDescription": "Drafts are kept for 30 minutes. Please fill it in again.",
+    "missingTitle": "No item is waiting to be restored",
+    "missingDescription": "You can create a new item without affecting other records.",
+    "invalidTitle": "This draft couldn't be restored",
+    "invalidDescription": "Please enter it again. The invalid draft has been safely cleared.",
+    "needsAttentionTitle": "A few details need attention",
+    "needsAttentionDescription": "Your earlier answers are prefilled. Review the prompts and save again.",
+    "retryTitle": "We couldn't save automatically yet",
+    "retryDescription": "Your earlier answers are prefilled and haven't been lost."
   },
   "layers": {
     "BODY": {

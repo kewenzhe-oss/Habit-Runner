@@ -49,11 +49,43 @@ export const metadata: Metadata = {
     images: [siteConfig.ogImage],
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon-16x16.png",
-    apple: "/apple-touch-icon.png",
+    icon: [
+      {
+        url: "/favicon-target-20260828.ico",
+        type: "image/x-icon",
+      },
+      {
+        url: "/favicon-target-16-20260828.png",
+        type: "image/png",
+        sizes: "16x16",
+      },
+      {
+        url: "/favicon-target-32-20260828.png",
+        type: "image/png",
+        sizes: "32x32",
+      },
+    ],
+    shortcut: "/favicon-target-20260828.ico",
+    apple: [
+      {
+        url: "/apple-touch-target-20260828.png",
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/safari-pinned-tab.svg",
+        color: "#DC2626",
+      },
+    ],
   },
-  manifest: "/site.webmanifest",
+  manifest: "/site-target-20260828.webmanifest",
+  other: {
+    "msapplication-TileColor": "#DC2626",
+    "msapplication-config": "/browserconfig.xml",
+  },
 }
 
 export const viewport: Viewport = {

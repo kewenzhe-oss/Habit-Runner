@@ -3,12 +3,13 @@
 import * as React from "react"
 import { signIn } from "next-auth/react"
 
-import { cn } from "@/lib/utils"
 import { getDictionary } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
+  callbackUrl?: string
   demoEnabled?: boolean
   googleEnabled?: boolean
   githubEnabled?: boolean
@@ -16,6 +17,7 @@ interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function UserAuthForm({
   className,
+  callbackUrl = "/dashboard",
   demoEnabled = false,
   googleEnabled = false,
   githubEnabled = false,
@@ -44,7 +46,7 @@ export function UserAuthForm({
             signIn("credentials", {
               email: "demo@habitrunner.dev",
               name: "Demo Runner",
-              callbackUrl: "/dashboard",
+              callbackUrl,
             })
           }}
           disabled={isLoading}
@@ -78,7 +80,7 @@ export function UserAuthForm({
           onClick={() => {
             setIsGoogleLoading(true)
             setIsLoading(true)
-            signIn("google", { callbackUrl: "/dashboard" })
+            signIn("google", { callbackUrl })
           }}
           disabled={isGoogleLoading || isLoading}
         >
@@ -98,7 +100,7 @@ export function UserAuthForm({
           onClick={() => {
             setIsGithubLoading(true)
             setIsLoading(true)
-            signIn("github", { callbackUrl: "/dashboard" })
+            signIn("github", { callbackUrl })
           }}
           disabled={isGithubLoading || isLoading}
         >

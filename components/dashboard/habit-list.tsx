@@ -1,19 +1,21 @@
 "use client"
 
 import * as React from "react"
-import { TodayItemDTO } from "@/types"
+import { EnergyLevel, TodayItemDTO } from "@/types"
 
-import { cn } from "@/lib/utils"
 import { useI18n } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 import { EmptyPlaceholder } from "@/components/empty-placeholder"
 import { Icons } from "@/components/icons"
 
+import { useLocalMigration } from "@/hooks/use-local-migration"
+import { LocalMigrationBanner } from "@/components/migration/local-migration-banner"
+import { LocalMigrationDialog } from "@/components/migration/local-migration-dialog"
 import { CategoryManagerModal } from "./category-manager-modal"
 import { HabitItem } from "./habit-item"
 import { QuickAddHabitModal } from "./quick-add-habit-modal"
 import { RecordActionModal } from "./record-action-modal"
 import { TodayCompassCard } from "./today-compass-card"
-import { EnergyLevel } from "@/types"
 
 interface Category {
   id: string
@@ -26,9 +28,16 @@ interface HabitListProps {
   dailyEnergy?: EnergyLevel | null
   dailyEnergyNote?: string | null
   dateStr?: string
+  userEmail?: string | null
 }
 
-export function HabitList({ initialItems, dailyEnergy, dailyEnergyNote, dateStr }: HabitListProps) {
+export function HabitList({
+  initialItems,
+  dailyEnergy,
+  dailyEnergyNote,
+  dateStr,
+  userEmail,
+}: HabitListProps) {
   const { dict, format } = useI18n()
   const secDict = dict.dashboard.sections
   const [items, setItems] = React.useState<TodayItemDTO[]>(initialItems)
@@ -100,8 +109,23 @@ export function HabitList({ initialItems, dailyEnergy, dailyEnergyNote, dateStr 
     (i) => i.type === "TODO" && i.status !== "COMPLETED"
   ).length
 
+  const migration = useLocalMigration({
+    userEmail,
+    onSuccess: refreshItems,
+  })
+
   return (
     <div className="space-y-6">
+      {/* Local Migration Banner (shown if un-migrated local items exist) */}
+      {migration.isEligible && (
+        <LocalMigrationBanner
+          count={migration.pendingCount}
+          email={userEmail || ""}
+          onMergeNow={migration.openMigration}
+          onRemindLater={migration.handleDismiss}
+        />
+      )}
+
       {/* 0. Today & Weekly Progress Compass Card (includes inline energy selector) */}
       <TodayCompassCard
         items={items}
@@ -160,17 +184,19 @@ export function HabitList({ initialItems, dailyEnergy, dailyEnergyNote, dateStr 
         )}
 
         <div className="ml-auto">
-          <QuickAddHabitModal onSuccess={refreshItems} />
+          <QuickAddHabitModal isAuthenticated onSuccess={refreshItems} />
         </div>
       </div>
 
       {/* 2. Daily Routines — divider list */}
       <section>
-        <div className="flex items-center justify-between mb-2">
+        <div className="mb-2 flex items-center justify-between">
           <h2 className="text-xs font-medium text-muted-foreground">
             {secDict.habitsTitle}
             {activeHabits.length > 0 && (
-              <span className="ml-1.5 font-normal opacity-60">({activeHabits.length})</span>
+              <span className="ml-1.5 font-normal opacity-60">
+                ({activeHabits.length})
+              </span>
             )}
           </h2>
         </div>
@@ -199,10 +225,12 @@ export function HabitList({ initialItems, dailyEnergy, dailyEnergyNote, dateStr 
       {/* 3. Pending TODOs — divider list */}
       {pendingTodos.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-2">
+          <div className="mb-2 flex items-center justify-between">
             <h2 className="text-xs font-medium text-muted-foreground">
               {secDict.todosTitle}
-              <span className="ml-1.5 font-normal opacity-60">({pendingTodos.length})</span>
+              <span className="ml-1.5 font-normal opacity-60">
+                ({pendingTodos.length})
+              </span>
             </h2>
           </div>
 
@@ -231,7 +259,9 @@ export function HabitList({ initialItems, dailyEnergy, dailyEnergyNote, dateStr 
             className="flex w-full items-center gap-2 py-2 text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground"
           >
             <Icons.check className="h-3 w-3" />
-            <span>{secDict.completedTodosTitle} ({completedTodos.length})</span>
+            <span>
+              {secDict.completedTodosTitle} ({completedTodos.length})
+            </span>
             <Icons.down
               className={cn(
                 "ml-auto h-3 w-3 transition-transform",
@@ -272,6 +302,24 @@ export function HabitList({ initialItems, dailyEnergy, dailyEnergyNote, dateStr 
         onOpenChange={setCategoryModalOpen}
         categories={categories}
         onRefresh={fetchCategories}
+      />
+
+      {/* 8. Local Data Migration & Conflict Resolution Dialog */}
+      <LocalMigrationDialog
+        open={migration.isModalOpen}
+        onOpenChange={migration.setIsModalOpen}
+        email={userEmail || ""}
+        isAnalyzing={migration.isAnalyzing}
+        isMerging={migration.isMerging}
+        step={migration.step}
+        migrationPlan={migration.migrationPlan}
+        mergeStats={migration.mergeStats}
+        onUpdateItemAction={migration.handleUpdateItemAction}
+        onBatchResolve={migration.handleBatchResolution}
+        onExecuteMerge={migration.handleExecuteMerge}
+        onDismiss={migration.handleDismiss}
+        onCleanLocalData={migration.handleCleanLocalData}
+        onKeepLocalBackup={migration.handleKeepLocalBackup}
       />
     </div>
   )

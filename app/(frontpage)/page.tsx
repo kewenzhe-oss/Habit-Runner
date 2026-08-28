@@ -1,14 +1,17 @@
-import Hero from "@/components/pages/hero"
+import { getCurrentUser } from "@/lib/session"
 import AdaptiveRhythmSection from "@/components/pages/adaptive-rhythm-section"
-import TraceHistorySection from "@/components/pages/trace-history-section"
+import Hero from "@/components/pages/hero"
 import OpenSource from "@/components/pages/opensource"
+import TraceHistorySection from "@/components/pages/trace-history-section"
 import { PWARedirect } from "@/components/pwa-redirect"
 
-export default function Home() {
+export default async function Home() {
+  const user = await getCurrentUser()
+
   return (
     <main>
       {/* 1. Hero: Today Action Workspace (Visual 1) */}
-      <Hero />
+      <Hero isAuthenticated={Boolean(user?.id)} />
 
       {/* 2. Differentiator: Adaptive 4-Tier Energy & Micro-Actions (Visual 2) */}
       <AdaptiveRhythmSection />

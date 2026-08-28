@@ -5,8 +5,13 @@ import { useRouter } from "next/navigation"
 import { ItemDetailDTO, Layer } from "@/types"
 
 import { LAYER_LIST } from "@/config/layers"
-import { cn } from "@/lib/utils"
+import { getDefaultDomainExample } from "@/lib/defaultDomainExamples"
 import { useI18n } from "@/lib/i18n"
+import {
+  clearPendingNewItem,
+  PendingNewItemPayload,
+} from "@/lib/pending-new-item"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -19,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
+import { RecommendedToolUrlField } from "@/components/items/recommended-tool-url-field"
 
 interface Category {
   id: string
@@ -28,60 +34,70 @@ interface Category {
 export type HabitUnitType = "TIME" | "COUNT" | "BINARY"
 
 interface ItemFormProps {
+  initialDraft?: PendingNewItemPayload
   initialItem?: ItemDetailDTO
   mode: "create" | "edit"
 }
 
-export function ItemForm({ initialItem, mode }: ItemFormProps) {
+function frequencyFromDays(frequencyDays?: string | null) {
+  if (frequencyDays === "1,2,3,4,5") return "WEEKDAYS" as const
+  if (frequencyDays === "3_4_DAYS") return "3_4_TIMES" as const
+  if (frequencyDays === "0,6") return "WEEKENDS" as const
+  return "DAILY" as const
+}
+
+export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
   const router = useRouter()
   const { dict } = useI18n()
   const [type, setType] = React.useState<"HABIT" | "QUIT_HABIT" | "TODO">(
-    initialItem?.type || "HABIT"
+    initialItem?.type || initialDraft?.type || "HABIT"
   )
   const [isLoading, setIsLoading] = React.useState(false)
 
   // 1. Shared Fields
-  const [title, setTitle] = React.useState(initialItem?.title || "")
-  const [whyPrompt, setWhyPrompt] = React.useState(
-    initialItem?.whyPrompt || ""
+  const [title, setTitle] = React.useState(
+    initialItem?.title || initialDraft?.title || ""
   )
-  const [layer, setLayer] = React.useState<Layer>(initialItem?.layer || "LIFE")
+  const [whyPrompt, setWhyPrompt] = React.useState(
+    initialItem?.whyPrompt || initialDraft?.whyPrompt || ""
+  )
+  const [layer, setLayer] = React.useState<Layer>(
+    initialItem?.layer || initialDraft?.layer || "LIFE"
+  )
   const [categories, setCategories] = React.useState<Category[]>([])
   const [selectedCategoryName, setSelectedCategoryName] = React.useState(
-    initialItem?.customCategory || ""
+    initialItem?.customCategory || initialDraft?.customCategory || ""
   )
   const [customCatInput, setCustomCatInput] = React.useState("")
   const [toolUrl, setToolUrl] = React.useState(
-    initialItem?.toolLinks?.[0]?.url || ""
+    initialItem?.toolLinks?.[0]?.url || initialDraft?.toolLinks?.[0]?.url || ""
   )
 
   // 2. Positive Habit (HABIT) Specific Fields
   const [triggerCue, setTriggerCue] = React.useState(
-    initialItem?.triggerCue || ""
+    initialItem?.triggerCue || initialDraft?.triggerCue || ""
   )
   const [targetFrequency, setTargetFrequency] = React.useState<
     "DAILY" | "WEEKDAYS" | "3_4_TIMES" | "WEEKENDS"
   >(() => {
-    if (!initialItem) return "DAILY"
-    if (initialItem.frequencyDays === "1,2,3,4,5") return "WEEKDAYS"
-    if (initialItem.frequencyDays === "3_4_DAYS") return "3_4_TIMES"
-    if (initialItem.frequencyDays === "0,6") return "WEEKENDS"
-    return "DAILY"
+    return frequencyFromDays(
+      initialItem?.frequencyDays || initialDraft?.frequencyDays
+    )
   })
 
   // Inferred unit type from DB or presets
   const initialUnitConfig = React.useMemo(() => {
-    if (initialItem?.unitType) {
+    const source = initialItem || initialDraft
+    if (source?.unitType) {
       return {
-        unitType: initialItem.unitType as HabitUnitType,
+        unitType: source.unitType as HabitUnitType,
         targetAmount:
-          initialItem.targetAmount || (initialItem.unitType === "BINARY" ? 1 : 20),
+          source.targetAmount || (source.unitType === "BINARY" ? 1 : 20),
         unitLabel:
-          initialItem.unitLabel ||
-          (initialItem.unitType === "TIME" ? "分钟" : "个"),
+          source.unitLabel || (source.unitType === "TIME" ? "分钟" : "个"),
       }
     }
-    const normalPreset = initialItem?.actionPresets?.find(
+    const normalPreset = source?.actionPresets?.find(
       (p) => p.energyLevel === "NORMAL"
     )
     if (normalPreset?.description) {
@@ -97,7 +113,7 @@ export function ItemForm({ initialItem, mode }: ItemFormProps) {
       targetAmount: 20,
       unitLabel: "分钟",
     }
-  }, [initialItem])
+  }, [initialDraft, initialItem])
 
   const [unitType, setUnitType] = React.useState<HabitUnitType>(
     initialUnitConfig.unitType
@@ -109,17 +125,23 @@ export function ItemForm({ initialItem, mode }: ItemFormProps) {
 
   // 3. Quit Habit (QUIT_HABIT) Specific Fields
   const [contextTags, setContextTags] = React.useState(
-    initialItem?.quitContext || ""
+    initialItem?.quitContext || initialDraft?.quitContext || ""
   )
   const [highRiskWindow, setHighRiskWindow] = React.useState(
-    initialItem?.highRiskWindow || ""
+    initialItem?.highRiskWindow || initialDraft?.highRiskWindow || ""
   )
 
   // 4. Todo (TODO) Specific Fields
-  const [dueDate, setDueDate] = React.useState(initialItem?.dueDate || "")
+  const [dueDate, setDueDate] = React.useState(
+    initialItem?.dueDate || initialDraft?.dueDate || ""
+  )
   const [todoRecurring, setTodoRecurring] = React.useState<
     "ONCE" | "WEEKLY" | "MONTHLY"
-  >((initialItem?.todoRecurrence as any) || "ONCE")
+  >(
+    (initialItem?.todoRecurrence as "ONCE" | "WEEKLY" | "MONTHLY") ||
+      initialDraft?.todoRecurrence ||
+      "ONCE"
+  )
 
   // Load Categories
   React.useEffect(() => {
@@ -314,6 +336,7 @@ export function ItemForm({ initialItem, mode }: ItemFormProps) {
         description: `“${title.trim()}” 已成功保存。`,
       })
 
+      if (mode === "create") clearPendingNewItem()
       router.push("/dashboard")
       router.refresh()
     } catch (err: any) {
@@ -345,7 +368,9 @@ export function ItemForm({ initialItem, mode }: ItemFormProps) {
         <CardContent className="space-y-4">
           {/* Item Type Selector */}
           <div className="space-y-1">
-            <Label className="text-xs font-semibold">{dict.form.fields.itemType}</Label>
+            <Label className="text-xs font-semibold">
+              {dict.form.fields.itemType}
+            </Label>
             <div className="grid grid-cols-3 gap-2">
               <button
                 type="button"
@@ -757,16 +782,18 @@ export function ItemForm({ initialItem, mode }: ItemFormProps) {
           </div>
 
           {/* External Tool URL */}
-          <div className="space-y-1 border-t pt-2">
-            <Label htmlFor="item-tool" className="text-xs font-semibold">
-              {dict.form.fields.toolUrlTitle}
-            </Label>
-            <Input
+          <div className="border-t pt-2">
+            <RecommendedToolUrlField
               id="item-tool"
+              label={dict.form.fields.toolUrlTitle}
               value={toolUrl}
-              onChange={(e) => setToolUrl(e.target.value)}
-              placeholder={dict.form.fields.toolUrlPlaceholder}
-              className="text-xs"
+              onValueChange={setToolUrl}
+              recommendation={getDefaultDomainExample(layer)}
+              recommendationLabel={dict.form.fields.toolUrlRecommendationLabel}
+              enterHint={dict.form.fields.toolUrlEnterHint}
+              appliedMessage={dict.form.fields.toolUrlApplied}
+              labelClassName="text-xs font-semibold"
+              inputClassName="text-xs"
             />
           </div>
         </CardContent>
@@ -782,9 +809,7 @@ export function ItemForm({ initialItem, mode }: ItemFormProps) {
           {dict.common.actions.cancel}
         </Button>
         <Button type="submit" disabled={isLoading}>
-          {isLoading && (
-            <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-          )}
+          {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
           <span>
             {mode === "edit"
               ? dict.form.fields.saveChanges
