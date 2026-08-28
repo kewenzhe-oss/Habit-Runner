@@ -1,0 +1,253 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// User & Auth Models
+// ----------------------------------------------------
+model Account {
+  id                String   @id @default(cuid())
+  userId            String   @map(name: "user_id")
+  type              String
+  provider          String
+  providerAccountId String   @map(name: "provider_account_id")
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?  @db.Text
+  session_state     String?
+  createdAt         DateTime @default(now()) @map(name: "created_at")
+  updatedAt         DateTime @updatedAt @map(name: "updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map(name: "accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map(name: "session_token")
+  userId       String   @map(name: "user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map(name: "sessions")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime? @map(name: "email_verified")
+  image         String?
+  timezone      String    @default("UTC")
+  createdAt     DateTime  @default(now()) @map(name: "created_at")
+  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+
+  accounts          Account[]
+  sessions          Session[]
+  categories        Category[]
+  items             Item[]
+  dailyEnergyStates DailyEnergyState[]
+  checkIns          CheckIn[]
+
+  @@map(name: "users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map(name: "verification_tokens")
+}
+
+// ----------------------------------------------------
+// Enums
+// ----------------------------------------------------
+enum ItemType {
+  HABIT
+  QUIT_HABIT
+  TODO
+}
+
+enum Layer {
+  BODY
+  CRAFT
+  SIGNAL
+  MEMORY
+  JUDGMENT
+  CONTEMPLATION
+  LIFE
+}
+
+enum EnergyLevel {
+  HIGH
+  NORMAL
+  LOW
+  REST
+}
+
+enum ItemStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum CheckInStatus {
+  COMPLETED
+  KEPT
+  LAPSED
+  REST
+  SKIPPED
+}
+
+// ----------------------------------------------------
+// Habit Runner Domain Models
+// ----------------------------------------------------
+model Category {
+  id        String   @id @default(cuid())
+  userId    String   @map(name: "user_id")
+  name      String
+  colorCode String?  @map(name: "color_code")
+  icon      String?
+  sortOrder Int      @default(0) @map(name: "sort_order")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     Item[]
+
+  @@unique([userId, name])
+  @@map(name: "categories")
+}
+
+model Item {
+  id             String     @id @default(cuid())
+  userId         String     @map(name: "user_id")
+  categoryId     String?    @map(name: "category_id")
+  title          String
+  whyPrompt      String?    @map(name: "why_prompt") @db.Text
+  type           ItemType
+  layer          Layer      @default(LIFE)
+  customCategory String?    @map(name: "custom_category")
+  status         ItemStatus @default(ACTIVE)
+
+  // Unit metadata for automatic completion & energy calculation
+  unitType       String?    @map(name: "unit_type") // "TIME" | "COUNT" | "BINARY"
+  targetAmount   Float?     @map(name: "target_amount")
+  unitLabel      String?    @map(name: "unit_label") // "分钟", "个", "页", "组", "次"
+
+  frequencyDays  String?    @map(name: "frequency_days") // Stored as comma-separated string
+  targetPerWeek  Int?       @map(name: "target_per_week")
+  dueDate        String?    @map(name: "due_date") // YYYY-MM-DD for TODO items
+
+  // Type-specific configuration. These must not share frequencyDays because
+  // their semantics and validation rules are different.
+  triggerCue      String?    @map(name: "trigger_cue")
+  quitContext     String?    @map(name: "quit_context")
+  highRiskWindow  String?    @map(name: "high_risk_window")
+  todoRecurrence  String?    @map(name: "todo_recurrence") // ONCE | WEEKLY | MONTHLY
+
+  sortOrder      Int        @default(0) @map(name: "sort_order")
+  colorCode      String?    @map(name: "color_code")
+
+  createdAt      DateTime   @default(now()) @map(name: "created_at")
+  updatedAt      DateTime   @updatedAt @map(name: "updated_at")
+  archivedAt     DateTime?  @map(name: "archived_at")
+
+  user           User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category       Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  actionPresets  EnergyActionPreset[]
+  toolLinks      ToolLink[]
+  checkIns       CheckIn[]
+
+  @@index([userId, status])
+  @@index([userId, type])
+  @@map(name: "items")
+}
+
+model EnergyActionPreset {
+  id          String      @id @default(cuid())
+  itemId      String      @map(name: "item_id")
+  energyLevel EnergyLevel @map(name: "energy_level")
+  actionText  String      @map(name: "action_text") @db.Text
+  description String?     @db.Text
+
+  item        Item        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, energyLevel])
+  @@map(name: "energy_action_presets")
+}
+
+model ToolLink {
+  id          String       @id @default(cuid())
+  itemId      String       @map(name: "item_id")
+  title       String
+  url         String       @db.Text
+  energyLevel EnergyLevel? @map(name: "energy_level")
+  description String?
+  sortOrder   Int          @default(0) @map(name: "sort_order")
+
+  item        Item         @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map(name: "tool_links")
+}
+
+model DailyEnergyState {
+  id          String      @id @default(cuid())
+  userId      String      @map(name: "user_id")
+  date        String      // Format: YYYY-MM-DD
+  energyLevel EnergyLevel @map(name: "energy_level")
+  note        String?     @db.Text
+
+  createdAt   DateTime    @default(now()) @map(name: "created_at")
+  updatedAt   DateTime    @updatedAt @map(name: "updated_at")
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId, date])
+  @@map(name: "daily_energy_states")
+}
+
+model CheckIn {
+  id            String        @id @default(cuid())
+  userId        String        @map(name: "user_id")
+  itemId        String        @map(name: "item_id")
+  date          String        // Format: YYYY-MM-DD
+
+  status        CheckInStatus
+
+  plannedEnergy EnergyLevel?  @map(name: "planned_energy")
+  actualEnergy  EnergyLevel?  @map(name: "actual_energy")
+  actionText    String?       @map(name: "action_text")
+
+  // Structured metrics & neutral rest reasons
+  actualAmount   Float?        @map(name: "actual_amount")
+  completionRate Int?          @map(name: "completion_rate")
+  restReasonTag  String?       @map(name: "rest_reason_tag")
+
+  notes         String?       @db.Text
+
+  createdAt     DateTime      @default(now()) @map(name: "created_at")
+  updatedAt     DateTime      @updatedAt @map(name: "updated_at")
+
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  item          Item          @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, date])
+  @@index([userId, date])
+  @@index([itemId, date])
+  @@map(name: "check_ins")
+}

@@ -1,0 +1,19 @@
+{
+  "brand": "Habit Runner",
+  "links": {
+    "dashboard": "我的行动",
+    "insights": "行动历史",
+    "settings": "系统设置"
+  },
+  "actions": {
+    "addItem": "新增事项",
+    "signIn": "登录",
+    "signUp": "创建账号",
+    "signOut": "退出登录",
+    "openAccountMenu": "打开账号菜单",
+    "skipToContent": "跳到主要内容"
+  },
+  "mobileAria": {
+    "mobileNavLabel": "移动端主导航"
+  }
+}

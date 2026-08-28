@@ -1,0 +1,53 @@
+{
+  "appName": "URUS",
+  "appDescription": "A low-energy friendly personal action system that keeps you running sustainably across varying energy levels.",
+  "brandTagline": "Sustainable Life Rhythm & Micro-Action System",
+  "theme": {
+    "toggle": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "energy": {
+    "high": "High",
+    "normal": "Normal",
+    "low": "Low",
+    "rest": "Rest"
+  },
+  "energyDescriptions": {
+    "high": "High energy & focus, suitable for intensive tasks",
+    "normal": "Steady state, proceeding with core habits at standard pace",
+    "low": "Limited energy, focusing on micro-actions and baseline",
+    "rest": "Mindful rest & recharge, preserving continuity without guilt"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "back": "Back",
+    "rename": "Rename"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "success": "Success",
+    "error": "Error",
+    "empty": "No data available"
+  },
+  "notifications": {
+    "titleRequired": "Please enter an item title",
+    "saveSuccess": "Saved successfully",
+    "saveFailed": "Failed to save, please try again",
+    "deleteSuccess": "Deleted successfully",
+    "deleteFailed": "Failed to delete, please try again",
+    "updateSuccess": "Updated successfully",
+    "updateFailed": "Failed to update, please try again",
+    "networkError": "Network error, please check connection"
+  }
+}

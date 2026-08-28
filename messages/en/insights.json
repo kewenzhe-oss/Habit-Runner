@@ -1,0 +1,208 @@
+{
+  "header": {
+    "title": "History",
+    "periodLabel": "Past 16 weeks",
+    "rangeText": "Activity timeline: {from} to {to}"
+  },
+  "activityHistory": {
+    "headerTitle": "Action History",
+    "headerSubtitle": "View your routine logs and consistency traces",
+    "stats": {
+      "totalCheckIns": "Total Actions",
+      "activeDays": "Active Days",
+      "bestStreak": "Current Best Streak",
+      "timesUnit": "times",
+      "daysUnit": "days"
+    },
+    "starter": {
+      "title": "This Week Rhythm",
+      "subtitle": "Focus on what happened this week",
+      "hint": "🌱 Every single action counts this week.",
+      "recentTitle": "Recent Check-ins",
+      "recentSubtext": "Latest {count} events"
+    },
+    "forming": {
+      "title": "4-Week Rhythm Matrix",
+      "subtitle": "Observe cross-week habit rhythm"
+    },
+    "heatmap": {
+      "title": "Activity Panorama Heatmap",
+      "description": "View long-term rhythm and consistency across weeks",
+      "legendHigh": "High Energy",
+      "legendNormal": "Completed",
+      "legendLow": "Micro",
+      "legendRest": "Rest",
+      "legendEmpty": "No record",
+      "todayPending": "Today pending",
+      "actionsCount": "{count} actions"
+    },
+    "activeItems": {
+      "title": "Active Routines",
+      "description": "View streaks and weekly rhythms for each routine. Click for detailed trend.",
+      "streakLabel": "Current Streak",
+      "longestLabel": "Best Streak",
+      "totalCompleted": "{count} total completions",
+      "empty": "No routines added yet. Start with a simple action."
+    },
+    "completedTodos": {
+      "title": "Recently Completed Tasks",
+      "description": "Log of finite tasks completed and closed recently.",
+      "empty": "No tasks completed recently.",
+      "completedOn": "Completed on {date}"
+    }
+  },
+  "rhythmCard": {
+    "title": "Weekly Rhythm Insights",
+    "tag": "Behavior Trace Density",
+    "statHabit": "Habit Actions Completed",
+    "statHabitTag": "[Action]",
+    "statRest": "Rest & Recharge Days",
+    "statRestTag": "[Rest]",
+    "statQuit": "Days Maintained",
+    "statQuitTag": "[Discipline]",
+    "statTodo": "Tasks Finished",
+    "statTodoTag": "[Done]",
+    "timesUnit": "times",
+    "daysUnit": "days",
+    "itemsUnit": "tasks"
+  },
+  "weeklyReview": {
+    "eyebrow": "Past 30 days · Growth in progress",
+    "question": "Where has your life been taking shape lately?",
+    "focusWithLayers": "Your actions have mostly landed in {layers}.",
+    "focusEmpty": "No clear focus has formed yet. Let your real records keep settling in.",
+    "states": {
+      "DATA_SETTLING": "Data settling in",
+      "FOCUSED_ROOTING": "Rooting with focus",
+      "MULTI_LAYER_GROWTH": "Growing in several places",
+      "RECONNECTING": "Reconnecting",
+      "QUIET_SETTLING": "Quietly settling"
+    },
+    "stateDescriptions": {
+      "DATA_SETTLING": "Your record is still taking shape. Let the rhythm appear a few more times before defining growth.",
+      "FOCUSED_ROOTING": "A small number of layers are appearing consistently, so this period looks more like focused rooting.",
+      "MULTI_LAYER_GROWTH": "Several layers have left traces across weeks, and life is opening up in more than one place.",
+      "RECONNECTING": "Some earlier rhythms are connecting again without needing to return at full strength all at once.",
+      "QUIET_SETTLING": "There are fewer action traces right now. This is better understood as a settling period, not regression."
+    },
+    "evidenceEstablished": "Real actions appeared in {connected} layers, and {established} of them show continuity across weeks.",
+    "evidenceSettling": "Real actions appeared in {connected} layers; the evidence is still settling in.",
+    "evidenceEmpty": "There are not enough behavior traces yet to describe a focus.",
+    "journeyTitle": "Slowly taking root",
+    "settlingTitle": "Rhythms still settling in",
+    "journeyDescription": "This looks beyond a single score to whether actions keep appearing across different weeks.",
+    "trackLabel": "12-week growth path",
+    "weeksConnected": "Across the past 12 weeks, {connected} of {eligible} planned weeks left a connection.",
+    "runContinues": "The connection has continued through the latest {count} planned weeks.",
+    "runSettling": "The recent rhythm is still reconnecting.",
+    "noTrack": "No observable path has formed across the past 12 weeks yet.",
+    "noJourneyYet": "There are not enough traces across weeks yet. Keep recording honestly; you do not need to prove growth early.",
+    "nextTitle": "What to carry forward",
+    "nextDescription": "A small direction for the rhythm you have now, without asking every layer to be filled.",
+    "keepTitle": "Keep holding",
+    "keepWithLayer": "Keep the current minimum action for {layer}; there is no need to raise the bar.",
+    "keepFallback": "Let honest records continue before adding another expectation.",
+    "gentleTitle": "If you have room",
+    "gentleWithLayer": "Leave one light connection in {layer} and let the rhythm find its way back gradually.",
+    "noGentle": "Nothing needs to be filled in right now. Holding your current rhythm is enough.",
+    "basisNote": "This describes a behavior process, not a total score or a comparison of which life layer is better."
+  },
+  "fullRecord": {
+    "title": "View all layer records",
+    "tag": "On demand",
+    "description": "Expand to review 30-day connections, stage trends, and 12-week paths across {count} layers."
+  },
+  "growthMatrix": {
+    "title": "Layer Growth Matrix",
+    "tag": "Life Rhythm",
+    "description": "See how your actions take root across life layers over the past 30 days and settle into rhythm across 12 weeks.",
+    "rangeBadge": "30-day connection · 12-week path",
+    "methodTitle": "View calculation notes",
+    "methodHint": "collapsed by default",
+    "basisTag": "Current-plan basis",
+    "basisText": "Connections come from your recorded behavior. Planned opportunities and historical trends use the current plan as a stage estimate.",
+    "planBasisLabel": "Planned-opportunity basis",
+    "historyCompleteLabel": "Plan and pause history complete",
+    "historyIncomplete": "No; long-term trends are stage estimates",
+    "equalWeightNote": "The 30-day connection score is calculated for each item first, then combined with equal weight so high-frequency items do not dominate a layer.",
+    "sharedItemsNote": "Stage trends only compare items with planned opportunities in both 30-day periods.",
+    "cohortTitle": "Items included in each layer's stage comparison",
+    "weekLegend": "Week cells: solid means connected, light means planned with no connection recorded, and dashed means no plan that week.",
+    "colLayerStatus": "Layer & current state",
+    "colConnectionTrend": "30-day connection & trend",
+    "colContinuity": "12-week connection path",
+    "connectionLabel": "30-day connection",
+    "trendLabel": "Stage trend",
+    "itemCount": "{count} participating items",
+    "connectionEvidence": "{connected} recorded connections · {opportunities} planned opportunities",
+    "currentPrevious": "Latest 30 days {current}% · prior 30 days {previous}%",
+    "delta": "{delta} percentage points",
+    "comparableItems": "{count} shared items",
+    "connectedWeeks": "Connected weeks {connected}/{eligible}",
+    "currentRun": "Connected across the latest {count} consecutive planned weeks",
+    "noCurrentRun": "The latest planned week has no connection record yet",
+    "noEligibleWeeks": "No continuous path has formed in the past 12 weeks",
+    "scoreLabel": "30-day connection {score}%",
+    "sample": {
+      "NO_PLAN": "No plan set for this stage",
+      "FORMING": "Data settling in",
+      "PRELIMINARY": "A rhythm is beginning to show",
+      "SUFFICIENT": "A record has formed",
+      "NO_COMPARISON": "No comparable stage yet"
+    },
+    "phase": {
+      "NO_PLAN": "No plan set for this stage",
+      "DATA_FORMING": "Data settling in",
+      "PRELIMINARY": "A rhythm is beginning to show",
+      "NEW_LAYER": "New plan taking root",
+      "GROWING": "Growing",
+      "STABLE_ROOTED": "Stably rooted",
+      "KEEPING_RHYTHM": "Keeping rhythm",
+      "RECONNECTING": "Reconnecting",
+      "TEMPORARILY_QUIET": "Temporarily quiet"
+    }
+  },
+  "radarChart": {
+    "title": "Layer Connection Overview",
+    "auxiliaryTag": "Optional supporting view",
+    "description": "Expand to see the shape of connection across layers over the current 30 days.",
+    "disclaimer": "This view only shows the current distribution of layer connection. It does not imply that every layer needs equal investment or indicate which layer is growing faster. A layer without a plan is not treated as a zero score.",
+    "loading": "Loading layer connection overview...",
+    "connectionRate": "Equal-weight connection foundation: {rate}",
+    "noPlan": "No plan this stage",
+    "connectionDetail": "{count} connections / {opportunities} scheduled opportunities",
+    "tableColLayer": "Layer",
+    "tableColActual": "Actual Connections",
+    "tableColPlan": "Scheduled Opportunities",
+    "tableColRate": "Connection Foundation"
+  },
+  "energyPanel": {
+    "title": "Energy context from the past 7 days",
+    "tag": "Supporting context",
+    "description": "Use the past 7 days of energy states to understand when micro-actions or restorative rest made sense.",
+    "expandBtn": "Expand Background Analysis",
+    "collapseBtn": "Collapse Details",
+    "detailIntro": "Low energy micro-actions and intentional rest are both recognized as legitimate progress. Here is the distribution for this week:",
+    "levelHighTitle": "High Energy Progress",
+    "levelHighSub": "Energized state, deep execution of planned actions",
+    "levelHighBadge": "[High Energy]",
+    "levelNormalTitle": "Standard Execution",
+    "levelNormalSub": "Sustainable standard actions, solidifying system foundation",
+    "levelNormalBadge": "[Normal Rhythm]",
+    "levelLowTitle": "Low Energy Micro-Action",
+    "levelLowSub": "3-minute minimum viable action, preserving connection (not failure)",
+    "levelLowBadge": "[Low Micro-Action]",
+    "levelRestTitle": "Restorative Recharge",
+    "levelRestSub": "Active recharge for body and mind, preserves continuity",
+    "levelRestBadge": "[Intentional Rest]",
+    "daysSuffix": "days",
+    "unloggedNotice": "Plus {count} days with unlogged energy; unlogged represents unknown and is not mapped to any tier."
+  },
+  "dynamicTemplates": {
+    "defaultConnection": "You maintained a continuous connection with your life operating system this week.",
+    "lowEnergy": "Across {lowDays} low energy days this week, you still completed {lowActions} micro-actions to preserve your long-term connection.",
+    "rest": "You scheduled {restDays} intentional rest days, allowing your system to recharge peacefully.",
+    "habit": "You completed {habitCount} positive actions this week, steadily moving forward in your rhythm.",
+    "quit": "You maintained mindful self-awareness on reduction goals for {quitDays} days this week."
+  }
+}

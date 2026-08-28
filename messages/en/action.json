@@ -1,0 +1,57 @@
+{
+  "modal": {
+    "actualAmountLabel": "Actual Volume Today",
+    "targetBaselinePrefix": "Target Baseline: ",
+    "toolLinkPrefix": "Connected Tool: ",
+    "shortcuts": {
+      "half": "50% Half",
+      "base": "80% Baseline",
+      "target": "100% Target",
+      "high": "120% High",
+      "rest": "0 Rest"
+    },
+    "mapping": {
+      "autoMappingTag": "Auto Computed",
+      "highTitle": "Deep Focus Progress (High · {ratio}%)",
+      "highDesc": "Full energy! Exceeded target goals, building strong momentum.",
+      "normalTitle": "Standard Execution (Normal · {ratio}%)",
+      "normalDesc": "Target achieved, maintaining a steady, sustainable daily rhythm.",
+      "lowTitle": "Micro-Connection (Low · {ratio}%)",
+      "lowDesc": "Micro-connection maintained! Micro-actions on low energy days are genuine progress.",
+      "restTitle": "Intentional Rest & Recovery (Rest)",
+      "restDesc": "Zero volume logged. Recorded as intentional restorative rest, preserving rhythm continuity."
+    },
+    "binary": {
+      "stateLabel": "Execution Status Today",
+      "doneTitle": "Completed Today",
+      "doneSub": "Standard Execution (Normal)",
+      "restTitle": "Rested Today",
+      "restSub": "Intentional Rest (Rest)"
+    },
+    "restReason": {
+      "label": "Select Rest Reason (Objective & Neutral)",
+      "customPlaceholder": "Optional notes (e.g. headache, schedule change...)",
+      "presets": {
+        "sickness": "Physical Fatigue / Recovery",
+        "timeConflict": "Time Conflict / Other Priority",
+        "lowMood": "Low Mood / Depleted Energy",
+        "unexpectedEvent": "Unplanned Event",
+        "intentionalEmpty": "Intentional Break / Unwinding"
+      }
+    },
+    "reflection": {
+      "label": "Quick Reflection / Notes (Optional)",
+      "placeholder": "e.g. Steady rhythm today, felt comfortable..."
+    },
+    "confirmButton": "Confirm & Record Action",
+    "toast": {
+      "restTitle": "Rest & Recharge Logged",
+      "restDesc": "Rest comfortably. System rhythm connection is preserved.",
+      "lowTitle": "Micro-Action Logged",
+      "lowDesc": "Logged with actual volume ({amount} {unit}). Micro-actions are real progress!",
+      "highTitle": "High Energy Progress Logged",
+      "normalTitle": "Standard Daily Action Logged",
+      "generalDesc": "Check-in for \"{title}\" recorded."
+    }
+  }
+}

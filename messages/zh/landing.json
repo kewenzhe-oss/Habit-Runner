@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "eyebrow": "私人行动与节律系统",
+    "title": "每天一点，时间会放大。",
+    "subtitle": "记录你的日常行动，看见时间带来的变化。",
+    "ctaPrimary": "进入我的行动",
+    "ctaSecondary": "登录账户",
+    "imageAlt": "Habit Runner 今日行动工作台"
+  },
+  "adaptive": {
+    "sectionBadge": "生活自适应",
+    "sectionTitle": "允许微行动，也允许主动休整",
+    "sectionSubtext": "状态不好时做一点点，累了就主动停下。行动系统应该适应真实生活，而不是给你制造负罪感。",
+    "tierHighTitle": "充沛状态 · 深入投入",
+    "tierHighDesc": "深度阅读 45 分钟 / 高强度训练",
+    "tierHighBadge": "High Energy",
+    "tierNormalTitle": "日常节奏 · 稳定完成",
+    "tierNormalDesc": "阅读 20 分钟 / 基础训练",
+    "tierNormalBadge": "Normal",
+    "tierLowTitle": "低能量日 · 微行动保底",
+    "tierLowDesc": "读 1 个关键段落 / 5 分钟拉伸 · 依然算作完成",
+    "tierLowBadge": "Low Energy · 微行动",
+    "tierRestTitle": "有意识休整 · 蓄积精力",
+    "tierRestDesc": "主动休息不等于断签，生活节律自然延续",
+    "tierRestBadge": "Conscious Rest"
+  },
+  "trace": {
+    "sectionBadge": "时间痕迹",
+    "sectionTitle": "每一次行动，都会在时间里留下痕迹",
+    "sectionSubtext": "从第一天到第十二周，无需刻意坚持，你的生活节奏会自然浮现。",
+    "stat1Value": "56",
+    "stat1Label": "累计行动次数",
+    "stat1Unit": "次",
+    "stat2Value": "21",
+    "stat2Label": "留下痕迹天数",
+    "stat2Unit": "天",
+    "stat3Value": "14",
+    "stat3Label": "当前最高连续",
+    "stat3Unit": "天",
+    "matrixTitle": "近 4 周生活节律矩阵",
+    "matrixSubtitle": "真实起伏与持续沉淀的完整记录"
+  },
+  "openSource": {
+    "title": "完全开源透明",
+    "subtext": "数据透明，支持自行部署与扩展！",
+    "githubButton": "在 GitHub 上关注"
+  },
+  "footer": {
+    "slogan": "每天一点，时间会放大。",
+    "allRightsReserved": "保留所有权利。",
+    "signature": "by postsoma-2050",
+    "philosophy": "真实记录 · 尊重能量 · 长期运行"
+  }
+}

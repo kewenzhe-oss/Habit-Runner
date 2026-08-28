@@ -1,0 +1,19 @@
+{
+  "brand": "Habit Runner",
+  "links": {
+    "dashboard": "Dashboard",
+    "insights": "History",
+    "settings": "Settings"
+  },
+  "actions": {
+    "addItem": "New Item",
+    "signIn": "Sign In",
+    "signUp": "Create Account",
+    "signOut": "Sign Out",
+    "openAccountMenu": "Open account menu",
+    "skipToContent": "Skip to main content"
+  },
+  "mobileAria": {
+    "mobileNavLabel": "Mobile navigation"
+  }
+}

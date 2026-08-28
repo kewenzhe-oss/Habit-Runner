@@ -1,0 +1,113 @@
+{
+  "types": {
+    "habit": {
+      "title": "Positive Habit",
+      "sub": "Set target & triggers"
+    },
+    "quitHabit": {
+      "title": "Habit to Reduce",
+      "sub": "Triggers & risk windows"
+    },
+    "todo": {
+      "title": "To-Do Task",
+      "sub": "Due date & completion"
+    }
+  },
+  "fields": {
+    "quickAddTitle": "Quick Add Item",
+    "quickAddSubtitle": "Create with minimum essential details. Fine-tune anytime in advanced settings.",
+    "moreOptionsTitle": "More Options (Motivation, Triggers, Categories...)",
+    "optionalTag": "Optional",
+    "itemType": "Item Type *",
+    "habitName": "Habit Title *",
+    "habitPlaceholder": "e.g. Morning Deep Reading, Free Writing, Push-ups",
+    "quitName": "Reduction Goal *",
+    "quitPlaceholder": "e.g. No short videos 1 hour before sleep, Reduce impulse takeout",
+    "todoName": "Task Title *",
+    "todoPlaceholder": "e.g. Book annual health checkup, Submit review document",
+    "whyTitle": "What is this for? (Optional)",
+    "whyTag": "Pure motivation prompt",
+    "whyHabitPlaceholder": "e.g. Deepen cognitive capacity; Stay physically energized",
+    "whyQuitPlaceholder": "e.g. Protect deep sleep; Preserve focus and mental calm",
+    "triggerTitle": "Trigger Cue (Anchored behavior or time)",
+    "triggerTag": "Make habits happen naturally",
+    "triggerPlaceholder": "e.g. After brewing morning coffee, After evening routine, At desk",
+    "freqTitle": "Expected Frequency",
+    "freqDaily": "Daily (7 days)",
+    "freqWeekdays": "Weekdays (5 days)",
+    "freqTimes": "3~4 Times / Week",
+    "freqWeekends": "Weekends",
+    "unitTypeTitle": "Unit Type",
+    "unitTypeTime": "⏱️ Duration",
+    "unitTypeTimeSub": "e.g. Focus minutes",
+    "unitTypeCount": "🔢 Count",
+    "unitTypeCountSub": "e.g. Reps / Pages / Sets",
+    "unitTypeBinary": "🔘 Binary",
+    "unitTypeBinarySub": "Done / Rested",
+    "targetAmount": "Target Amount *",
+    "unitLabel": "Unit Label",
+    "unitLabelTimePlaceholder": "minutes / hours",
+    "unitLabelCountPlaceholder": "reps / pages / sets",
+    "quitContextTitle": "Trigger Context / Cues (Optional)",
+    "quitContextTag": "High-risk situations",
+    "quitContextPlaceholder": "e.g. Boredom, Late night fatigue, Work stress, Low mood",
+    "quitRiskWindowTitle": "High-Risk Window Alert (Defensive Context Awareness)",
+    "quitRiskWindowSub": "Awakens defensive self-awareness and pauses during vulnerable moments, distinct from execution cues.",
+    "quitRiskWindowPlaceholder": "e.g. In bed after 23:00, Returning home alone after work",
+    "dueDate": "Due Date",
+    "quickToday": "+ Due Today",
+    "quickTomorrow": "+ Due Tomorrow",
+    "quick3Days": "+ In 3 Days",
+    "quick1Week": "+ In 1 Week",
+    "todoRecurring": "Recurrence",
+    "recurOnce": "Once Only",
+    "recurWeekly": "Weekly",
+    "recurMonthly": "Monthly",
+    "layerTitle": "Life Layer",
+    "layerTag": "For Review Balance Radar",
+    "customCategoryTitle": "Category Tag",
+    "customCategoryPlaceholder": "or enter custom category name...",
+    "toolUrlTitle": "Connected Tool HTTPS URL (Optional)",
+    "toolUrlPlaceholder": "e.g. https://read.example.com",
+    "linkAdvancedPage": "Go to Full Settings →",
+    "saveImmediate": "Save Item",
+    "saveChanges": "Save Changes"
+  },
+  "layers": {
+    "BODY": {
+      "label": "Body",
+      "zhLabel": "Body & Vitality",
+      "description": "Exercise, sleep, nutrition, recovery and physical stamina"
+    },
+    "CRAFT": {
+      "label": "Craft",
+      "zhLabel": "Craft & Work",
+      "description": "Professional craft, coding, design, art and project execution"
+    },
+    "SIGNAL": {
+      "label": "Signal",
+      "zhLabel": "Signal & Learning",
+      "description": "Deep reading, general learning, quality knowledge absorption"
+    },
+    "MEMORY": {
+      "label": "Memory",
+      "zhLabel": "Memory & Organization",
+      "description": "Reflection, note organization, knowledge crystallization"
+    },
+    "JUDGMENT": {
+      "label": "Judgment",
+      "zhLabel": "Judgment & Vision",
+      "description": "Major decisions, financial planning, strategic calibration"
+    },
+    "CONTEMPLATION": {
+      "label": "Contemplation",
+      "zhLabel": "Contemplation & Rest",
+      "description": "Meditation, stress release, solitary walking and margin"
+    },
+    "LIFE": {
+      "label": "Life",
+      "zhLabel": "Daily Life",
+      "description": "Daily routines, communication, decluttering and environment"
+    }
+  }
+}

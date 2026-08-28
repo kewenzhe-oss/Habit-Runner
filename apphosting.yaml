@@ -1,0 +1,32 @@
+# Settings for Cloud Run
+runConfig:
+  minInstances: 0
+  maxInstances: 2
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 1024
+
+# Environment variables and secrets
+env:
+  - variable: NEXTAUTH_URL
+    value: "https://habit-runner-2050.web.app"
+  - variable: NEXT_PUBLIC_APP_URL
+    value: "https://habit-runner-2050.web.app"
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyAc41HyGzUDsTMf69JUR_My0mb79u0OlmA"
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "habit-runner-2050.firebaseapp.com"
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "habit-runner-2050"
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "habit-runner-2050.firebasestorage.app"
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "925969151664"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:925969151664:web:1256f3f77821bae97f2d75"
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: "G-9V8WQSM3Q5"
+  - variable: DATABASE_URL
+    secret: DATABASE_URL
+  - variable: NEXTAUTH_SECRET
+    secret: NEXTAUTH_SECRET

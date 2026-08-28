@@ -1,0 +1,113 @@
+{
+  "types": {
+    "habit": {
+      "title": "正向习惯",
+      "sub": "设置目标与触发"
+    },
+    "quitHabit": {
+      "title": "戒除行为",
+      "sub": "诱因与时段觉察"
+    },
+    "todo": {
+      "title": "待办任务",
+      "sub": "截止时间与办结"
+    }
+  },
+  "fields": {
+    "quickAddTitle": "快速新建事项",
+    "quickAddSubtitle": "先建立最小必要信息，细节可随时在高级配置中完善",
+    "moreOptionsTitle": "更多补充配置（动机、触发提示、分类等）",
+    "optionalTag": "可选",
+    "itemType": "事项类型 *",
+    "habitName": "习惯名称 *",
+    "habitPlaceholder": "例如：晨间深度阅读、自由写作、俯卧撑",
+    "quitName": "戒除 / 减少事项 *",
+    "quitPlaceholder": "例如：睡前 1 小时不刷短视频、减少冲动点外卖",
+    "todoName": "待办任务名称 *",
+    "todoPlaceholder": "例如：预约年度体检、提交阶段复盘文档",
+    "whyTitle": "这是为了什么（可选）",
+    "whyTag": "仅用于展示初心与动力",
+    "whyHabitPlaceholder": "例如：沉淀深度心智力；保持体能充沛",
+    "whyQuitPlaceholder": "例如：保护高质量睡眠；保护专注力与情绪平静",
+    "triggerTitle": "触发提示 (依附行为 / 时间点)",
+    "triggerTag": "让习惯自然发生",
+    "triggerPlaceholder": "例如：起床冲咖啡后、晚上洗漱完毕后、坐在工位时",
+    "freqTitle": "预期频率",
+    "freqDaily": "每天 (7天)",
+    "freqWeekdays": "工作日 (5天)",
+    "freqTimes": "每周 3~4 次",
+    "freqWeekends": "周末专注",
+    "unitTypeTitle": "单位类型",
+    "unitTypeTime": "⏱️ 时间型",
+    "unitTypeTimeSub": "如专注分钟数",
+    "unitTypeCount": "🔢 数量型",
+    "unitTypeCountSub": "如个数/页数/组数",
+    "unitTypeBinary": "🔘 二元型",
+    "unitTypeBinarySub": "仅记录做了/没做",
+    "targetAmount": "目标量 *",
+    "unitLabel": "单位名称",
+    "unitLabelTimePlaceholder": "分钟 / 小时",
+    "unitLabelCountPlaceholder": "个 / 页 / 组",
+    "quitContextTitle": "触发因素 / 情境诱因（可选）",
+    "quitContextTag": "记录高发情境",
+    "quitContextPlaceholder": "例如：无聊空虚、深夜疲惫、工作压力、情绪低落",
+    "quitRiskWindowTitle": "高风险时段觉察提醒（提醒你注意此刻情境，而非去执行某事）",
+    "quitRiskWindowSub": "用于在特定时段主动唤醒防御性自我觉察与停顿，区别于习惯表单的执行提示。",
+    "quitRiskWindowPlaceholder": "例如：23:00 以后躺在床上时、独自下班回家后",
+    "dueDate": "截止日期",
+    "quickToday": "+ 今天截止",
+    "quickTomorrow": "+ 明天截止",
+    "quick3Days": "+ 3天后",
+    "quick1Week": "+ 1周后",
+    "todoRecurring": "是否重复",
+    "recurOnce": "仅此单次",
+    "recurWeekly": "每周重复",
+    "recurMonthly": "每月重复",
+    "layerTitle": "生活领域",
+    "layerTag": "用于复盘平衡雷达",
+    "customCategoryTitle": "自定义分类标签",
+    "customCategoryPlaceholder": "或直接输入自定义新分类名称...",
+    "toolUrlTitle": "关联外部工具 HTTPS 网址 (可选)",
+    "toolUrlPlaceholder": "例如：https://read.example.com",
+    "linkAdvancedPage": "前往完整高级配置页 →",
+    "saveImmediate": "立即保存",
+    "saveChanges": "保存修改"
+  },
+  "layers": {
+    "BODY": {
+      "label": "Body",
+      "zhLabel": "身体与能量",
+      "description": "运动、睡眠、饮食、体能恢复与躯体活力"
+    },
+    "CRAFT": {
+      "label": "Craft",
+      "zhLabel": "技能与创造",
+      "description": "专业手艺、编程、设计、艺术创作与项目推进"
+    },
+    "SIGNAL": {
+      "label": "Signal",
+      "zhLabel": "学习与输入",
+      "description": "深度阅读、通识学习、吸收优质信息与语言"
+    },
+    "MEMORY": {
+      "label": "Memory",
+      "zhLabel": "笔记与整理",
+      "description": "反思复盘、笔记整理、知识沉淀与系统维护"
+    },
+    "JUDGMENT": {
+      "label": "Judgment",
+      "zhLabel": "决策与方向",
+      "description": "重大决策、财务理财、战略思考与方向校准"
+    },
+    "CONTEMPLATION": {
+      "label": "Contemplation",
+      "zhLabel": "沉思与休息",
+      "description": "冥想正念、心理减压、散步独处与留白"
+    },
+    "LIFE": {
+      "label": "Life",
+      "zhLabel": "日常生活",
+      "description": "生活琐事、人际联络、环境整理与日常维护"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Habit Runner",
+  "short_name": "Habit Runner",
+  "description": "用今天真正拥有的能量，运行你想长期成为的人。",
+  "lang": "zh-CN",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#171717",
+  "background_color": "#0a0a0a",
+  "display": "standalone"
+}

@@ -1,0 +1,53 @@
+{
+  "appName": "URUS",
+  "appDescription": "低能量友好的个人行动系统，帮你在不同精力状态下持续运行。",
+  "brandTagline": "可持续的人生节律与微小行动系统",
+  "theme": {
+    "toggle": "切换色彩模式",
+    "light": "日间明亮",
+    "dark": "夜间深色",
+    "system": "跟随系统"
+  },
+  "energy": {
+    "high": "High",
+    "normal": "Normal",
+    "low": "Low",
+    "rest": "Rest"
+  },
+  "energyDescriptions": {
+    "high": "状态饱满，适合攻坚或高投入任务",
+    "normal": "标准状态，按日常节奏推进核心事项",
+    "low": "精力有限，聚焦微小行动与最低底线",
+    "rest": "主动休整蓄能，保护系统不中断"
+  },
+  "actions": {
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "confirm": "确定",
+    "close": "关闭",
+    "search": "搜索",
+    "filter": "筛选",
+    "reset": "重置",
+    "back": "返回",
+    "rename": "重命名"
+  },
+  "status": {
+    "loading": "加载中...",
+    "saving": "保存中...",
+    "success": "操作成功",
+    "error": "操作失败",
+    "empty": "暂无数据"
+  },
+  "notifications": {
+    "titleRequired": "请填写事项名称",
+    "saveSuccess": "保存成功",
+    "saveFailed": "保存失败，请稍后重试",
+    "deleteSuccess": "已删除",
+    "deleteFailed": "删除失败，请稍后重试",
+    "updateSuccess": "更新成功",
+    "updateFailed": "更新失败，请稍后重试",
+    "networkError": "网络连接异常，请检查网络后重试"
+  }
+}

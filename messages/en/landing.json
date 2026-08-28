@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "eyebrow": "Personal Action & Rhythm System",
+    "title": "A little every day, magnified over time.",
+    "subtitle": "Record your daily actions, see what time brings.",
+    "ctaPrimary": "Enter My Actions",
+    "ctaSecondary": "Sign In",
+    "imageAlt": "Habit Runner Today Action Workspace"
+  },
+  "adaptive": {
+    "sectionBadge": "Adaptive Rhythm",
+    "sectionTitle": "Allow micro-actions, allow conscious rest",
+    "sectionSubtext": "Do a little when energy is low, pause mindfully when tired. An action system should adapt to real life, not create guilt.",
+    "tierHighTitle": "High Energy · Deep Immersion",
+    "tierHighDesc": "Deep reading for 45 min / Intense workout",
+    "tierHighBadge": "High Energy",
+    "tierNormalTitle": "Steady Rhythm · Standard Action",
+    "tierNormalDesc": "Read for 20 min / Regular workout",
+    "tierNormalBadge": "Normal",
+    "tierLowTitle": "Low Energy · Micro-Action",
+    "tierLowDesc": "Read 1 key passage / 5-min stretch · Still counts as done",
+    "tierLowBadge": "Low Energy · Micro",
+    "tierRestTitle": "Conscious Rest · Recharge",
+    "tierRestDesc": "Active recovery is not a broken streak; rhythm continues",
+    "tierRestBadge": "Conscious Rest"
+  },
+  "trace": {
+    "sectionBadge": "Trace of Time",
+    "sectionTitle": "Every action leaves a trace in time",
+    "sectionSubtext": "From week one to week twelve, no rigid pressure needed—your authentic life rhythm naturally emerges.",
+    "stat1Value": "56",
+    "stat1Label": "Total Actions",
+    "stat1Unit": "times",
+    "stat2Value": "21",
+    "stat2Label": "Active Days",
+    "stat2Unit": "days",
+    "stat3Value": "14",
+    "stat3Label": "Current Streak",
+    "stat3Unit": "days",
+    "matrixTitle": "4-Week Rhythm Matrix",
+    "matrixSubtitle": "Complete record of real life rhythm and steady accumulation"
+  },
+  "openSource": {
+    "title": "Fully Open Source & Transparent",
+    "subtext": "Complete data ownership. Host and customize anywhere.",
+    "githubButton": "Star on GitHub"
+  },
+  "footer": {
+    "slogan": "A little every day, magnified over time.",
+    "allRightsReserved": "All rights reserved.",
+    "signature": "by postsoma-2050",
+    "philosophy": "Real Records · Respect Energy · Run for the Long Term"
+  }
+}

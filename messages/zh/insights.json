@@ -1,0 +1,208 @@
+{
+  "header": {
+    "title": "行动历史",
+    "periodLabel": "近 16 周",
+    "rangeText": "行动全景记录：{from} 至 {to}"
+  },
+  "activityHistory": {
+    "headerTitle": "行动历史",
+    "headerSubtitle": "回看你的日常记录与坚持走势",
+    "stats": {
+      "totalCheckIns": "累计行动",
+      "activeDays": "活跃天数",
+      "bestStreak": "当前最高连续",
+      "timesUnit": "次",
+      "daysUnit": "天"
+    },
+    "starter": {
+      "title": "本周生活节律",
+      "subtitle": "专注看见这几天的真实发生",
+      "hint": "🌱 记录正在逐步积累，本周的每一次行动都算数。",
+      "recentTitle": "最近打卡记录",
+      "recentSubtext": "近 {count} 笔行动"
+    },
+    "forming": {
+      "title": "近 4 周日常节律",
+      "subtitle": "观察跨周节律与稳固过程"
+    },
+    "heatmap": {
+      "title": "行动全景热图",
+      "description": "宏观回看长周期的生活起伏与坚持",
+      "legendHigh": "充沛",
+      "legendNormal": "完成",
+      "legendLow": "微行动",
+      "legendRest": "休整",
+      "legendEmpty": "未记录",
+      "todayPending": "今日待办",
+      "actionsCount": "{count} 次行动"
+    },
+    "activeItems": {
+      "title": "坚持中的日常",
+      "description": "查看每个日常的连续天数与本周节律，点击可查看单事项专属走势。",
+      "streakLabel": "当前连续",
+      "longestLabel": "历史最高",
+      "totalCompleted": "累计完成 {count} 次",
+      "empty": "还没有添加日常。先建一个简单的行动吧。"
+    },
+    "completedTodos": {
+      "title": "最近已办结待办",
+      "description": "查看近期完成并闭环的单次待办事项记录。",
+      "empty": "近期暂无已办结的待办事项。",
+      "completedOn": "办结于 {date}"
+    }
+  },
+  "rhythmCard": {
+    "title": "周度节律洞察",
+    "tag": "行为痕迹密度",
+    "statHabit": "正向行动完成",
+    "statHabitTag": "[行动]",
+    "statRest": "主动恢复日",
+    "statRestTag": "[休整]",
+    "statQuit": "戒除保持天数",
+    "statQuitTag": "[自律]",
+    "statTodo": "待办事项办结",
+    "statTodoTag": "[办结]",
+    "timesUnit": "次",
+    "daysUnit": "天",
+    "itemsUnit": "项"
+  },
+  "weeklyReview": {
+    "eyebrow": "最近 30 天 · 成长过程",
+    "question": "这段时间，你主要把生活放在了哪里？",
+    "focusWithLayers": "你的行动主要落在{layers}。",
+    "focusEmpty": "这段时间还没有形成明确重心，让真实记录继续沉淀就好。",
+    "states": {
+      "DATA_SETTLING": "数据沉淀中",
+      "FOCUSED_ROOTING": "集中扎根中",
+      "MULTI_LAYER_GROWTH": "多点生长中",
+      "RECONNECTING": "重新连接中",
+      "QUIET_SETTLING": "安静沉淀中"
+    },
+    "stateDescriptions": {
+      "DATA_SETTLING": "记录还在沉淀，先让真实节律多出现几次，不急着定义成长。",
+      "FOCUSED_ROOTING": "少数领域正在连续出现，这段时间更像是在集中扎根。",
+      "MULTI_LAYER_GROWTH": "多个领域都留下了跨周痕迹，生活正在多点展开。",
+      "RECONNECTING": "一些曾经出现的节律正在重新接上，不需要一次恢复到原来的强度。",
+      "QUIET_SETTLING": "目前的行动痕迹较少，这更适合被理解为沉淀期，而不是退步。"
+    },
+    "evidenceEstablished": "有 {connected} 个领域留下真实行动，其中 {established} 个已经出现跨周连续性。",
+    "evidenceSettling": "有 {connected} 个领域留下真实行动，目前样本仍在沉淀。",
+    "evidenceEmpty": "目前还没有足够的行为痕迹用于判断重心。",
+    "journeyTitle": "正在慢慢长出来",
+    "settlingTitle": "正在沉淀的节律",
+    "journeyDescription": "不看单次得分，只看这些领域是否在不同周持续留下行动。",
+    "trackLabel": "12 周成长轨迹",
+    "weeksConnected": "过去 12 周，{eligible} 个有计划周中有 {connected} 周留下连接。",
+    "runContinues": "最近连续 {count} 个有计划周仍在继续。",
+    "runSettling": "最近的节律仍在重新形成。",
+    "noTrack": "近 12 周还没有形成可观察轨迹。",
+    "noJourneyYet": "还没有足够的跨周痕迹。先继续真实记录，不需要急着证明自己正在成长。",
+    "nextTitle": "接下来",
+    "nextDescription": "只给现在的节奏一个小方向，不要求补齐所有领域。",
+    "keepTitle": "继续守住",
+    "keepWithLayer": "为{layer}保留现在的最小动作就好，不需要提高标准。",
+    "keepFallback": "先继续留下真实记录，不急着为自己增加新的要求。",
+    "gentleTitle": "如果还有余力",
+    "gentleWithLayer": "可以为{layer}留下一次轻量连接，让节律慢慢接回来。",
+    "noGentle": "目前不需要补齐所有领域，继续守住现在的节奏就足够了。",
+    "basisNote": "这里描述的是行为过程，不是综合评分，也不用于比较领域之间的好坏。"
+  },
+  "fullRecord": {
+    "title": "查看全部领域记录",
+    "tag": "按需查看",
+    "description": "展开核对 {count} 个领域的 30 天连接、阶段趋势与 12 周轨迹。"
+  },
+  "growthMatrix": {
+    "title": "领域成长矩阵",
+    "tag": "生活节律",
+    "description": "观察过去 30 天与 12 周里，你在各个生活领域的行动扎根与节律沉淀。",
+    "rangeBadge": "30 天连接 · 12 周轨迹",
+    "methodTitle": "查看计算口径",
+    "methodHint": "默认收起",
+    "basisTag": "当前计划口径",
+    "basisText": "行为连接来自你的真实记录；计划机会与历史趋势使用当前计划做阶段估算。",
+    "planBasisLabel": "计划机会口径",
+    "historyCompleteLabel": "计划与暂停历史完整",
+    "historyIncomplete": "否，长期趋势为阶段估算",
+    "equalWeightNote": "30 天连接度会先分别计算每个事项，再以相同权重合并，避免高频事项主导整个领域。",
+    "sharedItemsNote": "阶段趋势只比较前后两个 30 天里都存在计划机会的事项。",
+    "cohortTitle": "各领域参与阶段比较的事项数",
+    "weekLegend": "周格：实色表示有连接，浅色表示有计划但尚无连接记录，虚线表示该周无计划。",
+    "colLayerStatus": "领域与当前状态",
+    "colConnectionTrend": "30 天连接与趋势",
+    "colContinuity": "12 周连续轨迹",
+    "connectionLabel": "30 天连接度",
+    "trendLabel": "阶段趋势",
+    "itemCount": "{count} 个参与事项",
+    "connectionEvidence": "{connected} 次真实连接 · {opportunities} 次计划机会",
+    "currentPrevious": "最近 30 天 {current}% · 前 30 天 {previous}%",
+    "delta": "{delta} 个百分点",
+    "comparableItems": "{count} 个共同事项",
+    "connectedWeeks": "连接周 {connected}/{eligible}",
+    "currentRun": "已连续 {count} 个有计划周保持连接",
+    "noCurrentRun": "最近一个有计划周尚未留下连接记录",
+    "noEligibleWeeks": "近 12 周暂未形成连续轨迹",
+    "scoreLabel": "30 天连接度 {score}%",
+    "sample": {
+      "NO_PLAN": "本阶段暂未设计划",
+      "FORMING": "数据沉淀中",
+      "PRELIMINARY": "节律初步显现",
+      "SUFFICIENT": "记录已形成",
+      "NO_COMPARISON": "暂无可比阶段"
+    },
+    "phase": {
+      "NO_PLAN": "本阶段暂未设计划",
+      "DATA_FORMING": "数据沉淀中",
+      "PRELIMINARY": "节律初步显现",
+      "NEW_LAYER": "新计划建立中",
+      "GROWING": "正在生长",
+      "STABLE_ROOTED": "稳定扎根",
+      "KEEPING_RHYTHM": "保持节律",
+      "RECONNECTING": "重新连接",
+      "TEMPORARILY_QUIET": "暂时静息"
+    }
+  },
+  "radarChart": {
+    "title": "领域连接概览",
+    "auxiliaryTag": "可选辅助视图",
+    "description": "展开查看当前 30 天各领域的连接分布形状。",
+    "disclaimer": "此图只展示当前领域连接分布，不代表所有领域都需要保持相同投入，也不用于判断成长快慢。无计划领域不会被解释为零分。",
+    "loading": "加载领域连接概览...",
+    "connectionRate": "事项等权连接基础：{rate}",
+    "noPlan": "本阶段未设置计划",
+    "connectionDetail": "{count} 次连接 / {opportunities} 次计划机会",
+    "tableColLayer": "领域",
+    "tableColActual": "实际连接",
+    "tableColPlan": "计划机会",
+    "tableColRate": "连接基础"
+  },
+  "energyPanel": {
+    "title": "最近 7 天的能量背景",
+    "tag": "辅助解释",
+    "description": "用最近 7 天的能量状态，理解哪些日子采用了微行动或主动休整。",
+    "expandBtn": "展开背景分析",
+    "collapseBtn": "收起详情",
+    "detailIntro": "系统将 Low 能量微行动与主动休整均视为真实合法推进。以下为本周各档位能量在记录中的分布情况：",
+    "levelHighTitle": "高能量推进",
+    "levelHighSub": "状态充沛，完整深度执行既定行动",
+    "levelHighBadge": "[High 充沛推进]",
+    "levelNormalTitle": "平稳标准执行",
+    "levelNormalSub": "标准可持续的日常动作，稳固系统基底",
+    "levelNormalBadge": "[Normal 平稳日常]",
+    "levelLowTitle": "低能量微行动",
+    "levelLowSub": "3分钟最低可行行动，疲惫时维持连接（绝非失败）",
+    "levelLowBadge": "[Low 微小连接]",
+    "levelRestTitle": "主动恢复休整",
+    "levelRestSub": "身体与心智的主动蓄能日，合法休整不计断签",
+    "levelRestBadge": "[Rest 有意识休整]",
+    "daysSuffix": "天",
+    "unloggedNotice": "另有 {count} 天未填写能量背景；未填写仅表示未知，不会被归到任何能量档位。"
+  },
+  "dynamicTemplates": {
+    "defaultConnection": "你在本周持续保持了与自身生活系统的连接。",
+    "lowEnergy": "你在本周的 {lowDays} 个低能量日中，仍然完成了 {lowActions} 次最低可行行动版本，保持了长期连接。",
+    "rest": "你为自己安排了 {restDays} 个有意识的休息日，让生活系统平稳蓄能。",
+    "habit": "本周你累计执行了 {habitCount} 次正向行动，在日常节奏中稳步前行。",
+    "quit": "本周你在戒除目标上保持了 {quitDays} 天的专注守护。"
+  }
+}
