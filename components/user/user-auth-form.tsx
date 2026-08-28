@@ -31,33 +31,52 @@ export function UserAuthForm({
   // Auth pages are public entry environment -> strictly English
   const dict = getDictionary("en").auth.signIn
 
+  const [demoEmail, setDemoEmail] = React.useState("dwsun396@gmail.com")
+
   return (
     <div className={cn("grid gap-3", className)} {...props}>
       {demoEnabled && (
-        <button
-          type="button"
-          className={cn(
-            buttonVariants({ variant: "default" }),
-            "min-h-11 gap-2 bg-primary font-semibold text-primary-foreground shadow-md"
-          )}
-          onClick={() => {
-            setIsDemoLoading(true)
-            setIsLoading(true)
-            signIn("credentials", {
-              email: "demo@habitrunner.dev",
-              name: "Demo Runner",
-              callbackUrl,
-            })
-          }}
-          disabled={isLoading}
-        >
-          {isDemoLoading ? (
-            <Icons.spinner className="h-4 w-4 animate-spin" />
-          ) : (
-            <Icons.habit className="h-4 w-4" />
-          )}
-          <span>{dict.demoLogin}</span>
-        </button>
+        <div className="space-y-2 rounded-lg border border-primary/20 bg-primary/5 p-3">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-primary">
+            <Icons.habit className="h-3.5 w-3.5" />
+            <span>本地快速登录 (Local Dev Login)</span>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="email"
+              value={demoEmail}
+              onChange={(e) => setDemoEmail(e.target.value)}
+              placeholder="dwsun396@gmail.com"
+              className="flex-1 rounded-md border border-input bg-background px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+            <button
+              type="button"
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                "h-auto px-3 py-1.5 text-xs font-semibold text-primary-foreground shadow-xs"
+              )}
+              onClick={() => {
+                setIsDemoLoading(true)
+                setIsLoading(true)
+                signIn("credentials", {
+                  email: demoEmail.trim() || "dwsun396@gmail.com",
+                  name: (demoEmail.split("@")[0] || "Demo Runner"),
+                  callbackUrl,
+                })
+              }}
+              disabled={isLoading}
+            >
+              {isDemoLoading ? (
+                <Icons.spinner className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                "一键登录"
+              )}
+            </button>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            本地开发免密模式：可直接以 <span className="font-mono text-foreground font-medium">dwsun396@gmail.com</span> 身份进入
+          </p>
+        </div>
       )}
 
       {demoEnabled && (googleEnabled || githubEnabled) && (
