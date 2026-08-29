@@ -4,6 +4,7 @@ import Link from "next/link"
 import { env } from "@/env.mjs"
 import { buildSignUpUrl, resolvePostSignInPath } from "@/lib/auth-redirect"
 import { getDictionary } from "@/lib/i18n"
+import { PRIVATE_ROBOTS } from "@/lib/seo"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
@@ -14,6 +15,7 @@ const dict = getDictionary("en")
 export const metadata: Metadata = {
   title: dict.auth.signIn.title,
   description: dict.auth.signIn.subtitle,
+  robots: PRIVATE_ROBOTS,
 }
 
 interface SigninProps {

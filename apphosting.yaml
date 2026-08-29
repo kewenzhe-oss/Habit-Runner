@@ -9,9 +9,9 @@ runConfig:
 # Environment variables and secrets
 env:
   - variable: NEXTAUTH_URL
-    value: "https://habit-runner-2050.web.app"
+    value: "https://habits.dpdns.org"
   - variable: NEXT_PUBLIC_APP_URL
-    value: "https://habit-runner-2050.web.app"
+    value: "https://habits.dpdns.org"
   - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     value: "AIzaSyAc41HyGzUDsTMf69JUR_My0mb79u0OlmA"
   - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN

@@ -14,7 +14,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-App_Hosting-FFCA28?style=flat-square&logo=firebase)](https://firebase.google.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg?style=flat-square)](LICENSE)
 
-[在线体验](https://github.com/kewenzhe-oss/Habit-Runner) · [快速开始](#-快速开始) · [核心特性](#-核心设计理念) · [部署指南](#-部署指南)
+[在线体验](https://habits.dpdns.org/) · [快速开始](#-快速开始) · [核心特性](#-核心设计理念) · [部署指南](#-部署指南)
 
 </div>
 

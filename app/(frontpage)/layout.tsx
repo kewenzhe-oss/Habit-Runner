@@ -15,6 +15,7 @@ export default async function FrontPageLayout({
     <>
       <Navbar
         isAuthenticated={Boolean(user?.id)}
+        variant="public"
         user={{
           name: user?.name,
           image: user?.image,
@@ -23,7 +24,7 @@ export default async function FrontPageLayout({
         locale="en"
       />
       {children}
-      <Footer locale="en" />
+      <Footer locale="en" variant="public" />
     </>
   )
 }

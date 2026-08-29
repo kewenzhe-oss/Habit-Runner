@@ -1,0 +1,21 @@
+# Habit Runner
+
+> Habit Runner is an open-source, energy-adaptive action system for building habits, reducing unwanted behaviors, and completing tasks without treating low-energy days or conscious rest as failure.
+
+## Start here
+
+- [Habit Runner](https://habits.dpdns.org/): Public product overview and entry point.
+- [About Habit Runner](https://habits.dpdns.org/about): Mission, methodology, evidence boundaries, privacy, maintainership, and citation guidance.
+- [Search public knowledge](https://habits.dpdns.org/search): Search the project's public product and methodology index.
+
+## Core concepts
+
+- [Energy-adaptive rhythm](https://habits.dpdns.org/#adaptive-rhythm): High, Normal, Low, and Rest are valid ways to respond to the energy available today.
+- [Long-term action traces](https://habits.dpdns.org/#trace-history): Habit Runner emphasizes accumulated behavior and rhythm over binary streak pressure.
+- [Methodology and limitations](https://habits.dpdns.org/about#methodology): What the product derives from behavior records and what it does not claim.
+
+## Project resources
+
+- [Full machine-readable project knowledge](https://habits.dpdns.org/llms-full.txt): Detailed product, data, privacy, and citation context.
+- [Open-source repository](https://github.com/kewenzhe-oss/Habit-Runner): Source code, technical architecture, and MIT license.
+- [Citation guide](https://habits.dpdns.org/about#citation): Recommended citation formats and canonical links.

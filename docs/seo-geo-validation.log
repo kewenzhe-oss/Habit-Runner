@@ -1,0 +1,75 @@
+Habit Runner SEO/GEO validation log
+Date: 2026-08-29
+Canonical origin: https://habits.dpdns.org
+
+[PASS] Skill validator
+Command: python3 /Users/grangerfdad/.codex/skills/.system/skill-creator/scripts/quick_validate.py .agents/skills/geo-seo-optimization
+Result: Skill is valid.
+
+[PASS] Deterministic SEO/GEO source validation
+Command: pnpm seo:check
+Result: all required files, 14 crawler agents, canonical-domain checks, llms sections, schema types, and no-fabricated-rating checks passed.
+
+[PASS] SEO-specific Jest tests
+Command: pnpm exec jest --runInBand __tests__/seo
+Result: 3 suites passed; 12 tests passed; 0 failures.
+
+[PASS] ESLint
+Command: pnpm lint --max-warnings=0
+Result: 0 errors; 0 warnings.
+
+[PASS] TypeScript
+Command: pnpm exec tsc --noEmit
+Result: 0 errors.
+
+[PASS] Full Jest suite
+Command: pnpm exec jest --ci --runInBand
+Result: 31 suites passed; 109 tests passed; 0 failures.
+Note: existing React/Radix act(...) console notices remain in the migration UI test.
+
+[PASS] Production build in isolated temporary copy
+Command: SKIP_ENV_VALIDATION=1 pnpm build
+Framework: Next.js 15.5.21
+Result: compiled successfully; lint/type validation passed; 29/29 static generation steps completed.
+Note: Browserslist reported that caniuse-lite data can be updated. This is not an ESLint warning or build failure.
+
+[PASS] Production HTTP routes
+Base: http://127.0.0.1:3105
+200 /
+200 /about
+200 /search?q=energy
+200 /robots.txt
+200 /sitemap.xml
+200 /llms.txt
+200 /llms-full.txt
+200 /signin
+
+[PASS] Rendered metadata
+About canonical: https://habits.dpdns.org/about
+Search robots: noindex, follow
+Sign-in robots: noindex, nofollow, nocache
+JSON-LD: Organization, WebSite, WebApplication, AboutPage, BreadcrumbList, SearchAction, SearchResultsPage present where intended.
+
+[PASS] robots.txt
+Required AI/search agents present: 14/14
+Private route disallows present: 8/8
+Host: https://habits.dpdns.org
+Sitemap: https://habits.dpdns.org/sitemap.xml
+
+[PASS] sitemap.xml
+Entries: 2
+- https://habits.dpdns.org/
+- https://habits.dpdns.org/about
+Cross-domain entries: 0
+
+[PASS] Responsive UI review
+Desktop: 1280x800
+Mobile: 375x812
+Horizontal overflow: none
+Themes checked: dark and light
+Public search query checked: privacy -> Privacy and scope boundaries
+
+[BASELINE DEBT] Repository-wide Prettier
+Command: pnpm format:check
+Result: 65 pre-existing out-of-scope files reported formatting differences.
+Decision: do not rewrite unrelated files. All implementation code files were formatted with the project Prettier configuration.

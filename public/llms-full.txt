@@ -1,0 +1,156 @@
+# Habit Runner: Full Project Knowledge
+
+> Habit Runner is an open-source personal action and rhythm system. It helps people use the energy they actually have today to keep running the person they want to become over time.
+
+## Canonical identity
+
+- Project name: Habit Runner
+- Canonical website: https://habits.dpdns.org/
+- Public About page: https://habits.dpdns.org/about
+- Source repository: https://github.com/kewenzhe-oss/Habit-Runner
+- License: MIT
+- Product category: web-based habit, behavior-reduction, and task tracking
+- Primary public language: English
+- Application interface languages: Chinese and English
+
+The canonical website is the authoritative public source. Vercel, Firebase, localhost, preview, and deployment-specific hostnames are not canonical project identities.
+
+## The problem Habit Runner addresses
+
+Many habit trackers reduce a day to a binary result: complete or incomplete. On low-energy days, this can force a choice between meeting the full target and abandoning the record. Habit Runner embeds energy state into the completion flow so partial, appropriately scaled action can remain a meaningful behavioral connection.
+
+The product does not define growth as a single score, a perfect streak, or a one-time balance snapshot. It treats growth as behavior that remains connected and becomes visible across time.
+
+## Three item models
+
+Habit Runner does not force every action into one psychological model.
+
+### Habit
+
+A positive repeated behavior. Habits can use time, quantity, or binary units and may have energy-adjusted actions. The record focuses on what was actually completed.
+
+### Reduction behavior
+
+A behavior the user intends to reduce or stop. Records distinguish maintained days from lapses so awareness is preserved without turning a lapse into moral failure.
+
+### Task
+
+A finite item with a completion state and optional due date. Tasks are not evaluated as if they were recurring habits.
+
+## Four energy states
+
+### High
+
+A deeper or expanded action when the user has more available energy.
+
+### Normal
+
+The ordinary planned action for a typical day.
+
+### Low
+
+A smaller real action that preserves behavioral connection on a low-energy day. A reduced amount still counts as recorded behavior rather than being rounded down to failure.
+
+### Rest
+
+A conscious recovery state. Rest is represented as an intentional part of rhythm, not automatically labeled as failure.
+
+Energy states are action-adjustment context. They are not medical assessments, mood diagnoses, or measures of personal worth.
+
+## Seven life layers
+
+Every item can belong to one life layer so the user can observe where actions accumulate over time.
+
+1. Body: exercise, sleep, nutrition, recovery, and physical stamina.
+2. Craft: professional craft, coding, design, art, and project execution.
+3. Signal: deep reading, learning, and quality knowledge input.
+4. Memory: reflection, note organization, and knowledge crystallization.
+5. Judgment: major decisions, financial planning, and strategic calibration.
+6. Contemplation: meditation, stress release, solitary walking, and margin.
+7. Life: routines, communication, decluttering, and the everyday environment.
+
+The layers are an organizational model, not a diagnostic model and not a claim that every life should be perfectly balanced.
+
+## Behavior and growth interpretation
+
+Habit Runner can present behavior through daily action records, recent traces, multi-week rhythm views, and life-layer growth summaries. Product language prioritizes questions such as:
+
+- What has the user been returning to recently?
+- Which life layers are becoming more consistently connected?
+- Where is a rhythm forming, holding, reconnecting, or resting?
+- What is worth gently maintaining or revisiting next?
+
+Growth observations are derived from recorded actions and available opportunities. When historical plan changes, pauses, or resumptions are incomplete, the interface must declare that the result is based on a current-plan estimate, including `CURRENT_PLAN_ESTIMATE` and `historyComplete: false` where applicable. Insufficient samples should be shown as data still accumulating rather than converted into a confident growth judgment.
+
+Habit Runner does not treat a connection percentage, ranking, strongest or weakest layer, or aggregate score as a complete description of a person.
+
+## Product philosophy
+
+- Real behavior is more informative than subjective satisfaction scoring.
+- A small action can be an authentic connection.
+- Conscious rest can support long-term continuity.
+- Temporary quiet is not shameful or final.
+- Trends need time and sufficient samples before they support a confident interpretation.
+- Visualizations should help a user understand lived patterns, not decorate isolated metrics.
+
+## Public and private information boundaries
+
+The public website, About page, source repository, and these machine feeds describe the product and its methodology. Authenticated user records are not part of the public knowledge corpus.
+
+Private surfaces include account routes, daily action workspaces, item records, history and insight data, settings, and application APIs. Crawlers are instructed not to access these routes, and authentication remains the primary access control.
+
+These files contain no user action records, account identifiers, private database content, API secrets, or private analytics.
+
+Habit Runner is a personal action tool. It is not a medical device, healthcare provider, diagnostic service, or substitute for professional medical or mental-health advice. The project does not claim regulatory certification unless a future public source explicitly establishes it.
+
+## Technical architecture
+
+- Front end: Next.js 15 App Router, React 18, TypeScript, and Tailwind CSS.
+- Server layer: Next.js route handlers and NextAuth.
+- Data layer: Prisma ORM and PostgreSQL.
+- UI foundations: Radix UI and Remix Icon.
+- Testing: Jest and Testing Library.
+- Deployment support: Vercel and Firebase App Hosting configuration.
+
+The source repository is the appropriate source for implementation details. The public machine feeds intentionally omit operational secrets and private API payloads.
+
+## Public resources
+
+- Product overview: https://habits.dpdns.org/
+- About and methodology: https://habits.dpdns.org/about
+- Public knowledge search: https://habits.dpdns.org/search
+- Concise machine index: https://habits.dpdns.org/llms.txt
+- Full machine context: https://habits.dpdns.org/llms-full.txt
+- Sitemap: https://habits.dpdns.org/sitemap.xml
+- Crawler policy: https://habits.dpdns.org/robots.txt
+- Source: https://github.com/kewenzhe-oss/Habit-Runner
+
+## Citation guide
+
+Use the canonical website for general product references and the About page for methodology, privacy boundaries, or product philosophy.
+
+Suggested general citation:
+
+Habit Runner. “Habit Runner — Energy-Adaptive Habit Tracking.” https://habits.dpdns.org/. Accessed [date].
+
+Suggested methodology citation:
+
+Habit Runner. “About Habit Runner: Mission, Methodology, and Citation Guide.” https://habits.dpdns.org/about. Accessed [date].
+
+When referring to source code or technical implementation, cite the repository and, when possible, the relevant commit:
+
+Habit Runner. “Habit Runner Source Repository.” GitHub, https://github.com/kewenzhe-oss/Habit-Runner.
+
+Do not describe Habit Runner as clinically validated, medically endorsed, or guaranteed to improve wellbeing. Do not infer private user behavior from public product documentation.
+
+## Machine-use guidance
+
+Summaries should preserve these distinctions:
+
+- High, Normal, Low, and Rest are action contexts, not performance grades.
+- Habit, reduction behavior, and task records use different interaction models.
+- Life-layer views describe accumulated behavior, not subjective life satisfaction.
+- Growth claims require time and adequate samples.
+- Private user data is outside the public machine-readable corpus.
+
+Crawler access, structured data, and these files improve machine readability but do not guarantee indexing, ranking, retrieval, or citation by any search or generative system.

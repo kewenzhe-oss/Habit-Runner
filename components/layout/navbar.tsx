@@ -17,12 +17,14 @@ interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
   user: Pick<User, "name" | "image" | "email">
   isAuthenticated?: boolean
   locale?: Locale
+  variant?: "app" | "public"
 }
 
 export default function Navbar({
   user,
   isAuthenticated = Boolean(user.email),
   locale: explicitLocale,
+  variant = "app",
 }: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
@@ -32,29 +34,55 @@ export default function Navbar({
   // Otherwise use the active App operation environment dictionary.
   const dict = explicitLocale ? getDictionary(explicitLocale) : i18n.dict
 
-  const navLinks = [
-    { title: dict.nav.links.dashboard, href: "/dashboard" },
-    { title: dict.nav.links.insights, href: "/insights" },
-    { title: dict.nav.links.settings, href: "/settings" },
-  ]
+  const navLinks =
+    variant === "public"
+      ? [
+          { title: "About", href: "/about", external: false },
+          { title: "Search", href: "/search", external: false },
+          { title: "Source", href: siteConfig.links.github, external: true },
+        ]
+      : [
+          {
+            title: dict.nav.links.dashboard,
+            href: "/dashboard",
+            external: false,
+          },
+          {
+            title: dict.nav.links.insights,
+            href: "/insights",
+            external: false,
+          },
+          {
+            title: dict.nav.links.settings,
+            href: "/settings",
+            external: false,
+          },
+        ]
 
-  const mobileLinks = [
-    {
-      title: dict.nav.links.dashboard,
-      href: "/dashboard",
-      icon: "dashboard" as const,
-    },
-    {
-      title: dict.nav.links.insights,
-      href: "/insights",
-      icon: "history" as const,
-    },
-    {
-      title: dict.nav.links.settings,
-      href: "/settings",
-      icon: "settings" as const,
-    },
-  ]
+  const mobileLinks =
+    variant === "public"
+      ? [
+          { title: "Home", href: "/", icon: "dashboard" as const },
+          { title: "About", href: "/about", icon: "userAlt" as const },
+          { title: "Search", href: "/search", icon: "globe" as const },
+        ]
+      : [
+          {
+            title: dict.nav.links.dashboard,
+            href: "/dashboard",
+            icon: "dashboard" as const,
+          },
+          {
+            title: dict.nav.links.insights,
+            href: "/insights",
+            icon: "history" as const,
+          },
+          {
+            title: dict.nav.links.settings,
+            href: "/settings",
+            icon: "settings" as const,
+          },
+        ]
 
   return (
     <>
@@ -62,7 +90,10 @@ export default function Navbar({
         <nav className="mx-auto flex h-16 items-center justify-between px-4 md:px-8 lg:max-w-7xl">
           {/* Brand */}
           <div className="flex items-center gap-6">
-            <Link href="/dashboard" className="flex items-center gap-2">
+            <Link
+              href={variant === "public" ? "/" : "/dashboard"}
+              className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
               <Image
                 src="/habit-runner-target-20260828.svg"
                 alt=""
@@ -81,14 +112,19 @@ export default function Navbar({
             <div className="hidden items-center gap-1 md:flex">
               {navLinks.map((item, index) => {
                 const isActive =
-                  pathname === item.href ||
-                  (item.href !== "/dashboard" && pathname.startsWith(item.href))
+                  !item.external &&
+                  (pathname === item.href ||
+                    (item.href !== "/dashboard" &&
+                      pathname.startsWith(item.href)))
                 return (
                   <Link
                     key={index}
                     href={item.href}
+                    target={item.external ? "_blank" : undefined}
+                    rel={item.external ? "noreferrer" : undefined}
+                    aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "min-h-11 rounded-lg px-3 py-3 text-xs font-medium transition-colors",
+                      "min-h-11 rounded-lg px-3 py-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       isActive
                         ? "bg-muted font-semibold text-foreground"
                         : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -129,7 +165,11 @@ export default function Navbar({
         </nav>
       </header>
       <nav
-        aria-label={dict.nav.mobileAria.mobileNavLabel}
+        aria-label={
+          variant === "public"
+            ? "Public navigation"
+            : dict.nav.mobileAria.mobileNavLabel
+        }
         className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
       >
         <div className="mx-auto grid max-w-md grid-cols-3">
@@ -137,7 +177,9 @@ export default function Navbar({
             const Icon = Icons[item.icon || "next"]
             const isActive =
               pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href))
+              (item.href !== "/" &&
+                item.href !== "/dashboard" &&
+                pathname.startsWith(item.href))
             return (
               <Link
                 key={item.href}

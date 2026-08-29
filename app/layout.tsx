@@ -5,8 +5,13 @@ import { Inter } from "next/font/google"
 import NextTopLoader from "nextjs-toploader"
 
 import { siteConfig } from "@/config/site"
+import {
+  createOrganizationJsonLd,
+  createWebsiteJsonLd,
+} from "@/lib/structured-data"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
+import { StructuredData } from "@/components/seo/structured-data"
 import { ThemeProvider } from "@/components/theme-provider"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -26,6 +31,8 @@ export const metadata: Metadata = {
     },
   ],
   creator: siteConfig.author,
+  applicationName: siteConfig.name,
+  category: "lifestyle",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -102,6 +109,22 @@ interface RootLayoutProps {
 export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link
+          rel="describedby"
+          href="/llms.txt"
+          type="text/markdown"
+          title="Habit Runner machine-readable summary"
+        />
+        <StructuredData
+          id="habit-runner-organization"
+          data={createOrganizationJsonLd()}
+        />
+        <StructuredData
+          id="habit-runner-website"
+          data={createWebsiteJsonLd()}
+        />
+      </head>
       <body className={cn("antialiased", inter.className)}>
         <a
           href="#main-content"

@@ -1,6 +1,6 @@
 import { SiteConfig } from "@/types"
 
-import { env } from "@/env.mjs"
+export const PRIMARY_SITE_URL = "https://habits.dpdns.org"
 
 export const siteConfig: SiteConfig = {
   name: "Habit Runner",
@@ -20,11 +20,11 @@ export const siteConfig: SiteConfig = {
     "Tailwind CSS",
   ],
   url: {
-    base: env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-    author: env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+    base: PRIMARY_SITE_URL,
+    author: `${PRIMARY_SITE_URL}/about#maintainer`,
   },
   links: {
     github: "https://github.com/kewenzhe-oss/Habit-Runner",
   },
-  ogImage: `${env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/og.jpg`,
+  ogImage: `${PRIMARY_SITE_URL}/og.jpg`,
 }
