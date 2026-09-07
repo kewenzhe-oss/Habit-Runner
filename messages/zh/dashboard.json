@@ -19,7 +19,11 @@
     "lastDay": "本周最后一天",
     "badgeEmpty": "🌱 起步中",
     "titleEmpty": "开启你的第一个日常行动",
-    "emptyDesc": "添加你想维持的行动，生活节律将从每一次记录中自然生长。"
+    "emptyDesc": "添加你想维持的行动，生活节律将从每一次记录中自然生长。",
+    "shuffleQuote": "换一句",
+    "copyQuote": "复制金句",
+    "quoteCopied": "金句已复制到剪贴板",
+    "dailyWisdom": "每日灵感"
   },
   "energySelector": {
     "title": "今日能量状态",

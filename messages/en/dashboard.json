@@ -19,7 +19,11 @@
     "lastDay": "Last day of the week",
     "badgeEmpty": "🌱 Getting Started",
     "titleEmpty": "Start your first daily routine",
-    "emptyDesc": "Add routines you want to cultivate. Your rhythm will grow with every check-in."
+    "emptyDesc": "Add routines you want to cultivate. Your rhythm will grow with every check-in.",
+    "shuffleQuote": "New quote",
+    "copyQuote": "Copy quote",
+    "quoteCopied": "Quote copied to clipboard",
+    "dailyWisdom": "Daily Wisdom"
   },
   "energySelector": {
     "title": "Daily Energy State",

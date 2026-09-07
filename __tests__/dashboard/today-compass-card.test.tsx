@@ -96,4 +96,23 @@ describe("TodayCompassCard", () => {
     expect(screen.getByText("今天处于主动休整状态")).toBeInTheDocument()
     expect(screen.getByText(/今日主动休整/)).toBeInTheDocument()
   })
+
+  test("renders daily wisdom quote and shuffle button in all states", () => {
+    const { container } = render(
+      <TodayCompassCard
+        items={[mockHabit1, mockHabit2]}
+        dailyEnergy="NORMAL"
+        dateStr="2026-08-28"
+      />
+    )
+
+    // Check that a quote is rendered
+    const blockquote = container.querySelector("blockquote")
+    expect(blockquote).toBeInTheDocument()
+    expect(blockquote?.textContent).toBeTruthy()
+
+    // Check shuffle and copy buttons
+    expect(screen.getByRole("button", { name: /换一句/i })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /复制金句/i })).toBeInTheDocument()
+  })
 })

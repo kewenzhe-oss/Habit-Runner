@@ -56,6 +56,9 @@ import {
   RiGithubFill,           // github (fill — brand logo)
   RiDownload2Line,        // download
   RiUpload2Line,          // upload
+  RiRefreshLine,          // refresh
+  RiFileCopyLine,         // copy
+  RiDoubleQuotesL,        // quotes
 } from "@remixicon/react"
 
 export type IconKeys = keyof typeof icons
@@ -104,6 +107,9 @@ const icons = {
   arrowUpRight: RiArrowRightUpLine,
   download: RiDownload2Line,
   upload: RiUpload2Line,
+  refresh: RiRefreshLine,
+  copy: RiFileCopyLine,
+  quotes: RiDoubleQuotesL,
 
   // Habit Runner Energy States
   highEnergy: RiFlashlightLine,

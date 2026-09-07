@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/card"
 import { Icons } from "@/components/icons"
 import { cn } from "@/lib/utils"
 import { toast } from "@/components/ui/use-toast"
+import { getDailyQuote, getRandomQuote, type QuoteItem } from "@/lib/quotes"
 
 interface TodayCompassCardProps {
   items: TodayItemDTO[]
@@ -38,6 +39,40 @@ export function TodayCompassCard({
   React.useEffect(() => {
     setCurrentHour(new Date().getHours())
   }, [])
+
+  // Daily Quote state
+  const [quote, setQuote] = React.useState<QuoteItem>(() => getDailyQuote(dateStr))
+  const [isFading, setIsFading] = React.useState(false)
+  const [isRotating, setIsRotating] = React.useState(false)
+  const [isCopied, setIsCopied] = React.useState(false)
+
+  React.useEffect(() => {
+    setQuote(getDailyQuote(dateStr))
+  }, [dateStr])
+
+  const handleShuffleQuote = () => {
+    setIsRotating(true)
+    setIsFading(true)
+    setTimeout(() => {
+      setQuote((prev) => getRandomQuote(prev?.quote))
+      setIsFading(false)
+      setTimeout(() => setIsRotating(false), 350)
+    }, 150)
+  }
+
+  const handleCopyQuote = async () => {
+    if (!quote) return
+    try {
+      await navigator.clipboard.writeText(`"${quote.quote}" — ${quote.author}`)
+      setIsCopied(true)
+      toast({
+        title: compassDict.quoteCopied || "金句已复制到剪贴板",
+      })
+      setTimeout(() => setIsCopied(false), 2000)
+    } catch {
+      // ignore
+    }
+  }
 
   const saveEnergy = async (nextEnergy: EnergyLevel) => {
     const previous = energy
@@ -177,64 +212,76 @@ export function TodayCompassCard({
           </span>
         </div>
 
-        {/* Main Title & Narrative */}
-        <div className="space-y-1">
-          {state === "IN_PROGRESS" && (
-            <>
-              <h2 className="text-base font-bold tracking-tight text-foreground sm:text-lg">
-                {format(
-                  compassDict.titleInProgress || "今日还剩 {count} 项日常",
-                  {
-                    count: pendingHabitsCount,
-                    s: pendingHabitsCount > 1 ? "s" : "",
-                  }
-                )}
-              </h2>
-              <p className="text-xs text-muted-foreground sm:text-sm">
-                {isEvening
-                  ? compassDict.nightDesc ||
-                    "今晚时间不多了，做个微行动或者早点休息吧。"
-                  : compassDict.dayDesc ||
-                    "今天时间还很充裕，按你的节奏来。"}
-              </p>
-            </>
-          )}
+        {/* Daily Wisdom Mode (方案 1：优雅金句沉浸态) */}
+        <div className="relative pt-0.5 pb-0.5">
+          {/* Accessible screen-reader heading for status announcement and test compatibility */}
+          <h2 className="sr-only">
+            {state === "IN_PROGRESS" &&
+              format(
+                compassDict.titleInProgress || "今日还剩 {count} 项日常",
+                {
+                  count: pendingHabitsCount,
+                  s: pendingHabitsCount > 1 ? "s" : "",
+                }
+              )}
+            {state === "COMPLETED" &&
+              (compassDict.titleCompleted || "今天的日常已全部完成")}
+            {state === "REST" &&
+              (compassDict.titleRest || "今天处于主动休整状态")}
+            {state === "EMPTY" &&
+              (compassDict.titleEmpty || "开启你的第一个日常行动")}
+          </h2>
 
-          {state === "COMPLETED" && (
-            <>
-              <h2 className="text-base font-bold tracking-tight text-foreground sm:text-lg">
-                {compassDict.titleCompleted || "今天的日常已全部完成"}
-              </h2>
-              <p className="text-xs text-muted-foreground sm:text-sm">
-                {compassDict.completedDesc ||
-                  "今天的节律已稳稳达成，享受放松时间。"}
-              </p>
-            </>
-          )}
+          <div
+            className={cn(
+              "group relative transition-all duration-300",
+              isFading ? "opacity-0 translate-y-0.5" : "opacity-100 translate-y-0"
+            )}
+          >
+            <blockquote className="text-sm font-medium leading-relaxed tracking-tight text-foreground/95 sm:text-base md:text-[17px]">
+              <span className="mr-1 select-none font-serif text-base text-muted-foreground/50 sm:text-lg">“</span>
+              <span>{quote.quote}</span>
+              <span className="ml-1 select-none font-serif text-base text-muted-foreground/50 sm:text-lg">”</span>
+            </blockquote>
 
-          {state === "REST" && (
-            <>
-              <h2 className="text-base font-bold tracking-tight text-foreground sm:text-lg">
-                {compassDict.titleRest || "今天处于主动休整状态"}
-              </h2>
-              <p className="text-xs text-muted-foreground sm:text-sm">
-                {compassDict.restDesc ||
-                  "好好放松、蓄积精力，也是生活的一部分。"}
-              </p>
-            </>
-          )}
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <span className="text-xs font-normal tracking-wide text-muted-foreground/80">
+                —— {quote.author}
+              </span>
 
-          {state === "EMPTY" && (
-            <>
-              <h2 className="text-base font-bold tracking-tight text-foreground sm:text-lg">
-                {compassDict.titleEmpty || "开启你的第一个日常行动"}
-              </h2>
-              <p className="text-xs text-muted-foreground sm:text-sm">
-                {compassDict.emptyDesc ||
-                  "添加你想维持的行动，生活节律将从每一次记录中自然生长。"}
-              </p>
-            </>
-          )}
+              <div className="flex items-center gap-1.5 opacity-70 transition-opacity duration-200 group-hover:opacity-100 sm:opacity-60">
+                <button
+                  type="button"
+                  onClick={handleCopyQuote}
+                  title={compassDict.copyQuote || "复制金句"}
+                  aria-label={compassDict.copyQuote || "复制金句"}
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                >
+                  {isCopied ? (
+                    <Icons.check className="h-3 w-3 text-emerald-500" />
+                  ) : (
+                    <Icons.copy className="h-3 w-3" />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleShuffleQuote}
+                  title={compassDict.shuffleQuote || "换一句"}
+                  aria-label={compassDict.shuffleQuote || "换一句"}
+                  className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-background/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground hover:border-muted-foreground/40 hover:bg-muted hover:text-foreground transition-all active:scale-95"
+                >
+                  <Icons.refresh
+                    className={cn(
+                      "h-3 w-3 transition-transform duration-500",
+                      isRotating && "rotate-180"
+                    )}
+                  />
+                  <span>{compassDict.shuffleQuote || "换一句"}</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Secondary TODO Notification (Weak Auxiliary Mention) */}
