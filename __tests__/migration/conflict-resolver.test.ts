@@ -11,6 +11,7 @@ import { LocalItemRecord } from "@/lib/migration/local-data"
 
 describe("conflict-resolver", () => {
   const mockCloudHabit: ItemWithDetails = {
+    priority: "NORMAL",
     id: "cloud_1",
     userId: "user_1",
     title: "每日阅读",
@@ -174,7 +175,11 @@ describe("conflict-resolver", () => {
     expect(keepCloudPlan.analyses[0].selectedAction).toBe("skip")
 
     // Single item update
-    const customPlan = updateItemResolution(keepCloudPlan, "local_c1", "keep_both")
+    const customPlan = updateItemResolution(
+      keepCloudPlan,
+      "local_c1",
+      "keep_both"
+    )
     expect(customPlan.analyses[0].selectedAction).toBe("keep_both")
   })
 

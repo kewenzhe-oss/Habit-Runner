@@ -1,6 +1,7 @@
 import { buildQuickAddItemPayload } from "@/lib/domain/quick-add-item"
 
 const shared = {
+  priority: "HIGH" as const,
   title: "  晨间阅读  ",
   whyPrompt: "  保持输入  ",
   layer: "SIGNAL" as const,
@@ -24,6 +25,7 @@ describe("quick-add item payload", () => {
 
     expect(payload).toMatchObject({
       title: "晨间阅读",
+      priority: "HIGH",
       whyPrompt: "保持输入",
       type: "HABIT",
       layer: "SIGNAL",

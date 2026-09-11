@@ -1,15 +1,16 @@
 import { ItemWithDetails } from "@/types"
 
 import {
-  LocalCheckInRecord,
-  LocalItemPayload,
-  LocalItemRecord,
-} from "./local-data"
-import {
   MigrationAction,
   MigrationMergeInput,
   MigrationOperation,
 } from "@/lib/validations/migration"
+
+import {
+  LocalCheckInRecord,
+  LocalItemPayload,
+  LocalItemRecord,
+} from "./local-data"
 
 export interface ItemDifference {
   field: string
@@ -38,6 +39,7 @@ export interface MigrationPlan {
 
 const FIELD_LABELS: Record<string, { zh: string; en: string }> = {
   title: { zh: "事项名称", en: "Title" },
+  priority: { zh: "显示优先级", en: "Display priority" },
   type: { zh: "事项类型", en: "Item Type" },
   layer: { zh: "所属层级", en: "Layer" },
   targetAmount: { zh: "目标量", en: "Target Amount" },
@@ -105,6 +107,9 @@ export function extractDifferences(
 
   checkField("whyPrompt", local.whyPrompt, cloud.whyPrompt)
   checkField("layer", local.layer, cloud.layer)
+  if (local.priority !== undefined) {
+    checkField("priority", local.priority, cloud.priority)
+  }
 
   return diffs
 }
@@ -260,7 +265,8 @@ export function buildMergePayload(
       },
       checkIns: matchedCheckIns.length > 0 ? matchedCheckIns : undefined,
       customTitleSuffix:
-        analysis.selectedAction === "keep_both" && analysis.status === "conflict"
+        analysis.selectedAction === "keep_both" &&
+        analysis.status === "conflict"
           ? " (本地导入)"
           : undefined,
     })

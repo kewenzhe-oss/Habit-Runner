@@ -375,6 +375,9 @@ export async function getTodayDashboardData(
 
       return {
         id: item.id,
+        priority: item.priority,
+        sortOrder: item.sortOrder,
+        createdAt: item.createdAt.toISOString(),
         title: item.title,
         whyPrompt: item.whyPrompt,
         type: item.type,

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { ItemDetailDTO, Layer } from "@/types"
+import { ItemDetailDTO, ItemPriority, Layer } from "@/types"
 
 import { LAYER_LIST } from "@/config/layers"
 import { getDefaultDomainExample } from "@/lib/defaultDomainExamples"
@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
+import { ItemPrioritySelector } from "@/components/items/item-priority-selector"
 import { RecommendedToolUrlField } from "@/components/items/recommended-tool-url-field"
 
 interface Category {
@@ -55,6 +56,9 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
   const [isLoading, setIsLoading] = React.useState(false)
 
   // 1. Shared Fields
+  const [priority, setPriority] = React.useState<ItemPriority>(
+    initialItem?.priority ?? initialDraft?.priority ?? "NORMAL"
+  )
   const [title, setTitle] = React.useState(
     initialItem?.title || initialDraft?.title || ""
   )
@@ -202,7 +206,8 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
         }
       }
 
-      const payload: any = {
+      const payload: PendingNewItemPayload = {
+        priority,
         title: title.trim(),
         whyPrompt: whyPrompt.trim() || undefined,
         type,
@@ -454,6 +459,12 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
               className="text-xs"
             />
           </div>
+
+          <ItemPrioritySelector
+            value={priority}
+            onChange={setPriority}
+            disabled={isLoading}
+          />
 
           {/* 这是为了什么（可选） */}
           {type !== "TODO" && (

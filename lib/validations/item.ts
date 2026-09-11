@@ -11,6 +11,7 @@ export const layerEnum = z.enum([
 ])
 
 export const itemTypeEnum = z.enum(["HABIT", "QUIT_HABIT", "TODO"])
+export const itemPriorityEnum = z.enum(["HIGH", "NORMAL", "LOW"])
 
 export const energyLevelEnum = z.enum(["HIGH", "NORMAL", "LOW", "REST"])
 
@@ -38,6 +39,7 @@ export const itemCreateSchema = z.object({
   title: z.string().min(1, "Title is required").max(64),
   whyPrompt: z.string().max(256).optional(),
   type: itemTypeEnum,
+  priority: itemPriorityEnum.optional(),
   layer: layerEnum.optional().default("LIFE"),
   customCategory: z.string().max(32).optional().nullable(),
   categoryId: z.string().cuid().optional().nullable(),

@@ -1,10 +1,12 @@
 import {
   CheckInStatus,
   EnergyLevel,
+  ItemPriority,
   ItemStatus,
   ItemType,
   Layer,
 } from "@prisma/client"
+
 import { db } from "@/lib/db"
 
 export interface UserBackupData {
@@ -24,6 +26,7 @@ export interface UserBackupData {
     layer: Layer
     customCategory?: string | null
     status?: ItemStatus
+    priority?: ItemPriority
     unitType?: string | null
     targetAmount?: number | null
     unitLabel?: string | null
@@ -111,6 +114,7 @@ export async function exportUserData(userId: string): Promise<UserBackupData> {
       layer: i.layer,
       customCategory: i.customCategory,
       status: i.status,
+      priority: i.priority,
       unitType: i.unitType,
       targetAmount: i.targetAmount,
       unitLabel: i.unitLabel,
@@ -198,6 +202,7 @@ export async function importUserData(
           layer: item.layer || "LIFE",
           customCategory: item.customCategory,
           status: item.status || "ACTIVE",
+          priority: item.priority ?? "NORMAL",
           unitType: item.unitType,
           targetAmount: item.targetAmount,
           unitLabel: item.unitLabel,

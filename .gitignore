@@ -45,4 +45,5 @@ firebase-debug.*.log
 *backup*.json
 *.bak
 *.sql
+!prisma/migrations/**/migration.sql
 *.dump

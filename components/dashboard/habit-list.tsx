@@ -3,14 +3,15 @@
 import * as React from "react"
 import { EnergyLevel, TodayItemDTO } from "@/types"
 
+import { sortWithinStatusGroup } from "@/lib/domain/item-order"
 import { useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import { useLocalMigration } from "@/hooks/use-local-migration"
 import { EmptyPlaceholder } from "@/components/empty-placeholder"
 import { Icons } from "@/components/icons"
-
-import { useLocalMigration } from "@/hooks/use-local-migration"
 import { LocalMigrationBanner } from "@/components/migration/local-migration-banner"
 import { LocalMigrationDialog } from "@/components/migration/local-migration-dialog"
+
 import { CategoryManagerModal } from "./category-manager-modal"
 import { HabitItem } from "./habit-item"
 import { QuickAddHabitModal } from "./quick-add-habit-modal"
@@ -93,14 +94,20 @@ export function HabitList({
   })
 
   // Separate Habits from TODOs
-  const activeHabits = categoryFiltered.filter(
-    (i) => i.type === "HABIT" || i.type === "QUIT_HABIT"
+  const activeHabits = sortWithinStatusGroup(
+    categoryFiltered.filter(
+      (i) => i.type === "HABIT" || i.type === "QUIT_HABIT"
+    )
   )
-  const pendingTodos = categoryFiltered.filter(
-    (i) => i.type === "TODO" && i.status !== "COMPLETED"
+  const pendingTodos = sortWithinStatusGroup(
+    categoryFiltered.filter(
+      (i) => i.type === "TODO" && i.status !== "COMPLETED"
+    )
   )
-  const completedTodos = categoryFiltered.filter(
-    (i) => i.type === "TODO" && i.status === "COMPLETED"
+  const completedTodos = sortWithinStatusGroup(
+    categoryFiltered.filter(
+      (i) => i.type === "TODO" && i.status === "COMPLETED"
+    )
   )
 
   const habitsCount = items.filter((i) => i.type === "HABIT").length

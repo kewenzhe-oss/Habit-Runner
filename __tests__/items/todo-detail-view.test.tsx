@@ -11,8 +11,14 @@ jest.mock("next/navigation", () => ({
 }))
 
 describe("TodoDetailView", () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date("2026-08-28T12:00:00Z"))
+  })
+  afterEach(() => jest.useRealTimers())
   const dict = getDictionary("zh")
   const mockTodo: ItemDetailDTO = {
+    priority: "NORMAL",
     id: "todo_1",
     userId: "user_1",
     categoryId: null,

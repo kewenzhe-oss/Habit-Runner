@@ -1,12 +1,15 @@
 import { TodayItemDTO } from "@/types"
 import { render, screen } from "@testing-library/react"
 
-import { HabitItem } from "@/components/dashboard/habit-item"
 import { getDictionary } from "@/lib/i18n"
+import { HabitItem } from "@/components/dashboard/habit-item"
 
 describe("HabitItem", () => {
   const dict = getDictionary("zh")
   const mockHabit: TodayItemDTO = {
+    priority: "NORMAL",
+    sortOrder: 0,
+    createdAt: "2026-08-01T00:00:00.000Z",
     id: "habit_1",
     title: "每日深度阅读",
     whyPrompt: "保持专注思考",

@@ -1,4 +1,4 @@
-import type { Layer } from "@/types"
+import type { ItemPriority, Layer } from "@/types"
 
 import type { PendingNewItemPayload } from "@/lib/pending-new-item"
 
@@ -7,6 +7,7 @@ export type QuickAddUnitType = "TIME" | "COUNT" | "BINARY"
 export type QuickAddFrequency = "DAILY" | "WEEKDAYS" | "3_4_TIMES" | "WEEKENDS"
 
 export type QuickAddFormState = {
+  priority: ItemPriority
   title: string
   whyPrompt: string
   type: QuickAddItemType
@@ -29,6 +30,7 @@ export function buildQuickAddItemPayload(
   state: QuickAddFormState
 ): PendingNewItemPayload {
   const payload: PendingNewItemPayload = {
+    priority: state.priority,
     title: state.title.trim(),
     whyPrompt: state.whyPrompt.trim() || undefined,
     type: state.type,

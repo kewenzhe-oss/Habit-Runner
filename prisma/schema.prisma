@@ -104,6 +104,12 @@ enum ItemStatus {
   ARCHIVED
 }
 
+enum ItemPriority {
+  HIGH
+  NORMAL
+  LOW
+}
+
 enum CheckInStatus {
   COMPLETED
   KEPT
@@ -160,6 +166,7 @@ model Item {
   todoRecurrence  String?    @map(name: "todo_recurrence") // ONCE | WEEKLY | MONTHLY
 
   sortOrder      Int        @default(0) @map(name: "sort_order")
+  priority       ItemPriority @default(NORMAL)
   colorCode      String?    @map(name: "color_code")
 
   createdAt      DateTime   @default(now()) @map(name: "created_at")

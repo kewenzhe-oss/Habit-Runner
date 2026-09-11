@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Layer } from "@/types"
+import { ItemPriority, Layer } from "@/types"
 
 import { LAYER_LIST } from "@/config/layers"
 import { buildSignInUrl } from "@/lib/auth-redirect"
@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from "@/components/ui/use-toast"
 import { Icons } from "@/components/icons"
+import { ItemPrioritySelector } from "@/components/items/item-priority-selector"
 import { RecommendedToolUrlField } from "@/components/items/recommended-tool-url-field"
 
 interface Category {
@@ -61,6 +62,7 @@ export function QuickAddHabitModal({
 
   // 1. Core Quick Add Fields (Primary Visual Weight)
   const [title, setTitle] = React.useState("")
+  const [priority, setPriority] = React.useState<ItemPriority>("NORMAL")
   const [unitType, setUnitType] = React.useState<HabitUnitType>("TIME")
   const [targetAmount, setTargetAmount] = React.useState<number>(20)
   const [dueDate, setDueDate] = React.useState("")
@@ -120,6 +122,7 @@ export function QuickAddHabitModal({
   // Reset form state
   const resetForm = () => {
     setTitle("")
+    setPriority("NORMAL")
     setWhyPrompt("")
     setSelectedLayer("LIFE")
     setSelectedCategoryName(categories[0]?.name || "")
@@ -185,6 +188,7 @@ export function QuickAddHabitModal({
       (category) => category.name === finalCategory
     )?.id
     const formState = {
+      priority,
       title,
       whyPrompt,
       type,
@@ -407,6 +411,11 @@ export function QuickAddHabitModal({
             </div>
 
             {/* 3. TYPE-SPECIFIC MINIMUM FIELDS */}
+            <ItemPrioritySelector
+              value={priority}
+              onChange={setPriority}
+              disabled={isLoading}
+            />
 
             {/* A. HABIT: Unit Type + Target Amount */}
             {type === "HABIT" && (

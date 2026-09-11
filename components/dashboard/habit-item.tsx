@@ -4,8 +4,8 @@ import * as React from "react"
 import Link from "next/link"
 import { ItemRecentDayStatus, TodayItemDTO } from "@/types"
 
+import { formatLocalizedDate, useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
-import { useI18n, formatLocalizedDate } from "@/lib/i18n"
 import { buttonVariants } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -302,14 +302,14 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
   return (
     <article
       className={cn(
-        "group flex items-center gap-3 border-b border-border/40 px-0 py-3 last:border-b-0 transition-colors hover:bg-muted/20",
+        "group flex items-center gap-3 border-b border-border/40 px-0 py-3 transition-colors last:border-b-0 hover:bg-muted/20",
         item.status === "COMPLETED" && "opacity-50"
       )}
     >
       {/* 2px color bar — type/color indicator */}
       {item.type !== "TODO" && (
         <span
-          className="h-6 w-0.5 shrink-0 rounded-full opacity-60 group-hover:opacity-90 transition-opacity"
+          className="h-6 w-0.5 shrink-0 rounded-full opacity-60 transition-opacity group-hover:opacity-90"
           style={{ backgroundColor: item.colorCode || "#10B981" }}
         />
       )}
@@ -331,6 +331,14 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
           </Link>
 
           {/* External Tool Link Shortcut */}
+          {item.priority && item.priority !== "NORMAL" && (
+            <span
+              className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"
+              aria-label={`${locale === "zh" ? "显示优先级" : "Display priority"} ${item.priority === "HIGH" ? "P0" : "P2"}`}
+            >
+              {item.priority === "HIGH" ? "P0" : "P2"}
+            </span>
+          )}
           {primaryToolLink?.url && (
             <a
               href={primaryToolLink.url}
@@ -389,8 +397,8 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
               className={cn(
                 "h-4 w-4 rounded-full border-2 transition-all",
                 isCheckedIn
-                  ? "border-transparent scale-100"
-                  : "border-muted-foreground/25 bg-transparent hover:border-muted-foreground/50 scale-90"
+                  ? "scale-100 border-transparent"
+                  : "scale-90 border-muted-foreground/25 bg-transparent hover:border-muted-foreground/50"
               )}
               style={
                 isCheckedIn && checkInStatus !== "REST"
@@ -432,7 +440,7 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
                   type="button"
                   onClick={(e) => handleQuitStatus("KEPT", e)}
                   disabled={isLoading}
-                  className="rounded px-2 py-1 text-[11px] font-medium text-emerald-700 transition-colors hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40 disabled:opacity-50"
+                  className="rounded px-2 py-1 text-[11px] font-medium text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
                 >
                   {dict.dashboard.habitItem.quitKeptButton}
                 </button>
@@ -489,7 +497,7 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
             })}
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
-              "h-9 w-9 p-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:text-foreground"
+              "h-9 w-9 p-0 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
             )}
           >
             <Icons.ellipsis className="h-4 w-4" />

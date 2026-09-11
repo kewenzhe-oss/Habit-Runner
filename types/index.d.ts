@@ -10,6 +10,7 @@ import {
 import { IconKeys } from "@/components/icons"
 
 export type ItemType = "HABIT" | "QUIT_HABIT" | "TODO"
+export type ItemPriority = "HIGH" | "NORMAL" | "LOW"
 
 export type Layer =
   | "BODY"
@@ -69,6 +70,9 @@ export type ItemWithDetails = PrismaItem & {
 export type ItemDetailDTO = ItemWithDetails
 
 export type TodayItemDTO = {
+  priority: ItemPriority
+  sortOrder: number
+  createdAt: string
   id: string
   title: string
   whyPrompt?: string | null

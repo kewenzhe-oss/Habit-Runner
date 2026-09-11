@@ -5,6 +5,9 @@ import { TodayCompassCard } from "@/components/dashboard/today-compass-card"
 
 describe("TodayCompassCard", () => {
   const mockHabit1: TodayItemDTO = {
+    priority: "NORMAL",
+    sortOrder: 0,
+    createdAt: "2026-08-01T00:00:00.000Z",
     id: "h_1",
     title: "每天晨跑 20 分钟",
     type: "HABIT",
@@ -18,6 +21,9 @@ describe("TodayCompassCard", () => {
   }
 
   const mockHabit2: TodayItemDTO = {
+    priority: "NORMAL",
+    sortOrder: 0,
+    createdAt: "2026-08-01T00:00:00.000Z",
     id: "h_2",
     title: "深度阅读 15 分钟",
     type: "HABIT",
@@ -35,6 +41,9 @@ describe("TodayCompassCard", () => {
   }
 
   const mockTodo: TodayItemDTO = {
+    priority: "NORMAL",
+    sortOrder: 0,
+    createdAt: "2026-08-01T00:00:00.000Z",
     id: "t_1",
     title: "修水管",
     type: "TODO",
@@ -113,6 +122,8 @@ describe("TodayCompassCard", () => {
 
     // Check shuffle and copy buttons
     expect(screen.getByRole("button", { name: /换一句/i })).toBeInTheDocument()
-    expect(screen.getByRole("button", { name: /复制金句/i })).toBeInTheDocument()
+    expect(
+      screen.getByRole("button", { name: /复制金句/i })
+    ).toBeInTheDocument()
   })
 })
