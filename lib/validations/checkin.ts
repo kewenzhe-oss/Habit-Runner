@@ -14,6 +14,7 @@ export const checkInCreateSchema = z.object({
   actualAmount: z.number().finite().min(0).max(1_000_000).optional().nullable(),
   restReasonTag: z.string().max(128).optional().nullable(),
   notes: z.string().max(500).optional(),
+  nextIntent: z.string().max(200).optional(),
 })
 
 export const quitStatusSchema = z.object({

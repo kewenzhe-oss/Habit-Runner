@@ -125,6 +125,7 @@ export function RecordActionModal({
   const [restReason, setRestReason] = React.useState<string>("")
   const [customRestNote, setCustomRestNote] = React.useState<string>("")
   const [notes, setNotes] = React.useState<string>("")
+  const [nextIntent, setNextIntent] = React.useState<string>("")
   const [isLoading, setIsLoading] = React.useState(false)
 
   // Reset/sync state on open
@@ -136,6 +137,7 @@ export function RecordActionModal({
     setRestReason("")
     setCustomRestNote("")
     setNotes(item.todayCheckIn?.notes || "")
+    setNextIntent(item.todayCheckIn?.nextIntent || "")
 
     if (item.todayCheckIn?.status === "REST") {
       setActualAmount(0)
@@ -218,6 +220,7 @@ export function RecordActionModal({
               : actualAmount,
           restReasonTag: reasonTag,
           notes: combinedNotes || undefined,
+          nextIntent: nextIntent.trim() || undefined,
         }),
       })
 
@@ -529,6 +532,33 @@ export function RecordActionModal({
               className="resize-none text-xs"
             />
           </div>
+
+          {/* Next Action Seed — only shown when not resting */}
+          {!isRestMode && (
+            <div className="space-y-1.5 rounded-lg border border-border/60 bg-muted/30 p-3">
+              <Label
+                htmlFor="next-intent"
+                className="flex items-center gap-1.5 text-xs font-semibold text-foreground"
+              >
+                <span className="text-sm leading-none">🌱</span>
+                <span>明日想推进什么？</span>
+                <span className="ml-auto font-normal text-muted-foreground/60">可略过</span>
+              </Label>
+              <Input
+                id="next-intent"
+                value={nextIntent}
+                onChange={(e) => setNextIntent(e.target.value)}
+                placeholder={`一句话即可，例：把数据库迁移脚本跑通`}
+                maxLength={200}
+                className="bg-background text-xs"
+              />
+              {nextIntent.length > 0 && (
+                <p className="text-[10px] text-muted-foreground/60">
+                  明天打开习惯卡片时会直接显示这句话
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         <DialogFooter className="sticky bottom-0 -mx-4 -mb-4 flex items-stretch justify-between gap-2 border-t bg-background px-4 pb-4 pt-3 sm:static sm:mx-0 sm:mb-0 sm:items-center sm:px-0 sm:pb-0">

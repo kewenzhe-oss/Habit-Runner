@@ -16,17 +16,23 @@ import { isFlexibleSchedule, isScheduledDate } from "@/lib/domain/schedule"
  */
 export async function calculateItemStreaks(
   itemId: string,
-  todayStr: string
+  todayStr: string,
+  preloaded?: {
+    item?: { createdAt: Date; frequencyDays?: string | null; targetPerWeek?: number | null }
+    checkIns?: Array<{ date: string; status: string }>
+  }
 ): Promise<{
   actionStreak: number
   rhythmStreak: number
   longestActionStreak: number
   maintainedDays: number
 }> {
-  const item = await db.item.findUnique({
-    where: { id: itemId },
-    select: { createdAt: true, frequencyDays: true, targetPerWeek: true },
-  })
+  const item = preloaded?.item
+    ? preloaded.item
+    : await db.item.findUnique({
+        where: { id: itemId },
+        select: { createdAt: true, frequencyDays: true, targetPerWeek: true },
+      })
   if (!item) {
     return {
       actionStreak: 0,
@@ -36,14 +42,16 @@ export async function calculateItemStreaks(
     }
   }
 
-  const checkIns = await db.checkIn.findMany({
-    where: {
-      itemId,
-      date: { lte: todayStr },
-    },
-    orderBy: { date: "desc" },
-    take: 120, // look back 120 checkin days
-  })
+  const checkIns = preloaded?.checkIns
+    ? preloaded.checkIns
+    : await db.checkIn.findMany({
+        where: {
+          itemId,
+          date: { lte: todayStr },
+        },
+        orderBy: { date: "desc" },
+        take: 120, // look back 120 checkin days
+      })
 
   if (checkIns.length === 0) {
     return {
@@ -156,7 +164,7 @@ export async function calculateItemStreaks(
 /**
  * Record or update daily overall energy state
  */
-export async function setDailyEnergyState(
+export async function setDailyEnergy(
   userId: string,
   date: string,
   energyLevel: EnergyLevel,
@@ -183,12 +191,10 @@ export async function setDailyEnergyState(
   })
 }
 
-export const setDailyEnergy = setDailyEnergyState
-
 /**
  * Record or update CheckIn for an item (Dual-writing structured metrics & text fields)
  */
-export async function recordCheckIn(
+async function recordCheckIn(
   userId: string,
   itemId: string,
   date: string,
@@ -201,6 +207,7 @@ export async function recordCheckIn(
     completionRate?: number | null
     restReasonTag?: string | null
     notes?: string
+    nextIntent?: string
   }
 ) {
   // Verify item ownership
@@ -228,6 +235,7 @@ export async function recordCheckIn(
       completionRate: data.completionRate,
       restReasonTag: data.restReasonTag,
       notes: data.notes,
+      nextIntent: data.nextIntent,
       updatedAt: new Date(),
     },
     create: {
@@ -242,6 +250,7 @@ export async function recordCheckIn(
       completionRate: data.completionRate,
       restReasonTag: data.restReasonTag,
       notes: data.notes,
+      nextIntent: data.nextIntent,
     },
   })
 }
@@ -323,13 +332,60 @@ export async function getTodayDashboardData(
     }
   })
 
+  // Fetch yesterday's check-ins to extract nextIntent ("Next Action Seed")
+  const yesterdayStr = addCalendarDays(dateStr, -1)
+  const yesterdayCheckIns = await db.checkIn.findMany({
+    where: {
+      userId,
+      date: yesterdayStr,
+      itemId: { in: allItems.map((i) => i.id) },
+      nextIntent: { not: null },
+    },
+    select: { itemId: true, nextIntent: true },
+  })
+  const nextIntentMap = new Map<string, string>()
+  yesterdayCheckIns.forEach((c) => {
+    if (c.nextIntent) nextIntentMap.set(c.itemId, c.nextIntent)
+  })
+
+  // For completed TODOs, retain those completed within the current natural week or today.
+  // Older completed items are archived to keep the dashboard focused.
+  const completedThisWeekItemIds = new Set(
+    recentCheckIns
+      .filter((c) => c.status === "COMPLETED")
+      .map((c) => c.itemId)
+  )
+
   const items = allItems.filter(
     (item) =>
       item.status === "ACTIVE" ||
       (item.type === "TODO" &&
         item.status === "COMPLETED" &&
-        checkInMap.get(item.id)?.status === "COMPLETED")
+        (completedThisWeekItemIds.has(item.id) ||
+          checkInMap.get(item.id)?.status === "COMPLETED"))
   )
+
+  // Batch fetch lookback check-ins for streak calculations (eliminates N+1 queries)
+  const earliestLookbackDate = addCalendarDays(dateStr, -120)
+  const batchCheckIns120 = await db.checkIn.findMany({
+    where: {
+      userId,
+      itemId: { in: items.map((i) => i.id) },
+      date: { gte: earliestLookbackDate, lte: dateStr },
+    },
+    select: { itemId: true, date: true, status: true },
+    orderBy: { date: "desc" },
+  })
+
+  const item120CheckInsMap = new Map<string, Array<{ date: string; status: string }>>()
+  batchCheckIns120.forEach((c) => {
+    let list = item120CheckInsMap.get(c.itemId)
+    if (!list) {
+      list = []
+      item120CheckInsMap.set(c.itemId, list)
+    }
+    list.push(c)
+  })
 
   // 4. Map to TodayItemDTO with dynamic action text matching current energy
   const itemDTOs: TodayItemDTO[] = await Promise.all(
@@ -354,8 +410,11 @@ export async function getTodayDashboardData(
         item.toolLinks[0] ||
         null
 
-      // Calculate streak metrics
-      const streaks = await calculateItemStreaks(item.id, dateStr)
+      // Calculate streak metrics with preloaded item & checkins (in-memory O(1) DB cost)
+      const streaks = await calculateItemStreaks(item.id, dateStr, {
+        item,
+        checkIns: item120CheckInsMap.get(item.id) || [],
+      })
 
       // Map natural calendar week (Mon-Sun) trace
       const recent7Days = weekDates.map((d, idx) => {
@@ -378,6 +437,7 @@ export async function getTodayDashboardData(
         priority: item.priority,
         sortOrder: item.sortOrder,
         createdAt: item.createdAt.toISOString(),
+        updatedAt: item.updatedAt.toISOString(),
         title: item.title,
         whyPrompt: item.whyPrompt,
         type: item.type,
@@ -393,6 +453,7 @@ export async function getTodayDashboardData(
         actionPresets: item.actionPresets,
         recommendedTool: matchingTool,
         toolLinks: item.toolLinks,
+        tomorrowHint: nextIntentMap.get(item.id) || null,
         todayCheckIn: checkIn
           ? {
               id: checkIn.id,
@@ -403,6 +464,7 @@ export async function getTodayDashboardData(
               completionRate: checkIn.completionRate || null,
               restReasonTag: checkIn.restReasonTag || null,
               notes: checkIn.notes,
+              nextIntent: checkIn.nextIntent || null,
             }
           : null,
         actionStreak: streaks.actionStreak,

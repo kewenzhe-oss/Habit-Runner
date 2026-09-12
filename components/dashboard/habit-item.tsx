@@ -21,6 +21,10 @@ interface HabitItemProps {
   item: TodayItemDTO
   onOpenRecord: (item: TodayItemDTO) => void
   onRefresh: () => void
+  /** When true, list is in low/rest energy mode — P0 items get extra visual weight */
+  isLowEnergyMode?: boolean
+  /** When true, this habit has already been checked in today — dims the card */
+  isDimmed?: boolean
 }
 
 const WEEKDAY_SHORT_ZH = ["一", "二", "三", "四", "五", "六", "日"]
@@ -114,7 +118,7 @@ function getDomainFromUrl(url: string): string {
   }
 }
 
-export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
+export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = false, isDimmed = false }: HabitItemProps) {
   const { dict, format, locale } = useI18n()
   const [isLoading, setIsLoading] = React.useState(false)
   const isCheckedIn = !!item.todayCheckIn
@@ -299,11 +303,16 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
       ? "点击记录今日行动"
       : "Tap to record today"
 
+  const isP0 = item.priority === "HIGH"
+  const highlightP0 = isLowEnergyMode && isP0
+
   return (
     <article
       className={cn(
-        "group flex items-center gap-3 border-b border-border/40 px-0 py-3 transition-colors last:border-b-0 hover:bg-muted/20",
-        item.status === "COMPLETED" && "opacity-50"
+        "group flex items-center gap-3 border-b border-border/40 px-0 py-3 transition-all duration-300 last:border-b-0 hover:bg-muted/20",
+        item.status === "COMPLETED" && "opacity-50",
+        highlightP0 && "rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 hover:bg-amber-500/10",
+        isDimmed && !highlightP0 && "opacity-50 hover:opacity-70"
       )}
     >
       {/* 2px color bar — type/color indicator */}
@@ -330,10 +339,15 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
             {item.title}
           </Link>
 
-          {/* External Tool Link Shortcut */}
+          {/* Priority badge */}
           {item.priority && item.priority !== "NORMAL" && (
             <span
-              className="shrink-0 rounded border border-border px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground"
+              className={cn(
+                "shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px]",
+                highlightP0
+                  ? "border-amber-500/50 bg-amber-500/10 font-bold text-amber-700 dark:text-amber-400"
+                  : "border-border text-muted-foreground"
+              )}
               aria-label={`${locale === "zh" ? "显示优先级" : "Display priority"} ${item.priority === "HIGH" ? "P0" : "P2"}`}
             >
               {item.priority === "HIGH" ? "P0" : "P2"}
@@ -370,6 +384,24 @@ export function HabitItem({ item, onOpenRecord, onRefresh }: HabitItemProps) {
         {/* 7-day trace — second row, no label */}
         {item.type !== "TODO" && (
           <ThisWeekTraceBar days={item.recent7Days} locale={locale} />
+        )}
+
+        {/* Morning Activation Hint — yesterday's "next intent" for today (before check-in) */}
+        {item.tomorrowHint && !item.todayCheckIn && (
+          <p className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-300 font-medium leading-snug">
+            <span className="shrink-0 leading-none">🌱</span>
+            <span className="text-[10px] text-muted-foreground font-normal">今日方向：</span>
+            <span className="truncate">{item.tomorrowHint}</span>
+          </p>
+        )}
+
+        {/* Evening Shutdown Seed — today's "next intent" for tomorrow (after check-in) */}
+        {item.todayCheckIn?.nextIntent && (
+          <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground leading-snug">
+            <span className="shrink-0 leading-none text-emerald-600">🌱</span>
+            <span className="text-[10px] text-muted-foreground/70 font-medium">明日预演：</span>
+            <span className="truncate text-foreground/80">{item.todayCheckIn.nextIntent}</span>
+          </p>
         )}
 
         {/* TODO due date */}

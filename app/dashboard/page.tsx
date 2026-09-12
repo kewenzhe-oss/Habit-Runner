@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { redirect } from "next/navigation"
 
 import { getTodayDashboardData } from "@/lib/api/checkin"
+import { getUserCategories } from "@/lib/api/categories"
 import { getUserToday } from "@/lib/api/user-date"
 import { authOptions } from "@/lib/auth"
 import { getCurrentUser } from "@/lib/session"
@@ -21,7 +22,10 @@ export default async function DashboardPage() {
   }
 
   const todayStr = await getUserToday(user.id)
-  const dashboardData = await getTodayDashboardData(user.id, todayStr)
+  const [dashboardData, categories] = await Promise.all([
+    getTodayDashboardData(user.id, todayStr),
+    getUserCategories(user.id),
+  ])
 
   return (
     <div className="space-y-6">
@@ -31,6 +35,7 @@ export default async function DashboardPage() {
       {/* Main Action Stream — TodayCompassCard is rendered inside HabitList as the first element */}
       <HabitList
         initialItems={dashboardData.items}
+        initialCategories={categories}
         dailyEnergy={dashboardData.dailyEnergy}
         dailyEnergyNote={dashboardData.dailyEnergyNote}
         dateStr={dashboardData.date}

@@ -13,6 +13,7 @@ export type HabitCheckInInput = {
   actualAmount?: number | null
   restReasonTag?: string | null
   notes?: string
+  nextIntent?: string
 }
 
 export type DerivedHabitCheckIn = {
@@ -23,6 +24,7 @@ export type DerivedHabitCheckIn = {
   completionRate: number
   restReasonTag: string | null
   notes?: string
+  nextIntent?: string
 }
 
 export function normalizeUnitType(unitType?: string | null): HabitUnitType {
@@ -81,5 +83,6 @@ export function deriveHabitCheckIn(
     completionRate,
     restReasonTag,
     notes: input.notes?.trim() || undefined,
+    nextIntent: input.nextIntent?.trim() || undefined,
   }
 }

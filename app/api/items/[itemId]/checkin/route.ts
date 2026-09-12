@@ -26,6 +26,7 @@ export async function POST(req: Request, { params }: RouteProps) {
       actualAmount: body.actualAmount,
       restReasonTag: body.restReasonTag,
       notes: body.notes,
+      nextIntent: body.nextIntent,
     })
 
     return new Response(JSON.stringify(checkIn), {

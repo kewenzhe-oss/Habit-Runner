@@ -23,6 +23,7 @@ export interface TrendDailyPoint {
   completionRate?: number
   restReasonTag?: string
   notes?: string
+  nextIntent?: string
   isScheduled: boolean
   isLogged: boolean
   isRest: boolean
@@ -116,6 +117,7 @@ export async function getItemTrendData(
         (checkIn?.status === "COMPLETED" ? 100 : undefined),
       restReasonTag: checkIn?.restReasonTag || undefined,
       notes: checkIn?.notes || undefined,
+      nextIntent: checkIn?.nextIntent || undefined,
       isScheduled: item.type === "HABIT" ? isScheduledDate(date, item) : true,
       isLogged: Boolean(checkIn),
       isRest: checkIn?.status === "REST",

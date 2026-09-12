@@ -287,9 +287,34 @@ export async function getActivityHistoryData(
   // 7. Build Active Habits summary with streak metrics (Habits only)
   let maxCurrentStreak = 0
 
+  // Batch fetch lookback check-ins for streak calculations across habit items (eliminates N+1 queries)
+  const earliestLookbackDate = addCalendarDays(todayStr, -120)
+  const batchCheckIns120 = await db.checkIn.findMany({
+    where: {
+      userId,
+      itemId: { in: habitItems.map((i) => i.id) },
+      date: { gte: earliestLookbackDate, lte: todayStr },
+    },
+    select: { itemId: true, date: true, status: true },
+    orderBy: { date: "desc" },
+  })
+
+  const item120CheckInsMap = new Map<string, Array<{ date: string; status: string }>>()
+  batchCheckIns120.forEach((c) => {
+    let list = item120CheckInsMap.get(c.itemId)
+    if (!list) {
+      list = []
+      item120CheckInsMap.set(c.itemId, list)
+    }
+    list.push(c)
+  })
+
   const activeItems: HistoryItemSummary[] = await Promise.all(
     habitItems.map(async (item) => {
-      const streaks = await calculateItemStreaks(item.id, todayStr)
+      const streaks = await calculateItemStreaks(item.id, todayStr, {
+        item,
+        checkIns: item120CheckInsMap.get(item.id) || [],
+      })
       const currentStreak =
         item.type === "QUIT_HABIT"
           ? streaks.maintainedDays

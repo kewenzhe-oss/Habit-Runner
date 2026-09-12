@@ -52,7 +52,11 @@
     "habitsSubtitle": "Maintain consistency and streaks",
     "todosTitle": "Action Tasks",
     "todosSubtitle": "Tasks for today",
-    "completedTodosTitle": "Completed Today",
+    "completedTodosTitle": "Recently Completed",
+    "completedArchiveNotice": "· Showing recent {max} ({archived} archived)",
+    "expandArchived": "Expand older archived tasks (+{count})",
+    "collapseArchived": "Collapse archived tasks",
+    "viewHistoryArchive": "View full history in archive",
     "completedCount": "{count} completed",
     "noPendingTodos": "All tasks completed. Great job!",
     "noHabits": "No routines added yet. Start with a simple action."

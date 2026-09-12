@@ -73,6 +73,7 @@ export type TodayItemDTO = {
   priority: ItemPriority
   sortOrder: number
   createdAt: string
+  updatedAt?: string
   id: string
   title: string
   whyPrompt?: string | null
@@ -94,6 +95,9 @@ export type TodayItemDTO = {
   recommendedTool?: PrismaToolLink | null
   toolLinks: PrismaToolLink[]
 
+  // Yesterday's "Next Action Seed" — surfaced as morning activation hint
+  tomorrowHint?: string | null
+
   // Today checkin status
   todayCheckIn?: {
     id: string
@@ -104,6 +108,7 @@ export type TodayItemDTO = {
     completionRate?: number | null
     restReasonTag?: string | null
     notes?: string | null
+    nextIntent?: string | null
   } | null
 
   // Streak & stats summary

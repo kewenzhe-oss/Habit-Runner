@@ -246,6 +246,7 @@ model CheckIn {
   restReasonTag  String?       @map(name: "rest_reason_tag")
 
   notes         String?       @db.Text
+  nextIntent    String?       @map(name: "next_intent") @db.Text
 
   createdAt     DateTime      @default(now()) @map(name: "created_at")
   updatedAt     DateTime      @updatedAt @map(name: "updated_at")
