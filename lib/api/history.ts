@@ -112,23 +112,14 @@ export async function getActivityHistoryData(
   const startDateStr = addCalendarDays(currentWeekSunday, -111) // 16 * 7 = 112 days
   const heatmapDates = enumerateCalendarDates(startDateStr, currentWeekSunday)
 
-  // 2. Fetch all user items (filtered to Habits & Quits for streaks/heatmaps)
-  const allItems = await getUserItems(userId, {
+  // 2. Start the independent reads immediately. The streak read only needs the
+  // item IDs, so it can start as soon as items resolve without waiting for
+  // these queries to finish.
+  const itemsPromise = getUserItems(userId, {
     status: ["ACTIVE", "COMPLETED"],
     includeCheckInCount: false,
   })
-  const habitItems = allItems.filter(
-    (i) => i.type === "HABIT" || i.type === "QUIT_HABIT"
-  )
-
-  // 3. Fetch Habit-only checkins in window, stats, completed todos, earliest checkin, and recent actions
-  const [
-    windowCheckIns,
-    allTimeStats,
-    recentCompletedTodos,
-    earliestCheckIn,
-    latestActions,
-  ] = await Promise.all([
+  const independentQueriesPromise = Promise.all([
     db.checkIn.findMany({
       where: {
         userId,
@@ -187,6 +178,43 @@ export async function getActivityHistoryData(
       take: 6,
     }),
   ])
+
+  const earliestLookbackDate = addCalendarDays(todayStr, -120)
+  const batchCheckIns120Promise = itemsPromise.then((allItems) => {
+    const habitItems = allItems.filter(
+      (i) => i.type === "HABIT" || i.type === "QUIT_HABIT"
+    )
+
+    return db.checkIn.findMany({
+      where: {
+        userId,
+        itemId: { in: habitItems.map((i) => i.id) },
+        date: { gte: earliestLookbackDate, lte: todayStr },
+      },
+      select: { itemId: true, date: true, status: true },
+      orderBy: { date: "desc" },
+    })
+  })
+
+  // 3. Join the item and independent reads with the item-dependent streak read.
+  const [
+    allItems,
+    [
+      windowCheckIns,
+      allTimeStats,
+      recentCompletedTodos,
+      earliestCheckIn,
+      latestActions,
+    ],
+    batchCheckIns120,
+  ] = await Promise.all([
+    itemsPromise,
+    independentQueriesPromise,
+    batchCheckIns120Promise,
+  ])
+  const habitItems = allItems.filter(
+    (i) => i.type === "HABIT" || i.type === "QUIT_HABIT"
+  )
 
   // Map checkins by date
   const dateCheckInsMap = new Map<string, typeof windowCheckIns>()
@@ -295,18 +323,6 @@ export async function getActivityHistoryData(
 
   // 7. Build Active Habits summary with streak metrics (Habits only)
   let maxCurrentStreak = 0
-
-  // Batch fetch lookback check-ins for streak calculations across habit items (eliminates N+1 queries)
-  const earliestLookbackDate = addCalendarDays(todayStr, -120)
-  const batchCheckIns120 = await db.checkIn.findMany({
-    where: {
-      userId,
-      itemId: { in: habitItems.map((i) => i.id) },
-      date: { gte: earliestLookbackDate, lte: todayStr },
-    },
-    select: { itemId: true, date: true, status: true },
-    orderBy: { date: "desc" },
-  })
 
   const item120CheckInsMap = new Map<
     string,

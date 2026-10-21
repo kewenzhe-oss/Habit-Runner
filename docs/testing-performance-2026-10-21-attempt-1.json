@@ -1,0 +1,517 @@
+{
+  "startedAt": "2026-10-21T10:52:16.588Z",
+  "smoke": false,
+  "environment": {
+    "origin": "http://localhost:3000",
+    "database": "habit_runner_perf",
+    "host": "localhost",
+    "cdpPort": 9242,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "deviceScaleFactor": 2
+    },
+    "user": "demo@habitrunner.dev",
+    "browser": "Chrome/155.0.8059.85"
+  },
+  "definitions": {
+    "feedback": "Trusted CDP mouse click event to next animation frame after pending spinner, active nav, or optimistic pressed-state/disabled buttons appears; rendering proxy, not measured screen presentation/INP.",
+    "navigation": "Trusted click to next animation frame with destination pathname, active bottom nav and destination h1 visible. Does not assert every chart has finished rendering.",
+    "cold": "Separate cache-bypassed dashboard document navigation; browser HTTP cache disabled, server/OS/connection caches uncontrolled. Never pooled with warmed SPA clicks.",
+    "quitResponse": "CDP requestWillBeSent -> responseReceived (headers); bodyComplete uses loadingFinished; clickToResponse also recorded. Server-Timing is verbatim auth/save_and_streaks, not pure SQL.",
+    "throttle": "CDP emulated network RTT/throughput and CPU rate; not a real mobile network or hardware benchmark."
+  },
+  "coldDocuments": [
+    {
+      "profile": "normal",
+      "h1": "我的行动",
+      "responseStartMs": 20.900000005960464,
+      "responseEndMs": 64.40000000596046,
+      "domContentLoadedMs": 89.19999998807907,
+      "loadMs": 224
+    }
+  ],
+  "warmups": [
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 1840.699999988079,
+      "feedbackMs": 13.7,
+      "readyMs": 347.6,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 392.2999999821186,
+      "feedbackMs": 2.9,
+      "readyMs": 320.3,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 1003.0999999940395,
+      "feedbackMs": 9,
+      "readyMs": 342.1,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 1647.5999999940395,
+      "feedbackMs": 14.5,
+      "readyMs": 330.9,
+      "trusted": true,
+      "requestsSinceArm": 0
+    }
+  ],
+  "navigations": [
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 2288.4000000059605,
+      "feedbackMs": 6.9,
+      "readyMs": 323.6,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 2931.4000000059605,
+      "feedbackMs": 13.3,
+      "readyMs": 329.4,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 3571.699999988079,
+      "feedbackMs": 6.9,
+      "readyMs": 322.9,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 4191.299999982119,
+      "feedbackMs": 3.6,
+      "readyMs": 336.9,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 4832.5,
+      "feedbackMs": 12.8,
+      "readyMs": 329.1,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 5471.5999999940395,
+      "feedbackMs": 6.9,
+      "readyMs": 323.7,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 6088.9000000059605,
+      "feedbackMs": 6,
+      "readyMs": 340,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 6731.0999999940395,
+      "feedbackMs": 13.2,
+      "readyMs": 346.9,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 7371.5999999940395,
+      "feedbackMs": 6.2,
+      "readyMs": 323.3,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 8015.0999999940395,
+      "feedbackMs": 13.1,
+      "readyMs": 330.5,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 8662.299999982119,
+      "feedbackMs": 16.3,
+      "readyMs": 348.7,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 9302,
+      "feedbackMs": 9,
+      "readyMs": 326,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 9946.299999982119,
+      "feedbackMs": 15.3,
+      "readyMs": 332.6,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 10595.799999982119,
+      "feedbackMs": 15.5,
+      "readyMs": 33.6,
+      "trusted": true,
+      "requestsSinceArm": 0
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 10926.799999982119,
+      "feedbackMs": 2.2,
+      "readyMs": 318.4,
+      "trusted": true,
+      "requestsSinceArm": 0
+    }
+  ],
+  "quits": [
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 16.75,
+          "status": 200,
+          "serverTiming": "auth;dur=1.1, save_and_streaks;dur=7.3",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 16.24,
+          "clickToResponseMs": 17.94
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 8.3,
+      "readyMs": 35.7,
+      "trusted": true,
+      "elapsedHarnessMs": 332,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "LAPSED",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 11.45,
+          "status": 200,
+          "serverTiming": "auth;dur=1.1, save_and_streaks;dur=3.6",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 11.23,
+          "clickToResponseMs": 12.05
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 5.1,
+      "readyMs": 17.2,
+      "trusted": true,
+      "elapsedHarnessMs": 327,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 13.25,
+          "status": 200,
+          "serverTiming": "auth;dur=0.8, save_and_streaks;dur=3.5",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 13.04,
+          "clickToResponseMs": 13.49
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 6.3,
+      "readyMs": 18.2,
+      "trusted": true,
+      "elapsedHarnessMs": 327,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "LAPSED",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 12.44,
+          "status": 200,
+          "serverTiming": "auth;dur=1.1, save_and_streaks;dur=2.7",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 10.06,
+          "clickToResponseMs": 12.87
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 11.5,
+      "readyMs": 28.1,
+      "trusted": true,
+      "elapsedHarnessMs": 327,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 14.67,
+          "status": 200,
+          "serverTiming": "auth;dur=0.8, save_and_streaks;dur=3.5",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 10.19,
+          "clickToResponseMs": 14.92
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 13.7,
+      "readyMs": 29.8,
+      "trusted": true,
+      "elapsedHarnessMs": 326,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    }
+  ],
+  "checks": [
+    {
+      "profile": "normal",
+      "check": "initial real navigation dashboard to insights",
+      "ok": true,
+      "harnessElapsedMs": 683
+    }
+  ],
+  "errors": [
+    {
+      "stage": "run",
+      "message": "Click target missing, disabled, or outside viewport"
+    }
+  ],
+  "cleanup": {
+    "fixtureDeleted": true,
+    "fixtureCheckInsDeleted": true,
+    "afterHashes": {
+      "checkIns": "264b2438657150865c72a07f8376a4cc00279aa68e450c8001f1e111e0ee2bd7",
+      "energy": "152c242e9d822b51b37f203bf465ba049c2faaf839e8ec6e318012a815df9450",
+      "items": "3400f745a58f594b32bb2358895d23db8752d9df3262b618bd3890b977157eb9",
+      "user": "202beb64ac2a365017c704c3dfbfb3b020354c404a0362b51a63d2cd5355d936"
+    },
+    "unchanged": {
+      "checkIns": true,
+      "energy": true,
+      "items": true,
+      "user": true
+    }
+  },
+  "safety": {
+    "baselineHashes": {
+      "checkIns": "264b2438657150865c72a07f8376a4cc00279aa68e450c8001f1e111e0ee2bd7",
+      "energy": "152c242e9d822b51b37f203bf465ba049c2faaf839e8ec6e318012a815df9450",
+      "items": "3400f745a58f594b32bb2358895d23db8752d9df3262b618bd3890b977157eb9",
+      "user": "202beb64ac2a365017c704c3dfbfb3b020354c404a0362b51a63d2cd5355d936"
+    },
+    "baselineCounts": {
+      "checkIns": 998,
+      "energy": 1,
+      "items": 20
+    },
+    "fixtureId": "qa_perf_20261021_6b0ab03b-ed21-47f6-91db-3e5f90b9d4d0"
+  },
+  "profiles": [
+    {
+      "name": "normal",
+      "latency": 0,
+      "downloadThroughput": -1,
+      "uploadThroughput": -1,
+      "cpu": 1
+    },
+    {
+      "name": "latency150_cpu4",
+      "latency": 150,
+      "downloadThroughput": 200000,
+      "uploadThroughput": 93750,
+      "cpu": 4
+    }
+  ],
+  "status": "failed",
+  "finishedAt": "2026-10-21T10:52:36.141Z",
+  "validForFinalResults": false,
+  "exclusionReason": "Pre-READY diagnostic run. Throttled-only may overlap rebuild; all final comparisons must use a single fixed post-READY build."
+}

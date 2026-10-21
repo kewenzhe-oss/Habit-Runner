@@ -1,0 +1,1622 @@
+{
+  "startedAt": "2026-10-21T10:57:40.014Z",
+  "smoke": false,
+  "buildAtStart": {
+    "buildId": "3J1xQq7sEZ1dc_5Xe6q8z",
+    "artifacts": {
+      ".next/BUILD_ID": "c387810ca14e9cad7555cae5ec64f7392bfa1239a95f1c821fee5d2cb9d71f5e",
+      ".next/server/app/(app)/dashboard/page.js": "caa39c0893fe5aea438d32468df21cd41497c9da9730deba7ffdd609a986476d",
+      ".next/server/app/(app)/insights/page.js": "de6c0da022468cd66ca6fed40a132f3aacffae12c5bb7dddff322658da091b5c",
+      ".next/server/app/(app)/settings/page.js": "cdf4edea663e8e7948064f80385d780da3af4f2cd0d7fcd01b303abe165fd8ed"
+    }
+  },
+  "validForFinalResults": true,
+  "environment": {
+    "origin": "http://localhost:3000",
+    "database": "habit_runner_perf",
+    "host": "localhost",
+    "cdpPort": 9242,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "deviceScaleFactor": 2
+    },
+    "user": "demo@habitrunner.dev",
+    "browser": "Chrome/155.0.8059.85"
+  },
+  "definitions": {
+    "feedback": "Trusted CDP mouse click event to next animation frame after pending spinner, active nav, or optimistic pressed-state/disabled buttons appears; rendering proxy, not measured screen presentation/INP.",
+    "navigation": "Trusted click to next animation frame with destination pathname, active bottom nav and destination h1 text present. Not pixel presentation or full chart readiness.",
+    "cold": "Separate cache-bypassed dashboard document navigation; browser HTTP cache disabled, server/OS/connection caches uncontrolled. Never pooled with warmed SPA clicks.",
+    "quitResponse": "CDP requestWillBeSent -> responseReceived (headers); bodyComplete uses loadingFinished; clickToResponse also recorded. Server-Timing is verbatim auth/save_and_streaks, not pure SQL.",
+    "throttle": "CDP emulated latency/throughput and CPU rate; not a real mobile network or hardware benchmark."
+  },
+  "coldDocuments": [
+    {
+      "profile": "normal",
+      "h1": "我的行动",
+      "responseStartMs": 85.59999999403954,
+      "responseEndMs": 161.59999999403954,
+      "domContentLoadedMs": 225.30000001192093,
+      "loadMs": 269.09999999403954,
+      "loadEventObserved": true,
+      "eligibleForTimingConclusions": true
+    },
+    {
+      "profile": "latency150_cpu4",
+      "h1": "我的行动",
+      "responseStartMs": 12.799999982118607,
+      "responseEndMs": 280.19999998807907,
+      "domContentLoadedMs": 496.09999999403954,
+      "loadMs": 0,
+      "loadEventObserved": false,
+      "eligibleForTimingConclusions": false
+    }
+  ],
+  "warmups": [
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 3763.300000011921,
+      "feedbackMs": 12.3,
+      "readyMs": 328.4,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176169.568273,
+          "status": 200,
+          "responseMs": 9.28,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 992.6999999880791,
+      "feedbackMs": 2.1,
+      "readyMs": 336,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176171.835954,
+          "status": 200,
+          "responseMs": 17.83,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 2246.7999999821186,
+      "feedbackMs": 14,
+      "readyMs": 347.1,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176173.101789,
+          "status": 200,
+          "responseMs": 10.85,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 3484.5,
+      "feedbackMs": 9.7,
+      "readyMs": 326,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176174.334526,
+          "status": 200,
+          "responseMs": 10.99,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 5427.899999976158,
+      "feedbackMs": 11.5,
+      "readyMs": 516.6,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176204.937497,
+          "status": 200,
+          "responseMs": 162.8,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 2400.699999988079,
+      "feedbackMs": 6.9,
+      "readyMs": 530.3,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176208.224032,
+          "status": 200,
+          "responseMs": 174.35,
+          "fromDiskCache": false
+        },
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176208.224399,
+          "status": 200,
+          "responseMs": 168.28,
+          "fromDiskCache": false
+        },
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176208.945861,
+          "status": 200,
+          "responseMs": 157.14,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 3848.699999988079,
+      "feedbackMs": 5.2,
+      "readyMs": 201.9,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176210.391958,
+          "status": 200,
+          "responseMs": 158.73,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 4972.799999982119,
+      "feedbackMs": 12.9,
+      "readyMs": 511,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176211.521681,
+          "status": 200,
+          "responseMs": 153.55,
+          "fromDiskCache": false
+        }
+      ]
+    }
+  ],
+  "navigations": [
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 4722.799999982119,
+      "feedbackMs": 4.1,
+      "readyMs": 321.8,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176175.567448,
+          "status": 200,
+          "responseMs": 12.23,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 5962.299999982119,
+      "feedbackMs": 15,
+      "readyMs": 33,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176176.818265,
+          "status": 200,
+          "responseMs": 11.04,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 6884.9000000059605,
+      "feedbackMs": 9.2,
+      "readyMs": 325.4,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176177.734372,
+          "status": 200,
+          "responseMs": 11.2,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 8126.199999988079,
+      "feedbackMs": 1.3,
+      "readyMs": 317.3,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176178.96799,
+          "status": 200,
+          "responseMs": 11.07,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 9332.59999999404,
+      "feedbackMs": 10.4,
+      "readyMs": 28.1,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176180.184001,
+          "status": 200,
+          "responseMs": 11.58,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 10250.40000000596,
+      "feedbackMs": 10.1,
+      "readyMs": 326.4,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176181.101162,
+          "status": 200,
+          "responseMs": 6.39,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 11487.5,
+      "feedbackMs": 6.3,
+      "readyMs": 323.3,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176182.334173,
+          "status": 200,
+          "responseMs": 13.51,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 12720.199999988079,
+      "feedbackMs": 6.9,
+      "readyMs": 24.5,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176183.567955,
+          "status": 200,
+          "responseMs": 11.67,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 13640.299999982119,
+      "feedbackMs": 2.7,
+      "readyMs": 319.8,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176184.483106,
+          "status": 200,
+          "responseMs": 6.52,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 14877.90000000596,
+      "feedbackMs": 15.8,
+      "readyMs": 335.9,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176185.734174,
+          "status": 200,
+          "responseMs": 9.98,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 16122.90000000596,
+      "feedbackMs": 3.5,
+      "readyMs": 21.6,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176186.967137,
+          "status": 200,
+          "responseMs": 12.18,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 17041.19999998808,
+      "feedbackMs": 1.5,
+      "readyMs": 318.3,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176187.882994,
+          "status": 200,
+          "responseMs": 8.37,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 18251.40000000596,
+      "feedbackMs": 8.9,
+      "readyMs": 342.5,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176189.100767,
+          "status": 200,
+          "responseMs": 13.84,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 19500.5,
+      "feedbackMs": 9.4,
+      "readyMs": 325.1,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176190.350688,
+          "status": 200,
+          "responseMs": 10.25,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 20734.40000000596,
+      "feedbackMs": 9.1,
+      "readyMs": 325.5,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176191.583673,
+          "status": 200,
+          "responseMs": 12.66,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 6380.0999999940395,
+      "feedbackMs": 5.8,
+      "readyMs": 506.2,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176212.923202,
+          "status": 200,
+          "responseMs": 155.9,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 7789.5,
+      "feedbackMs": 12.2,
+      "readyMs": 198.9,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176214.339502,
+          "status": 200,
+          "responseMs": 164.12,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 8889.699999988079,
+      "feedbackMs": 12.8,
+      "readyMs": 514.6,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176215.437023,
+          "status": 200,
+          "responseMs": 162.45,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 10301.09999999404,
+      "feedbackMs": 4.9,
+      "readyMs": 507.6,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176216.842429,
+          "status": 200,
+          "responseMs": 158.42,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 11708.799999982119,
+      "feedbackMs": 8.7,
+      "readyMs": 191.8,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176218.255293,
+          "status": 200,
+          "responseMs": 155.98,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 12796,
+      "feedbackMs": 5.1,
+      "readyMs": 510.3,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176219.336084,
+          "status": 200,
+          "responseMs": 163.71,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 14208.5,
+      "feedbackMs": 10.7,
+      "readyMs": 520.3,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176220.756118,
+          "status": 200,
+          "responseMs": 160.1,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 15628.799999982119,
+      "feedbackMs": 5.9,
+      "readyMs": 205.8,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176222.173029,
+          "status": 200,
+          "responseMs": 160.51,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 16731.59999999404,
+      "feedbackMs": 5.1,
+      "readyMs": 505.9,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176223.271772,
+          "status": 200,
+          "responseMs": 157.24,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 18134.09999999404,
+      "feedbackMs": 5.4,
+      "readyMs": 518.5,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176224.677018,
+          "status": 200,
+          "responseMs": 160.81,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 19572.5,
+      "feedbackMs": 12,
+      "readyMs": 194.2,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176226.121176,
+          "status": 200,
+          "responseMs": 157.51,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 20671.40000000596,
+      "feedbackMs": 12.7,
+      "readyMs": 519.8,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176227.219398,
+          "status": 200,
+          "responseMs": 164.02,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 22091.69999998808,
+      "feedbackMs": 9.1,
+      "readyMs": 513.8,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/insights",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176228.637254,
+          "status": 200,
+          "responseMs": 162.44,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/insights",
+      "to": "/settings",
+      "kind": "nav",
+      "target": "/settings",
+      "start": 23506.09999999404,
+      "feedbackMs": 11.4,
+      "readyMs": 193.8,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/settings",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176230.054726,
+          "status": 200,
+          "responseMs": 153.73,
+          "fromDiskCache": false
+        }
+      ]
+    },
+    {
+      "profile": "latency150_cpu4",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 24595.29999998212,
+      "feedbackMs": 5.9,
+      "readyMs": 505.4,
+      "trusted": true,
+      "routeRequestsDuringClickPreparationAndNavigation": [
+        {
+          "path": "/dashboard",
+          "type": "Fetch",
+          "rsc": false,
+          "prefetch": false,
+          "startTimestamp": 176231.135977,
+          "status": 200,
+          "responseMs": 159.31,
+          "fromDiskCache": false
+        }
+      ]
+    }
+  ],
+  "quits": [
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 22.46,
+          "status": 200,
+          "serverTiming": "auth;dur=1.0, save_and_streaks;dur=6.8",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 22.44,
+          "clickToResponseMs": 23.75
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 14.5,
+      "readyMs": 32.6,
+      "trusted": true,
+      "elapsedHarnessMs": 385,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "LAPSED",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 15.91,
+          "status": 200,
+          "serverTiming": "auth;dur=0.7, save_and_streaks;dur=3.9",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 10.35,
+          "clickToResponseMs": 15.83
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 14.8,
+      "readyMs": 31.3,
+      "trusted": true,
+      "elapsedHarnessMs": 380,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 14.77,
+          "status": 200,
+          "serverTiming": "auth;dur=0.8, save_and_streaks;dur=3.3",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 9.61,
+          "clickToResponseMs": 15.12
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 13.8,
+      "readyMs": 30.4,
+      "trusted": true,
+      "elapsedHarnessMs": 419,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "LAPSED",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 17.82,
+          "status": 200,
+          "serverTiming": "auth;dur=0.6, save_and_streaks;dur=3.7",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 11.2,
+          "clickToResponseMs": 18.17
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 16.9,
+      "readyMs": 33.3,
+      "trusted": true,
+      "elapsedHarnessMs": 387,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 12.34,
+          "status": 200,
+          "serverTiming": "auth;dur=1.4, save_and_streaks;dur=2.8",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 12.06,
+          "clickToResponseMs": 12.91
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 6.5,
+      "readyMs": 19,
+      "trusted": true,
+      "elapsedHarnessMs": 378,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "LAPSED",
+      "mode": "delayed",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 1209.39,
+          "status": 200,
+          "serverTiming": "auth;dur=0.6, save_and_streaks;dur=3.0",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 1209.17,
+          "clickToResponseMs": 1209.83
+        }
+      ],
+      "intercepted": 1,
+      "feedbackMs": 11,
+      "readyMs": 1214.9,
+      "trusted": true,
+      "elapsedHarnessMs": 1556,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "failure",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 602,
+          "status": 503,
+          "serverTiming": null,
+          "cacheControl": null,
+          "bodyCompleteMs": 601.71,
+          "clickToResponseMs": 602.18
+        }
+      ],
+      "intercepted": 1,
+      "feedbackMs": 14.4,
+      "readyMs": null,
+      "trusted": true,
+      "elapsedHarnessMs": 951,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "latency150_cpu4",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 167.97,
+          "status": 200,
+          "serverTiming": "auth;dur=0.5, save_and_streaks;dur=2.9",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 166.89,
+          "clickToResponseMs": 169.37
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 20.4,
+      "readyMs": 189.8,
+      "trusted": true,
+      "elapsedHarnessMs": 542,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "latency150_cpu4",
+      "status": "LAPSED",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 168.21,
+          "status": 200,
+          "serverTiming": "auth;dur=0.6, save_and_streaks;dur=3.9",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 167.37,
+          "clickToResponseMs": 168.7
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 18,
+      "readyMs": 189.8,
+      "trusted": true,
+      "elapsedHarnessMs": 535,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "latency150_cpu4",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 166.32,
+          "status": 200,
+          "serverTiming": "auth;dur=0.7, save_and_streaks;dur=3.2",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 165.68,
+          "clickToResponseMs": 166.87
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 19.4,
+      "readyMs": 186.6,
+      "trusted": true,
+      "elapsedHarnessMs": 2081,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "latency150_cpu4",
+      "status": "LAPSED",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 164.91,
+          "status": 200,
+          "serverTiming": "auth;dur=0.7, save_and_streaks;dur=3.8",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 164.68,
+          "clickToResponseMs": 165.61
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 18.2,
+      "readyMs": 189.6,
+      "trusted": true,
+      "elapsedHarnessMs": 2093,
+      "pressedAfter": [
+        "false",
+        "true"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "LAPSED"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "false",
+        "true"
+      ],
+      "reloadConsistent": true
+    },
+    {
+      "profile": "latency150_cpu4",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 163.54,
+          "status": 200,
+          "serverTiming": "auth;dur=0.6, save_and_streaks;dur=2.2",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 162.81,
+          "clickToResponseMs": 164.65
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 20.3,
+      "readyMs": 183.7,
+      "trusted": true,
+      "elapsedHarnessMs": 2077,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    }
+  ],
+  "checks": [
+    {
+      "profile": "normal",
+      "check": "initial real navigation dashboard to insights",
+      "ok": true,
+      "harnessElapsedMs": 1301
+    },
+    {
+      "profile": "latency150_cpu4",
+      "check": "initial real navigation dashboard to insights",
+      "ok": true,
+      "harnessElapsedMs": 2744
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "fixtureDeleted": true,
+    "fixtureCheckInsDeleted": true,
+    "afterHashes": {
+      "checkIns": "264b2438657150865c72a07f8376a4cc00279aa68e450c8001f1e111e0ee2bd7",
+      "energy": "152c242e9d822b51b37f203bf465ba049c2faaf839e8ec6e318012a815df9450",
+      "items": "3400f745a58f594b32bb2358895d23db8752d9df3262b618bd3890b977157eb9",
+      "user": "202beb64ac2a365017c704c3dfbfb3b020354c404a0362b51a63d2cd5355d936"
+    },
+    "unchanged": {
+      "checkIns": true,
+      "energy": true,
+      "items": true,
+      "user": true
+    }
+  },
+  "safety": {
+    "baselineHashes": {
+      "checkIns": "264b2438657150865c72a07f8376a4cc00279aa68e450c8001f1e111e0ee2bd7",
+      "energy": "152c242e9d822b51b37f203bf465ba049c2faaf839e8ec6e318012a815df9450",
+      "items": "3400f745a58f594b32bb2358895d23db8752d9df3262b618bd3890b977157eb9",
+      "user": "202beb64ac2a365017c704c3dfbfb3b020354c404a0362b51a63d2cd5355d936"
+    },
+    "baselineCounts": {
+      "checkIns": 998,
+      "energy": 1,
+      "items": 20
+    },
+    "fixtureId": "qa_perf_20261021_9db2c0f1-bba9-4831-85ba-9fea534d776b"
+  },
+  "profiles": [
+    {
+      "name": "normal",
+      "latency": 0,
+      "downloadThroughput": -1,
+      "uploadThroughput": -1,
+      "cpu": 1
+    },
+    {
+      "name": "latency150_cpu4",
+      "latency": 150,
+      "downloadThroughput": 200000,
+      "uploadThroughput": 93750,
+      "cpu": 4
+    }
+  ],
+  "summaries": {
+    "navigation": [
+      {
+        "profile": "normal",
+        "from": "/dashboard",
+        "to": "/insights",
+        "feedback": {
+          "n": 5,
+          "medianMs": 6.3,
+          "maxMs": 15.8
+        },
+        "contentReady": {
+          "n": 5,
+          "medianMs": 323.3,
+          "maxMs": 342.5
+        }
+      },
+      {
+        "profile": "normal",
+        "from": "/insights",
+        "to": "/settings",
+        "feedback": {
+          "n": 5,
+          "medianMs": 9.4,
+          "maxMs": 15
+        },
+        "contentReady": {
+          "n": 5,
+          "medianMs": 28.1,
+          "maxMs": 325.1
+        }
+      },
+      {
+        "profile": "normal",
+        "from": "/settings",
+        "to": "/dashboard",
+        "feedback": {
+          "n": 5,
+          "medianMs": 9.1,
+          "maxMs": 10.1
+        },
+        "contentReady": {
+          "n": 5,
+          "medianMs": 325.4,
+          "maxMs": 326.4
+        }
+      },
+      {
+        "profile": "latency150_cpu4",
+        "from": "/dashboard",
+        "to": "/insights",
+        "feedback": {
+          "n": 5,
+          "medianMs": 5.8,
+          "maxMs": 10.7
+        },
+        "contentReady": {
+          "n": 5,
+          "medianMs": 513.8,
+          "maxMs": 520.3
+        }
+      },
+      {
+        "profile": "latency150_cpu4",
+        "from": "/insights",
+        "to": "/settings",
+        "feedback": {
+          "n": 5,
+          "medianMs": 11.4,
+          "maxMs": 12.2
+        },
+        "contentReady": {
+          "n": 5,
+          "medianMs": 194.2,
+          "maxMs": 205.8
+        }
+      },
+      {
+        "profile": "latency150_cpu4",
+        "from": "/settings",
+        "to": "/dashboard",
+        "feedback": {
+          "n": 5,
+          "medianMs": 5.9,
+          "maxMs": 12.8
+        },
+        "contentReady": {
+          "n": 5,
+          "medianMs": 510.3,
+          "maxMs": 519.8
+        }
+      }
+    ],
+    "quit": [
+      {
+        "profile": "normal",
+        "feedback": {
+          "n": 5,
+          "medianMs": 14.5,
+          "maxMs": 16.9
+        },
+        "response": {
+          "n": 5,
+          "medianMs": 15.91,
+          "maxMs": 22.46
+        },
+        "clickToResponse": {
+          "n": 5,
+          "medianMs": 15.83,
+          "maxMs": 23.75
+        },
+        "bodyComplete": {
+          "n": 5,
+          "medianMs": 11.2,
+          "maxMs": 22.44
+        }
+      },
+      {
+        "profile": "latency150_cpu4",
+        "feedback": {
+          "n": 5,
+          "medianMs": 19.4,
+          "maxMs": 20.4
+        },
+        "response": {
+          "n": 5,
+          "medianMs": 166.32,
+          "maxMs": 168.21
+        },
+        "clickToResponse": {
+          "n": 5,
+          "medianMs": 166.87,
+          "maxMs": 169.37
+        },
+        "bodyComplete": {
+          "n": 5,
+          "medianMs": 165.68,
+          "maxMs": 167.37
+        }
+      }
+    ]
+  },
+  "status": "passed",
+  "buildAtEnd": {
+    "buildId": "3J1xQq7sEZ1dc_5Xe6q8z",
+    "artifacts": {
+      ".next/BUILD_ID": "c387810ca14e9cad7555cae5ec64f7392bfa1239a95f1c821fee5d2cb9d71f5e",
+      ".next/server/app/(app)/dashboard/page.js": "caa39c0893fe5aea438d32468df21cd41497c9da9730deba7ffdd609a986476d",
+      ".next/server/app/(app)/insights/page.js": "de6c0da022468cd66ca6fed40a132f3aacffae12c5bb7dddff322658da091b5c",
+      ".next/server/app/(app)/settings/page.js": "cdf4edea663e8e7948064f80385d780da3af4f2cd0d7fcd01b303abe165fd8ed"
+    }
+  },
+  "fixedBuild": true,
+  "finishedAt": "2026-10-21T10:58:57.754Z",
+  "validityScope": "Final fixed-build warmed browser SPA navigation and temporary quit-status interaction checks. Cold-document diagnostics are separate; throttled load timing is incomplete and excluded.",
+  "analysisNotes": {
+    "concurrency": "Waited for the estimated UI matrix interval before launch; explicit confirmation that UI matrix had finished arrived during normal sampling. Some normal samples may have minor parallel read-only UI load; throttled phase was exclusive.",
+    "navigationWaits": "Click timestamp is captured by a trusted document click listener. Pre-click hydration/scroll/150ms positioning waits and post-result 180ms sleep are outside the measured interval. Browser route/React/Suspense/rAF scheduling remains inside. No trace was collected to attribute the approximately 300ms plateau to an internal Next/React policy.",
+    "responseTiming": "responseMs uses Network.responseReceived.timestamp minus requestWillBeSent.timestamp; bodyCompleteMs uses loadingFinished.timestamp. These event endpoints can be non-monotonic in this instrumented capture and must not be compared as physical header/body arrival order. bodyCompleteMs is diagnostic only. clickToResponseMs additionally maps wallTime to performance.timeOrigin and is approximate.",
+    "coldTiming": "Throttled cold snapshot had loadMs=0 and no explicit new-document timeOrigin guard. It is incomplete and excluded from timing conclusions. The normal cold snapshot remains a separate single diagnostic sample, not pooled with warm navigation.",
+    "rscFlags": "Route request type/path/status/responseMs are usable. Raw rsc/prefetch booleans used exact header-name casing and are not reliable evidence that headers were absent."
+  }
+}

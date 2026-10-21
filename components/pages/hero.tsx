@@ -2,8 +2,6 @@ import Link from "next/link"
 
 import { buildSignInUrl } from "@/lib/auth-redirect"
 import { getDictionary } from "@/lib/i18n"
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
 
 interface HeroHeaderProps {
@@ -12,253 +10,77 @@ interface HeroHeaderProps {
 
 export default function HeroHeader({ isAuthenticated }: HeroHeaderProps) {
   const dict = getDictionary("zh").landing.hero
+  const examples = [
+    { title: "读书", action: "读了 20 分钟", status: "已完成" },
+    { title: "晚间散步", action: "今天走 5 分钟", status: "微行动" },
+    { title: "睡前不刷短视频", action: "今天做到了", status: "已记录" },
+  ]
 
   return (
-    <section className="space-y-8 pb-12 pt-8 md:space-y-12 md:pt-14 lg:py-20">
-      {/* 1. Header Typography */}
-      <div className="container flex max-w-[58rem] flex-col items-center gap-3 text-center">
-        {/* 眉题 (Eyebrow) */}
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/80">
-          {dict.eyebrow}
-        </p>
-
-        {/* 主标题 (Headline) */}
-        <h1 className="text-3xl font-extrabold tracking-tight text-foreground sm:text-5xl md:text-6xl">
-          {dict.title}
-        </h1>
-
-        {/* 副标题 (Subtitle) */}
-        <p className="max-w-[36rem] text-sm leading-relaxed text-muted-foreground sm:text-base sm:leading-7">
-          {dict.subtitle}
-        </p>
-
-        {/* CTA 按钮 */}
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+    <section
+      aria-labelledby="landing-title"
+      className="px-4 py-14 sm:px-6 sm:py-20 lg:py-24"
+    >
+      <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
+        <div className="min-w-0 space-y-6">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground">
+            {dict.eyebrow}
+          </p>
+          <h1
+            id="landing-title"
+            className="max-w-xl text-4xl font-semibold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+          >
+            {dict.title}
+          </h1>
+          <p className="max-w-md text-base leading-7 text-muted-foreground">
+            {dict.subtitle}
+          </p>
           <Link
             href={isAuthenticated ? "/dashboard" : buildSignInUrl("/dashboard")}
-            className={cn(
-              buttonVariants({ variant: "default", size: "lg" }),
-              "shadow-xs gap-2"
-            )}
+            className="inline-flex min-h-11 items-center justify-center gap-3 rounded-lg bg-foreground px-5 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            <span>{dict.ctaPrimary}</span>
-            <Icons.next className="h-4 w-4" />
+            {dict.ctaPrimary}
+            <Icons.next aria-hidden="true" className="h-4 w-4" />
           </Link>
+          <p className="text-xs leading-5 text-muted-foreground">{dict.note}</p>
         </div>
-      </div>
 
-      {/* 2. Hero Visual 1: Today Compass & Action Surface (Centered Floating Mockup) */}
-      <div className="container max-w-4xl px-4 sm:px-6">
-        <div className="bg-linear-to-b relative overflow-hidden rounded-2xl border border-border/80 from-card to-card/95 p-4 shadow-2xl shadow-black/5 ring-1 ring-border/40 md:p-6">
-          {/* Subtle Ambient Glow */}
-          <div className="pointer-events-none absolute -right-6 -top-6 h-36 w-36 rounded-full bg-emerald-500/10 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-6 -left-6 h-36 w-36 rounded-full bg-blue-500/10 blur-3xl" />
-
-          {/* ——— Today Compass Card ——— */}
-          <div className="relative space-y-3 rounded-xl border border-border/60 bg-muted/20 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/40 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-400">
-                <Icons.check className="h-3 w-3" />
-                <span>✓ 今日日常已达成 · 4/4</span>
-              </span>
-              <span className="text-[11px] text-muted-foreground/75">
-                本周还剩 3 天
-              </span>
-            </div>
-
-            <div className="space-y-0.5">
-              <h2 className="text-base font-bold tracking-tight text-foreground sm:text-lg">
-                今天的日常已全部完成
-              </h2>
-              <p className="text-xs text-muted-foreground sm:text-sm">
-                今天的节律已稳稳达成，享受放松时间。
-              </p>
-            </div>
-
-            {/* Inline Energy Selector Pill Row */}
-            <div className="flex items-center gap-1.5 border-t border-border/40 pt-2.5">
-              <span className="mr-1 text-[11px] text-muted-foreground/60">
-                今日能量状态
-              </span>
-              <span className="rounded-full border border-foreground bg-foreground px-2.5 py-0.5 text-[11px] font-medium text-background">
-                High
-              </span>
-              <span className="rounded-full border border-border/60 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                Normal
-              </span>
-              <span className="rounded-full border border-border/60 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                Low
-              </span>
-              <span className="rounded-full border border-border/60 px-2.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                Rest
-              </span>
-            </div>
+        <figure className="min-w-0 rounded-xl border bg-card">
+          <figcaption className="flex flex-wrap items-center justify-between gap-2 border-b px-5 py-4 text-xs text-muted-foreground">
+            <span className="font-medium text-foreground">
+              {dict.previewTitle}
+            </span>
+            <span>{dict.previewLabel}</span>
+          </figcaption>
+          <div className="px-5 py-5 sm:px-6">
+            <p className="text-lg font-semibold text-foreground">
+              {dict.previewHeading}
+            </p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {dict.previewDescription}
+            </p>
+            <ul className="mt-5 divide-y">
+              {examples.map((example) => (
+                <li
+                  key={example.title}
+                  className="flex items-start justify-between gap-3 py-4"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">
+                      {example.title}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {example.action}
+                    </p>
+                  </div>
+                  <span className="shrink-0 pt-0.5 text-xs text-muted-foreground">
+                    {example.status}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
-
-          {/* ——— Category Filter Pills ——— */}
-          <div className="mt-4 flex flex-wrap items-center gap-1.5">
-            <span className="rounded-full border border-foreground bg-foreground px-2.5 py-0.5 text-xs font-semibold text-background">
-              全部
-            </span>
-            <span className="flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-              <span>身体与健康</span>
-            </span>
-            <span className="flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-              <span>创造与工作</span>
-            </span>
-            <span className="flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-purple-500" />
-              <span>学习与输入</span>
-            </span>
-            <span className="flex items-center gap-1 rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-              <span>深度思考</span>
-            </span>
-          </div>
-
-          {/* ——— Action Stream (Quiet Minimal Divider List) ——— */}
-          <div className="mt-3 divide-y divide-border/40 rounded-xl border border-border/50 bg-card px-4">
-            {/* Item 1 */}
-            <div className="flex items-center gap-3 py-3">
-              <span className="h-6 w-0.5 shrink-0 rounded-full bg-purple-500 opacity-80" />
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">
-                    每日深度阅读
-                  </span>
-                  <span className="text-[11px] text-muted-foreground/60">
-                    12天
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[8px] text-muted-foreground/50">
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>一</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>二</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>三</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground/35" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>四</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>五</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>六</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>日</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                </div>
-              </div>
-              <span className="h-4 w-4 shrink-0 rounded-full bg-purple-500" />
-            </div>
-
-            {/* Item 2 */}
-            <div className="flex items-center gap-3 py-3">
-              <span className="h-6 w-0.5 shrink-0 rounded-full bg-emerald-500 opacity-80" />
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">
-                    力量与体态恢复训练
-                  </span>
-                  <span className="text-[11px] text-muted-foreground/60">
-                    8天
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[8px] text-muted-foreground/50">
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>一</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>二</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>三</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>四</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>五</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>六</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>日</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                </div>
-              </div>
-              <span className="h-4 w-4 shrink-0 rounded-full bg-emerald-500" />
-            </div>
-
-            {/* Item 3 */}
-            <div className="flex items-center gap-3 py-3">
-              <span className="h-6 w-0.5 shrink-0 rounded-full bg-blue-500 opacity-80" />
-              <div className="min-w-0 flex-1 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground">
-                    自由书写 post
-                  </span>
-                  <span className="text-[11px] text-muted-foreground/60">
-                    5天
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[8px] text-muted-foreground/50">
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>一</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>二</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>三</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>四</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>五</span>
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 font-bold text-primary" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>六</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                  <span className="flex flex-col items-center gap-0.5">
-                    <span>日</span>
-                    <span className="h-1.5 w-1.5 rounded-full border border-dashed border-muted-foreground/20" />
-                  </span>
-                </div>
-              </div>
-              <span className="h-4 w-4 shrink-0 rounded-full bg-blue-500" />
-            </div>
-          </div>
-        </div>
+        </figure>
       </div>
     </section>
   )

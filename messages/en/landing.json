@@ -5,24 +5,31 @@
     "subtitle": "Record your daily actions, see what time brings.",
     "ctaPrimary": "Enter My Actions",
     "ctaSecondary": "Sign In",
-    "imageAlt": "Habit Runner Today Action Workspace"
+    "imageAlt": "Habit Runner Today Action Workspace",
+    "note": "Habits, quit goals and tasks · Open source and self-hostable",
+    "previewTitle": "Today",
+    "previewLabel": "Interface example",
+    "previewHeading": "Make room for today.",
+    "previewDescription": "Record progress and adjustments."
   },
   "adaptive": {
     "sectionBadge": "Adaptive Rhythm",
     "sectionTitle": "Allow micro-actions, allow conscious rest",
     "sectionSubtext": "Do a little when energy is low, pause mindfully when tired. An action system should adapt to real life, not create guilt.",
-    "tierHighTitle": "High Energy · Deep Immersion",
-    "tierHighDesc": "Deep reading for 45 min / Intense workout",
+    "tierHighTitle": "Plenty of energy",
+    "tierHighDesc": "Read for 45 minutes.",
     "tierHighBadge": "High Energy",
-    "tierNormalTitle": "Steady Rhythm · Standard Action",
-    "tierNormalDesc": "Read for 20 min / Regular workout",
+    "tierNormalTitle": "An ordinary day",
+    "tierNormalDesc": "Read for 20 minutes.",
     "tierNormalBadge": "Normal",
-    "tierLowTitle": "Low Energy · Micro-Action",
-    "tierLowDesc": "Read 1 key passage / 5-min stretch · Still counts as done",
+    "tierLowTitle": "Feeling tired",
+    "tierLowDesc": "Read one paragraph. It counts.",
     "tierLowBadge": "Low Energy · Micro",
-    "tierRestTitle": "Conscious Rest · Recharge",
-    "tierRestDesc": "Active recovery is not a broken streak; rhythm continues",
-    "tierRestBadge": "Conscious Rest"
+    "tierRestTitle": "Time to rest",
+    "tierRestDesc": "Take a rest day and record it.",
+    "tierRestBadge": "Conscious Rest",
+    "exampleLabel": "Reading plan example",
+    "exampleTitle": "Read a little each day"
   },
   "trace": {
     "sectionBadge": "Trace of Time",
@@ -37,8 +44,12 @@
     "stat3Value": "14",
     "stat3Label": "Current Streak",
     "stat3Unit": "days",
-    "matrixTitle": "4-Week Rhythm Matrix",
-    "matrixSubtitle": "Complete record of real life rhythm and steady accumulation"
+    "matrixTitle": "Four-week example",
+    "matrixSubtitle": "Illustrative data, not user statistics.",
+    "matrixAria": "Four-week illustration: dark cells represent action, outlined cells rest, and light cells no record. Demonstration only.",
+    "legendDone": "Action",
+    "legendRest": "Rest",
+    "legendEmpty": "No record"
   },
   "openSource": {
     "title": "Fully Open Source & Transparent",

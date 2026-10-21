@@ -146,6 +146,7 @@ export function HabitItem({
 }: HabitItemProps) {
   const { dict, format, locale } = useI18n()
   const [isSaving, setIsLoading] = React.useState(false)
+  const quitMutationInFlight = React.useRef(false)
   const isLoading = isSaving || isPending
   const todoCompleted = isTodoCompleted(item)
   const mutate: MutateDashboardItem =
@@ -187,6 +188,8 @@ export function HabitItem({
     e: React.MouseEvent
   ) => {
     e.stopPropagation()
+    if (quitMutationInFlight.current || checkInStatus === status) return
+    quitMutationInFlight.current = true
     setIsLoading(true)
     try {
       const optimistic = {
@@ -225,6 +228,7 @@ export function HabitItem({
         variant: "destructive",
       })
     } finally {
+      quitMutationInFlight.current = false
       setIsLoading(false)
     }
   }
@@ -377,9 +381,7 @@ export function HabitItem({
   const isP0 = item.priority === "HIGH"
   const highlightP0 = isLowEnergyMode && isP0
   const completedItem =
-    todoCompleted ||
-    checkInStatus === "COMPLETED" ||
-    checkInStatus === "KEPT"
+    todoCompleted || checkInStatus === "COMPLETED" || checkInStatus === "KEPT"
 
   const itemCopy = dict.dashboard.habitItem
   const goal =
@@ -397,12 +399,14 @@ export function HabitItem({
         : item.recommendedAction
   const checkedLabel =
     item.type === "QUIT_HABIT"
-      ? checkInStatus === "KEPT" ? itemCopy.quitKeptDone : itemCopy.quitLapsedDone
+      ? checkInStatus === "KEPT"
+        ? itemCopy.quitKeptDone
+        : itemCopy.quitLapsedDone
       : checkInStatus === "REST"
-      ? itemCopy.restButton
-      : checkInStatus === "COMPLETED" || checkInStatus === "KEPT"
-        ? itemCopy.doneButton
-        : itemCopy.loggedButton
+        ? itemCopy.restButton
+        : checkInStatus === "COMPLETED" || checkInStatus === "KEPT"
+          ? itemCopy.doneButton
+          : itemCopy.loggedButton
 
   return (
     <article
@@ -478,7 +482,7 @@ export function HabitItem({
         <div
           className={cn(
             "ml-auto flex min-w-0 items-center justify-end gap-2 max-[375px]:ml-0 max-[375px]:w-full max-[375px]:justify-stretch",
-            item.type === "QUIT_HABIT" && !isCheckedIn && "w-full sm:w-auto"
+            item.type === "QUIT_HABIT" && "w-full sm:w-auto"
           )}
         >
           {primaryToolLink?.url && (
@@ -529,34 +533,27 @@ export function HabitItem({
               {isCheckedIn ? checkedLabel : itemCopy.recordButton}
             </button>
           )}
-          {item.type === "QUIT_HABIT" &&
-            (isCheckedIn ? (
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic("light")
-                  onOpenRecord(item)
-                }}
-                disabled={isLoading}
-                title={
-                  checkInStatus === "KEPT"
-                    ? itemCopy.quitKeptDone
-                    : itemCopy.quitLapsedDone
-                }
-                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 max-[375px]:flex-1"
-              >
-                <Icons.check aria-hidden="true" className="h-4 w-4" />
-                {checkedLabel}
-              </button>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <span className="text-xs text-muted-foreground">{itemCopy.quitQuestion}</span>
-                <div className="flex items-center gap-2">
+          {item.type === "QUIT_HABIT" && (
+            <div
+              role="group"
+              aria-label={itemCopy.quitQuestion}
+              className="flex flex-col gap-2"
+            >
+              <span className="text-xs text-muted-foreground">
+                {itemCopy.quitQuestion}
+              </span>
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={(e) => handleQuitStatus("KEPT", e)}
                   disabled={isLoading}
-                  className="min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border border-emerald-700 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 dark:border-emerald-500 dark:bg-emerald-950 dark:text-emerald-200"
+                  aria-pressed={checkInStatus === "KEPT"}
+                  className={cn(
+                    "min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
+                    checkInStatus === "KEPT"
+                      ? "border-emerald-700 bg-emerald-50 text-emerald-900 dark:border-emerald-500 dark:bg-emerald-950 dark:text-emerald-200"
+                      : "border-input hover:bg-muted"
+                  )}
                 >
                   {itemCopy.quitKeptButton}
                 </button>
@@ -564,13 +561,19 @@ export function HabitItem({
                   type="button"
                   onClick={(e) => handleQuitStatus("LAPSED", e)}
                   disabled={isLoading}
-                  className="min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border border-input px-3 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                  aria-pressed={checkInStatus === "LAPSED"}
+                  className={cn(
+                    "min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
+                    checkInStatus === "LAPSED"
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-input hover:bg-muted"
+                  )}
                 >
                   {itemCopy.quitLapsedButton}
                 </button>
-                </div>
               </div>
-            ))}
+            </div>
+          )}
           {item.type === "TODO" && (
             <button
               type="button"

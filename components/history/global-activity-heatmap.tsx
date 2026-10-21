@@ -254,7 +254,7 @@ export function GlobalActivityHeatmap({
               onClick={() => setWindowWeeks(weeks)}
               aria-pressed={windowWeeks === weeks}
               className={cn(
-                "min-h-9 rounded-md px-2.5 py-1 text-xs font-semibold transition-[background-color,color,transform] duration-150 active:scale-95 motion-reduce:transform-none",
+                "min-h-11 min-w-11 rounded-md px-2.5 py-1 text-xs font-semibold transition-[background-color,color,transform] duration-150 active:scale-95 motion-reduce:transform-none",
                 windowWeeks === weeks
                   ? "shadow-xs bg-background text-foreground"
                   : "text-muted-foreground hover:text-foreground"

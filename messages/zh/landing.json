@@ -1,33 +1,40 @@
 {
   "hero": {
-    "eyebrow": "私人行动与节律系统",
+    "eyebrow": "每天的行动，简单记录",
     "title": "每天一点，时间会放大。",
-    "subtitle": "记录你的日常行动，看见时间带来的变化。",
+    "subtitle": "习惯、待办与想少做的事，放在一起记录。精力少时减量，累了就休息。",
     "ctaPrimary": "进入我的行动",
     "ctaSecondary": "登录账户",
-    "imageAlt": "Habit Runner 今日行动工作台"
+    "imageAlt": "Habit Runner 今日行动工作台",
+    "note": "支持习惯、戒除与待办 · 开源，可自行部署",
+    "previewTitle": "今日行动",
+    "previewLabel": "界面示例",
+    "previewHeading": "按今天的状态，做一点。",
+    "previewDescription": "记录完成，也记录调整。"
   },
   "adaptive": {
-    "sectionBadge": "生活自适应",
-    "sectionTitle": "允许微行动，也允许主动休整",
-    "sectionSubtext": "状态不好时做一点点，累了就主动停下。行动系统应该适应真实生活，而不是给你制造负罪感。",
-    "tierHighTitle": "充沛状态 · 深入投入",
-    "tierHighDesc": "深度阅读 45 分钟 / 高强度训练",
+    "sectionBadge": "按精力调整",
+    "sectionTitle": "同一件事，不必每天做一样多。",
+    "sectionSubtext": "为行动设定不同的份量。今天选适合自己的那一种。",
+    "tierHighTitle": "精力充足",
+    "tierHighDesc": "读 45 分钟，深入一章。",
     "tierHighBadge": "High Energy",
-    "tierNormalTitle": "日常节奏 · 稳定完成",
-    "tierNormalDesc": "阅读 20 分钟 / 基础训练",
+    "tierNormalTitle": "日常状态",
+    "tierNormalDesc": "读 20 分钟，按计划推进。",
     "tierNormalBadge": "Normal",
-    "tierLowTitle": "低能量日 · 微行动保底",
-    "tierLowDesc": "读 1 个关键段落 / 5 分钟拉伸 · 依然算作完成",
+    "tierLowTitle": "有点累",
+    "tierLowDesc": "读一段，也算今天的行动。",
     "tierLowBadge": "Low Energy · 微行动",
-    "tierRestTitle": "有意识休整 · 蓄积精力",
-    "tierRestDesc": "主动休息不等于断签，生活节律自然延续",
-    "tierRestBadge": "Conscious Rest"
+    "tierRestTitle": "需要休息",
+    "tierRestDesc": "今天主动休整，记录下来就好。",
+    "tierRestBadge": "Conscious Rest",
+    "exampleLabel": "阅读计划示例",
+    "exampleTitle": "每天读一点"
   },
   "trace": {
-    "sectionBadge": "时间痕迹",
-    "sectionTitle": "每一次行动，都会在时间里留下痕迹",
-    "sectionSubtext": "从第一天到第十二周，无需刻意坚持，你的生活节奏会自然浮现。",
+    "sectionBadge": "回看记录",
+    "sectionTitle": "看见积累，也看见停下来的日子。",
+    "sectionSubtext": "完成、微行动和休整都留下记录。回头看时，不必只记得有没有连续打卡。",
     "stat1Value": "56",
     "stat1Label": "累计行动次数",
     "stat1Unit": "次",
@@ -37,13 +44,17 @@
     "stat3Value": "14",
     "stat3Label": "当前最高连续",
     "stat3Unit": "天",
-    "matrixTitle": "近 4 周生活节律矩阵",
-    "matrixSubtitle": "真实起伏与持续沉淀的完整记录"
+    "matrixTitle": "四周记录示例",
+    "matrixSubtitle": "示意数据，非用户统计。",
+    "matrixAria": "四周记录示例，深色方块表示行动，描边表示休整，浅色表示未记录；仅用于演示。",
+    "legendDone": "行动",
+    "legendRest": "休整",
+    "legendEmpty": "未记录"
   },
   "openSource": {
-    "title": "完全开源透明",
-    "subtext": "数据透明，支持自行部署与扩展！",
-    "githubButton": "在 GitHub 上关注"
+    "title": "代码公开，使用方式由你决定。",
+    "subtext": "可以查看实现，也可以自行部署和修改。",
+    "githubButton": "查看源代码"
   },
   "footer": {
     "slogan": "每天一点，时间会放大。",

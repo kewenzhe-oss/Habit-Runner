@@ -253,9 +253,9 @@ export function ItemDetailView({
       {/* Habit footprint and flow journal */}
       <Card>
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-sm font-semibold tracking-tight">
+          <div className="flex min-w-0 flex-col gap-1">
+            <div className="flex min-w-0 items-center justify-between gap-3">
+              <CardTitle className="min-w-0 text-sm font-semibold tracking-tight">
                 <span className="inline-flex items-center gap-2">
                   <Icons.sparkles
                     aria-hidden="true"
@@ -264,15 +264,15 @@ export function ItemDetailView({
                   {detailDict.journal.title}
                 </span>
               </CardTitle>
-              <span className="text-[11px] text-muted-foreground">
-                {detailDict.journal.description}
+              <span className="shrink-0 whitespace-nowrap rounded-full border bg-muted/40 px-2.5 py-0.5 text-xs font-bold text-muted-foreground">
+                {format(detailDict.recordCount, {
+                  count: item.checkIns?.length || 0,
+                })}
               </span>
             </div>
-            <span className="rounded-full bg-muted/40 px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground border">
-              {format(detailDict.recordCount, {
-                count: item.checkIns?.length || 0,
-              })}
-            </span>
+            <p className="min-w-0 text-xs text-muted-foreground">
+              {detailDict.journal.description}
+            </p>
           </div>
         </CardHeader>
         <CardContent className="pt-2">

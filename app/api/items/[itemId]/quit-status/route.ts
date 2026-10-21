@@ -4,6 +4,7 @@ import { z } from "zod"
 import { recordQuitStatus } from "@/lib/api/checkin"
 import { getUserToday } from "@/lib/api/user-date"
 import { authOptions } from "@/lib/auth"
+import { createServerTiming } from "@/lib/server-timing"
 import { quitStatusSchema } from "@/lib/validations/checkin"
 
 interface RouteProps {
@@ -13,7 +14,10 @@ interface RouteProps {
 export async function POST(req: Request, { params }: RouteProps) {
   try {
     const { itemId } = await params
-    const session = await getServerSession(authOptions)
+    const timing = createServerTiming()
+    const session = await timing.measure("auth", () =>
+      getServerSession(authOptions)
+    )
     if (!session?.user?.id) {
       return new Response("Unauthorized", { status: 401 })
     }
@@ -21,17 +25,20 @@ export async function POST(req: Request, { params }: RouteProps) {
     const json = await req.json()
     const body = quitStatusSchema.parse(json)
 
-    const checkIn = await recordQuitStatus(
-      session.user.id,
-      itemId,
-      body.date || (await getUserToday(session.user.id)),
-      body.status,
-      body.notes
+    const date =
+      body.date ||
+      (await timing.measure("user_date", () => getUserToday(session.user.id)))
+    const checkIn = await timing.measure("save_and_streaks", () =>
+      recordQuitStatus(session.user.id, itemId, date, body.status, body.notes)
     )
 
     return new Response(JSON.stringify(checkIn), {
       status: 200,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Server-Timing": timing.header(),
+        "Cache-Control": "private, no-store",
+      },
     })
   } catch (error: any) {
     if (error instanceof z.ZodError) {

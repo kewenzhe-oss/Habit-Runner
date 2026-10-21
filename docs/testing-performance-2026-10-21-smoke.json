@@ -1,0 +1,197 @@
+{
+  "startedAt": "2026-10-21T10:51:55.468Z",
+  "smoke": true,
+  "environment": {
+    "origin": "http://localhost:3000",
+    "database": "habit_runner_perf",
+    "host": "localhost",
+    "cdpPort": 9242,
+    "viewport": {
+      "width": 375,
+      "height": 812,
+      "deviceScaleFactor": 2
+    },
+    "user": "demo@habitrunner.dev",
+    "browser": "Chrome/155.0.8059.85"
+  },
+  "definitions": {
+    "feedback": "Trusted CDP mouse click event to next animation frame after pending spinner, active nav, or optimistic pressed-state/disabled buttons appears; rendering proxy, not measured screen presentation/INP.",
+    "navigation": "Trusted click to next animation frame with destination pathname, active bottom nav and destination h1 visible. Does not assert every chart has finished rendering.",
+    "cold": "Separate cache-bypassed dashboard document navigation; browser HTTP cache disabled, server/OS/connection caches uncontrolled. Never pooled with warmed SPA clicks.",
+    "quitResponse": "CDP requestWillBeSent -> responseReceived (headers); bodyComplete uses loadingFinished; clickToResponse also recorded. Server-Timing is verbatim auth/save_and_streaks, not pure SQL.",
+    "throttle": "CDP emulated network RTT/throughput and CPU rate; not a real mobile network or hardware benchmark."
+  },
+  "coldDocuments": [
+    {
+      "profile": "normal",
+      "h1": "我的行动",
+      "responseStartMs": 52.400000005960464,
+      "responseEndMs": 86.10000002384186,
+      "domContentLoadedMs": 112.30000001192093,
+      "loadMs": 294.40000000596046
+    }
+  ],
+  "warmups": [
+    {
+      "profile": "normal",
+      "from": "/settings",
+      "to": "/dashboard",
+      "kind": "nav",
+      "target": "/dashboard",
+      "start": 1914.800000011921,
+      "feedbackMs": 6,
+      "readyMs": 338.9,
+      "trusted": true,
+      "requestsSinceArm": 0
+    }
+  ],
+  "navigations": [
+    {
+      "profile": "normal",
+      "from": "/dashboard",
+      "to": "/insights",
+      "kind": "nav",
+      "target": "/insights",
+      "start": 431.69999998807907,
+      "feedbackMs": 4.6,
+      "readyMs": 338.9,
+      "trusted": true,
+      "requestsSinceArm": 0
+    }
+  ],
+  "quits": [
+    {
+      "profile": "normal",
+      "status": "KEPT",
+      "mode": "success",
+      "network": [
+        {
+          "method": "POST",
+          "responseMs": 36.95,
+          "status": 200,
+          "serverTiming": "auth;dur=3.1, save_and_streaks;dur=13.6",
+          "cacheControl": "private, no-store",
+          "bodyCompleteMs": 36.64,
+          "clickToResponseMs": 38.31
+        }
+      ],
+      "intercepted": 0,
+      "feedbackMs": 10,
+      "readyMs": 53.4,
+      "trusted": true,
+      "elapsedHarnessMs": 335,
+      "pressedAfter": [
+        "true",
+        "false"
+      ],
+      "persistedStatuses": [
+        {
+          "date": "2026-10-21",
+          "status": "KEPT"
+        }
+      ],
+      "repeatSelectedRequestCount": 0,
+      "reloadPressed": [
+        "true",
+        "false"
+      ],
+      "reloadConsistent": true
+    }
+  ],
+  "checks": [
+    {
+      "profile": "normal",
+      "check": "initial real navigation dashboard to insights",
+      "ok": true,
+      "harnessElapsedMs": 677
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "fixtureDeleted": true,
+    "fixtureCheckInsDeleted": true,
+    "afterHashes": {
+      "checkIns": "264b2438657150865c72a07f8376a4cc00279aa68e450c8001f1e111e0ee2bd7",
+      "energy": "152c242e9d822b51b37f203bf465ba049c2faaf839e8ec6e318012a815df9450",
+      "items": "3400f745a58f594b32bb2358895d23db8752d9df3262b618bd3890b977157eb9",
+      "user": "202beb64ac2a365017c704c3dfbfb3b020354c404a0362b51a63d2cd5355d936"
+    },
+    "unchanged": {
+      "checkIns": true,
+      "energy": true,
+      "items": true,
+      "user": true
+    }
+  },
+  "safety": {
+    "baselineHashes": {
+      "checkIns": "264b2438657150865c72a07f8376a4cc00279aa68e450c8001f1e111e0ee2bd7",
+      "energy": "152c242e9d822b51b37f203bf465ba049c2faaf839e8ec6e318012a815df9450",
+      "items": "3400f745a58f594b32bb2358895d23db8752d9df3262b618bd3890b977157eb9",
+      "user": "202beb64ac2a365017c704c3dfbfb3b020354c404a0362b51a63d2cd5355d936"
+    },
+    "baselineCounts": {
+      "checkIns": 998,
+      "energy": 1,
+      "items": 20
+    },
+    "fixtureId": "qa_perf_20261021_373d310c-2cab-4ba9-8d4e-fc9eab00ae64"
+  },
+  "profiles": [
+    {
+      "name": "normal",
+      "latency": 0,
+      "downloadThroughput": -1,
+      "uploadThroughput": -1,
+      "cpu": 1
+    }
+  ],
+  "summaries": {
+    "navigation": [
+      {
+        "profile": "normal",
+        "from": "/dashboard",
+        "to": "/insights",
+        "feedback": {
+          "n": 1,
+          "medianMs": 4.6,
+          "maxMs": 4.6
+        },
+        "contentReady": {
+          "n": 1,
+          "medianMs": 338.9,
+          "maxMs": 338.9
+        }
+      }
+    ],
+    "quit": [
+      {
+        "profile": "normal",
+        "feedback": {
+          "n": 1,
+          "medianMs": 10,
+          "maxMs": 10
+        },
+        "response": {
+          "n": 1,
+          "medianMs": 36.95,
+          "maxMs": 36.95
+        },
+        "clickToResponse": {
+          "n": 1,
+          "medianMs": 38.31,
+          "maxMs": 38.31
+        },
+        "bodyComplete": {
+          "n": 1,
+          "medianMs": 36.64,
+          "maxMs": 36.64
+        }
+      }
+    ]
+  },
+  "status": "passed",
+  "finishedAt": "2026-10-21T10:52:01.775Z",
+  "validForFinalResults": false,
+  "exclusionReason": "Pre-READY diagnostic run. Throttled-only may overlap rebuild; all final comparisons must use a single fixed post-READY build."
+}

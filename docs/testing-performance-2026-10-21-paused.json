@@ -1,0 +1,19 @@
+{
+  "pausedAt": "2026-10-21T10:55:39.577Z",
+  "reason": "User requested pause for build/restart; await READY",
+  "samplerStopped": true,
+  "fixtureIdsDeleted": [],
+  "remainingFixtures": 0,
+  "hashes": {
+    "checkIns": "264b2438657150865c72a07f8376a4cc00279aa68e450c8001f1e111e0ee2bd7",
+    "energy": "152c242e9d822b51b37f203bf465ba049c2faaf839e8ec6e318012a815df9450",
+    "items": "3400f745a58f594b32bb2358895d23db8752d9df3262b618bd3890b977157eb9",
+    "user": "202beb64ac2a365017c704c3dfbfb3b020354c404a0362b51a63d2cd5355d936"
+  },
+  "unchanged": {
+    "checkIns": true,
+    "energy": true,
+    "items": true,
+    "user": true
+  }
+}

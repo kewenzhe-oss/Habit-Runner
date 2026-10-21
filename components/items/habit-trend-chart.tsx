@@ -1080,10 +1080,10 @@ export function HabitTrendChart({ initialData }: HabitTrendChartProps) {
               })}
               className="group flex min-h-[44px] w-full items-center justify-between rounded-xl border bg-muted/20 px-4 py-2.5 text-left text-xs transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <span className="flex min-w-0 items-center gap-2 font-semibold text-foreground">
+              <span className="flex min-w-0 flex-wrap items-center gap-2 font-semibold text-foreground">
                 <Icons.statsBar className="h-4 w-4 shrink-0 text-primary" />
                 <span>{dict.toggleTable}</span>
-                <span className="shrink-0 rounded-full bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground ring-1 ring-border/70">
+                <span className="shrink-0 whitespace-nowrap rounded-full bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground ring-1 ring-border/70">
                   {weekCountLabel}
                 </span>
               </span>
@@ -1112,7 +1112,7 @@ export function HabitTrendChart({ initialData }: HabitTrendChartProps) {
 
             <div
               role="list"
-              className="max-h-[60vh] divide-y divide-border/40 overflow-y-auto overscroll-contain pr-1"
+              className="max-h-[60dvh] divide-y divide-border/40 overflow-y-auto overscroll-contain pr-1"
               aria-label={dict.weeklyDetailsListAria}
             >
               {data.weeklyPoints.map((week, index) => {
@@ -1133,18 +1133,18 @@ export function HabitTrendChart({ initialData }: HabitTrendChartProps) {
                     role="listitem"
                     className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 px-5 py-4 transition-colors hover:bg-muted/25 sm:grid-cols-[minmax(150px,0.9fr)_minmax(150px,1.3fr)_auto] sm:items-center sm:px-6"
                   >
-                    <div className="min-w-0">
-                      <div className="font-mono text-xs font-semibold tracking-tight text-foreground">
+                    <div className="col-start-1 row-start-1 min-w-0 sm:col-start-1 sm:row-start-1">
+                      <div className="font-mono text-sm font-semibold tracking-tight text-foreground">
                         {weekRange}
                       </div>
-                      <div className="mt-0.5 text-[10px] text-muted-foreground">
+                      <div className="mt-0.5 text-xs text-muted-foreground">
                         {format(dict.weekOrdinal, {
                           index: index + 1,
                         })}
                       </div>
                     </div>
 
-                    <div className="col-span-2 min-w-0 sm:col-span-1">
+                    <div className="col-span-2 col-start-1 row-start-2 min-w-0 sm:col-span-1 sm:col-start-2 sm:row-start-1">
                       <div className="flex items-center gap-2.5">
                         <div
                           role="progressbar"
@@ -1174,7 +1174,7 @@ export function HabitTrendChart({ initialData }: HabitTrendChartProps) {
                             }}
                           />
                         </div>
-                        <span className="shrink-0 whitespace-nowrap font-mono text-[11px] text-muted-foreground">
+                        <span className="shrink-0 whitespace-nowrap font-mono text-xs text-muted-foreground">
                           {format(dict.weeklyRecorded, {
                             recorded: week.recordedDays,
                             scheduled: week.scheduledDays,
@@ -1192,7 +1192,7 @@ export function HabitTrendChart({ initialData }: HabitTrendChartProps) {
                             })
                       }
                       className={cn(
-                        "inline-flex min-w-12 items-center justify-center rounded-full border px-2.5 py-1 font-mono text-[11px] font-semibold",
+                        "col-start-2 row-start-1 inline-flex min-w-12 items-center justify-center self-start justify-self-end rounded-full border px-2.5 py-1 font-mono text-xs font-semibold sm:col-start-3 sm:row-start-1",
                         week.completionRate === null
                           ? "border-transparent bg-muted text-muted-foreground"
                           : isHigh

@@ -1,0 +1,252 @@
+{
+  "date": "2026-10-21T10:46:57.583Z",
+  "kind": "read-only loopback HTTP warmed production; not browser INP",
+  "samples": 7,
+  "rows": [
+    {
+      "path": "/api/dashboard/today",
+      "medianMs": 14.6,
+      "maxMs": 17.6,
+      "samples": [
+        {
+          "totalMs": 15.9,
+          "ttfbMs": 15.5,
+          "bytes": 34763,
+          "serverTiming": "auth;dur=0.9, dashboard;dur=9.6"
+        },
+        {
+          "totalMs": 15.5,
+          "ttfbMs": 15.2,
+          "bytes": 34763,
+          "serverTiming": "auth;dur=1.5, dashboard;dur=9.1"
+        },
+        {
+          "totalMs": 17.6,
+          "ttfbMs": 17.4,
+          "bytes": 34763,
+          "serverTiming": "auth;dur=1.0, dashboard;dur=11.2"
+        },
+        {
+          "totalMs": 14.6,
+          "ttfbMs": 14.3,
+          "bytes": 34763,
+          "serverTiming": "auth;dur=1.2, dashboard;dur=8.5"
+        },
+        {
+          "totalMs": 12.8,
+          "ttfbMs": 12.5,
+          "bytes": 34763,
+          "serverTiming": "auth;dur=0.7, dashboard;dur=7.8"
+        },
+        {
+          "totalMs": 12.3,
+          "ttfbMs": 12,
+          "bytes": 34763,
+          "serverTiming": "auth;dur=0.7, dashboard;dur=7.7"
+        },
+        {
+          "totalMs": 12.7,
+          "ttfbMs": 12.3,
+          "bytes": 34763,
+          "serverTiming": "auth;dur=0.7, dashboard;dur=7.9"
+        }
+      ]
+    },
+    {
+      "path": "/dashboard",
+      "medianMs": 25.5,
+      "maxMs": 28.1,
+      "samples": [
+        {
+          "totalMs": 26.8,
+          "ttfbMs": 12.1,
+          "bytes": 167220,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 25.3,
+          "ttfbMs": 11.1,
+          "bytes": 167220,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 25.3,
+          "ttfbMs": 11.4,
+          "bytes": 167220,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 28.1,
+          "ttfbMs": 13.2,
+          "bytes": 167220,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 25.2,
+          "ttfbMs": 11.7,
+          "bytes": 167220,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 26.3,
+          "ttfbMs": 12.5,
+          "bytes": 167220,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 25.5,
+          "ttfbMs": 11.5,
+          "bytes": 167220,
+          "serverTiming": null
+        }
+      ]
+    },
+    {
+      "path": "/insights",
+      "medianMs": 41.9,
+      "maxMs": 44.4,
+      "samples": [
+        {
+          "totalMs": 41.3,
+          "ttfbMs": 11.5,
+          "bytes": 319751,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 41.1,
+          "ttfbMs": 11.2,
+          "bytes": 319751,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 41.6,
+          "ttfbMs": 9.5,
+          "bytes": 319751,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 44.4,
+          "ttfbMs": 10,
+          "bytes": 319751,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 44.1,
+          "ttfbMs": 13.6,
+          "bytes": 319751,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 43.1,
+          "ttfbMs": 9.8,
+          "bytes": 319751,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 41.9,
+          "ttfbMs": 12.5,
+          "bytes": 319751,
+          "serverTiming": null
+        }
+      ]
+    },
+    {
+      "path": "/settings",
+      "medianMs": 12.4,
+      "maxMs": 13.4,
+      "samples": [
+        {
+          "totalMs": 11.3,
+          "ttfbMs": 8.7,
+          "bytes": 50808,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 12.6,
+          "ttfbMs": 9.5,
+          "bytes": 50808,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 11.2,
+          "ttfbMs": 9,
+          "bytes": 50808,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 13.3,
+          "ttfbMs": 10.7,
+          "bytes": 50808,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 13.4,
+          "ttfbMs": 9.2,
+          "bytes": 50808,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 11.8,
+          "ttfbMs": 8.4,
+          "bytes": 50808,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 12.4,
+          "ttfbMs": 10.1,
+          "bytes": 50808,
+          "serverTiming": null
+        }
+      ]
+    },
+    {
+      "path": "/items/local_perf_water",
+      "medianMs": 24.1,
+      "maxMs": 33.4,
+      "samples": [
+        {
+          "totalMs": 28.1,
+          "ttfbMs": 8.5,
+          "bytes": 166866,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 24.1,
+          "ttfbMs": 8.7,
+          "bytes": 166866,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 22.5,
+          "ttfbMs": 7.6,
+          "bytes": 166866,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 24,
+          "ttfbMs": 11.3,
+          "bytes": 166866,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 24.6,
+          "ttfbMs": 10.1,
+          "bytes": 166866,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 23.3,
+          "ttfbMs": 9.4,
+          "bytes": 166866,
+          "serverTiming": null
+        },
+        {
+          "totalMs": 33.4,
+          "ttfbMs": 10.6,
+          "bytes": 166866,
+          "serverTiming": null
+        }
+      ]
+    }
+  ]
+}
