@@ -1,9 +1,14 @@
 import { TodayItemDTO } from "@/types"
 import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
 
 import { TodayCompassCard } from "@/components/dashboard/today-compass-card"
 
 describe("TodayCompassCard", () => {
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
   const mockHabit1: TodayItemDTO = {
     priority: "NORMAL",
     sortOrder: 0,
@@ -106,7 +111,13 @@ describe("TodayCompassCard", () => {
     expect(screen.getByText(/今日主动休整/)).toBeInTheDocument()
   })
 
-  test("renders daily wisdom quote and shuffle button in all states", () => {
+  test("always shows the daily wisdom quote and supports copy and shuffle", async () => {
+    const writeText = jest.fn().mockResolvedValue(undefined)
+    const user = userEvent.setup({ writeToClipboard: false })
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText },
+    })
     const { container } = render(
       <TodayCompassCard
         items={[mockHabit1, mockHabit2]}
@@ -115,15 +126,21 @@ describe("TodayCompassCard", () => {
       />
     )
 
-    // Check that a quote is rendered
     const blockquote = container.querySelector("blockquote")
     expect(blockquote).toBeInTheDocument()
     expect(blockquote?.textContent).toBeTruthy()
-
-    // Check shuffle and copy buttons
-    expect(screen.getByRole("button", { name: /换一句/i })).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "每日灵感" })).toBeVisible()
     expect(
-      screen.getByRole("button", { name: /复制金句/i })
-    ).toBeInTheDocument()
+      screen.queryByRole("button", { name: "每日灵感" })
+    ).not.toBeInTheDocument()
+
+    const copyButton = screen.getByRole("button", { name: /复制金句/i })
+    await user.click(copyButton)
+    expect(writeText).toHaveBeenCalledWith(expect.stringMatching(/^".+" — .+$/))
+
+    const shuffleButton = screen.getByRole("button", { name: /换一句/i })
+    await user.click(shuffleButton)
+    expect(shuffleButton.querySelector("svg")).toHaveClass("rotate-180")
+    expect(container.querySelector("blockquote")).toBeVisible()
   })
 })

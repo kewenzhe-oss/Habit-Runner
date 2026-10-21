@@ -6,7 +6,7 @@ interface ShellProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Shell({ children, className, ...props }: ShellProps) {
   return (
-    <div className={cn("grid items-start gap-8", className)} {...props}>
+    <div className={cn("grid min-w-0 max-w-full items-start gap-8", className)} {...props}>
       {children}
     </div>
   )

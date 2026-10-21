@@ -92,14 +92,14 @@ export function QuickAddHabitModal({
       if (res.ok) {
         const data = await res.json()
         setCategories(data)
-        if (data.length > 0 && !selectedCategoryName) {
-          setSelectedCategoryName(data[0].name)
+        if (data.length > 0) {
+          setSelectedCategoryName((selected) => selected || data[0].name)
         }
       }
     } catch (e) {
       console.error("Failed to load categories", e)
     }
-  }, [selectedCategoryName])
+  }, [])
 
   React.useEffect(() => {
     if (open) {
@@ -320,21 +320,21 @@ export function QuickAddHabitModal({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-[460px]">
-        <form onSubmit={handleSubmit}>
-          <DialogHeader className="space-y-1 pb-2">
-            <DialogTitle className="text-base font-bold">
+      <DialogContent className="bottom-0 top-auto flex max-h-[calc(100dvh-0.5rem)] w-full translate-y-0 flex-col overflow-hidden rounded-b-none rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))] sm:bottom-auto sm:top-1/2 sm:w-[calc(100%-1rem)] sm:max-w-[460px] sm:-translate-y-1/2 sm:rounded-lg sm:pb-6">
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-col">
+          <DialogHeader className="shrink-0 space-y-1 pb-2 pr-10 text-left">
+            <DialogTitle className="text-lg font-bold leading-snug">
               {dict.form.fields.quickAddTitle}
             </DialogTitle>
-            <DialogDescription className="text-xs text-muted-foreground">
+            <DialogDescription className="text-sm text-muted-foreground">
               {dict.form.fields.quickAddSubtitle}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-3.5 py-2">
+          <div className="min-h-0 flex-1 space-y-3.5 overflow-y-auto overscroll-contain py-2">
             {/* 1. Item Type Selector (Compact Segmented Controls) */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold text-foreground">
+              <Label className="text-sm font-semibold text-foreground">
                 {dict.form.fields.itemType}
               </Label>
               <div className="grid grid-cols-3 gap-1.5 rounded-lg border bg-muted/30 p-1">
@@ -342,7 +342,7 @@ export function QuickAddHabitModal({
                   type="button"
                   onClick={() => setType("HABIT")}
                   className={cn(
-                    "flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition-all",
+                    "flex min-h-11 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-all",
                     type === "HABIT"
                       ? "shadow-xs border border-emerald-500/40 bg-background text-emerald-800 ring-1 ring-emerald-500/30 dark:text-emerald-300"
                       : "text-muted-foreground hover:text-foreground"
@@ -356,7 +356,7 @@ export function QuickAddHabitModal({
                   type="button"
                   onClick={() => setType("QUIT_HABIT")}
                   className={cn(
-                    "flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition-all",
+                    "flex min-h-11 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-all",
                     type === "QUIT_HABIT"
                       ? "shadow-xs border border-amber-500/40 bg-background text-amber-800 ring-1 ring-amber-500/30 dark:text-amber-300"
                       : "text-muted-foreground hover:text-foreground"
@@ -370,7 +370,7 @@ export function QuickAddHabitModal({
                   type="button"
                   onClick={() => setType("TODO")}
                   className={cn(
-                    "flex items-center justify-center gap-1.5 rounded-md py-2 text-xs font-semibold transition-all",
+                    "flex min-h-11 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-all",
                     type === "TODO"
                       ? "shadow-xs border border-blue-500/40 bg-background text-blue-800 ring-1 ring-blue-500/30 dark:text-blue-300"
                       : "text-muted-foreground hover:text-foreground"
@@ -386,7 +386,7 @@ export function QuickAddHabitModal({
             <div className="space-y-1.5">
               <Label
                 htmlFor="quick-item-title"
-                className="text-xs font-semibold text-foreground"
+                className="text-sm font-semibold text-foreground"
               >
                 {type === "HABIT"
                   ? dict.form.fields.habitName
@@ -406,7 +406,7 @@ export function QuickAddHabitModal({
                       : dict.form.fields.todoPlaceholder
                 }
                 autoFocus
-                className="text-xs"
+                className="text-base sm:text-sm"
               />
             </div>
 
@@ -421,7 +421,7 @@ export function QuickAddHabitModal({
             {type === "HABIT" && (
               <div className="space-y-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs font-semibold text-emerald-950 dark:text-emerald-200">
+                  <Label className="text-sm font-semibold text-emerald-950 dark:text-emerald-200">
                     {dict.form.fields.unitTypeTitle}
                   </Label>
                 </div>
@@ -440,7 +440,7 @@ export function QuickAddHabitModal({
                         if (u.id === "COUNT") setUnitLabel("个")
                       }}
                       className={cn(
-                        "rounded-md border py-1.5 text-center text-xs font-medium transition-all",
+                        "min-h-11 rounded-md border py-2 text-center text-sm font-medium transition-all",
                         unitType === u.id
                           ? "shadow-xs border-emerald-600 bg-emerald-600 font-semibold text-white"
                           : "border-border bg-background text-muted-foreground hover:bg-muted"
@@ -456,7 +456,7 @@ export function QuickAddHabitModal({
                   <div className="flex items-center gap-2 pt-1">
                     <Label
                       htmlFor="quick-target-amount"
-                      className="whitespace-nowrap text-xs font-semibold text-emerald-950 dark:text-emerald-200"
+                      className="whitespace-nowrap text-sm font-semibold text-emerald-950 dark:text-emerald-200"
                     >
                       {dict.form.fields.targetAmount}
                     </Label>
@@ -464,14 +464,15 @@ export function QuickAddHabitModal({
                       <Input
                         id="quick-target-amount"
                         type="number"
+                        inputMode="decimal"
                         min="1"
                         value={targetAmount}
                         onChange={(e) =>
                           setTargetAmount(Number(e.target.value) || 0)
                         }
-                        className="h-8 bg-background pr-12 text-xs font-semibold"
+                        className="h-11 bg-background pr-12 text-base font-semibold sm:text-sm"
                       />
-                      <span className="absolute right-2.5 top-1.5 text-xs text-muted-foreground">
+                      <span className="absolute right-2.5 top-1.5 text-sm text-muted-foreground">
                         {unitType === "TIME"
                           ? locale === "zh"
                             ? "分钟"
@@ -492,7 +493,7 @@ export function QuickAddHabitModal({
                 <div className="flex items-center justify-between">
                   <Label
                     htmlFor="quick-due-date"
-                    className="text-xs font-semibold text-blue-950 dark:text-blue-200"
+                    className="text-sm font-semibold text-blue-950 dark:text-blue-200"
                   >
                     {dict.form.fields.dueDate}
                   </Label>
@@ -502,34 +503,34 @@ export function QuickAddHabitModal({
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="h-8 bg-background text-xs"
+                  className="h-11 bg-background text-base sm:text-sm"
                 />
                 <div className="flex flex-wrap gap-1 pt-0.5">
                   <button
                     type="button"
                     onClick={() => setQuickDate(0)}
-                    className="rounded bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
+                    className="min-h-11 rounded-lg bg-blue-500/15 px-3 py-2 text-sm font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
                   >
                     {dict.form.fields.quickToday}
                   </button>
                   <button
                     type="button"
                     onClick={() => setQuickDate(1)}
-                    className="rounded bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
+                    className="min-h-11 rounded-lg bg-blue-500/15 px-3 py-2 text-sm font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
                   >
                     {dict.form.fields.quickTomorrow}
                   </button>
                   <button
                     type="button"
                     onClick={() => setQuickDate(3)}
-                    className="rounded bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
+                    className="min-h-11 rounded-lg bg-blue-500/15 px-3 py-2 text-sm font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
                   >
                     {dict.form.fields.quick3Days}
                   </button>
                   <button
                     type="button"
                     onClick={() => setQuickDate(7)}
-                    className="rounded bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
+                    className="min-h-11 rounded-lg bg-blue-500/15 px-3 py-2 text-sm font-medium text-blue-900 transition-colors hover:bg-blue-500/25 dark:text-blue-200"
                   >
                     {dict.form.fields.quick1Week}
                   </button>
@@ -539,11 +540,11 @@ export function QuickAddHabitModal({
 
             {/* 4. Life Layer (Optional, De-emphasized Compact Selector) */}
             <div className="space-y-1.5 pt-0.5">
-              <div className="flex items-center justify-between text-xs">
+              <div className="flex items-center justify-between text-sm">
                 <Label className="font-normal text-muted-foreground">
                   {dict.form.fields.layerTitle}
                 </Label>
-                <span className="text-[10px] text-muted-foreground/70">
+                <span className="text-xs text-muted-foreground">
                   {dict.form.fields.optionalTag}
                 </span>
               </div>
@@ -554,7 +555,7 @@ export function QuickAddHabitModal({
                     type="button"
                     onClick={() => setSelectedLayer(l.key as Layer)}
                     className={cn(
-                      "flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-medium transition-colors",
+                      "flex min-h-11 items-center gap-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
                       selectedLayer === l.key
                         ? "border-primary bg-primary/10 font-semibold text-primary ring-1 ring-primary/40"
                         : "border-border/70 bg-background text-muted-foreground hover:bg-muted"
@@ -571,7 +572,7 @@ export function QuickAddHabitModal({
             </div>
 
             {/* 5. ADVANCED / OPTIONAL SECTION (Collapsed Accordion) */}
-            <details className="group rounded-lg border border-border/70 bg-muted/15 text-xs transition-all">
+            <details className="group rounded-lg border border-border/70 bg-muted/15 text-sm transition-all">
               <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 font-medium text-muted-foreground transition-colors hover:text-foreground">
                 <div className="flex items-center gap-1.5">
                   <Icons.settings className="h-3.5 w-3.5 text-muted-foreground" />
@@ -585,7 +586,7 @@ export function QuickAddHabitModal({
                 <div className="space-y-1">
                   <Label
                     htmlFor="advanced-why"
-                    className="text-[11px] font-medium text-foreground"
+                    className="text-xs font-medium text-foreground"
                   >
                     {dict.form.fields.whyTitle}
                   </Label>
@@ -598,7 +599,7 @@ export function QuickAddHabitModal({
                         ? dict.form.fields.whyHabitPlaceholder
                         : dict.form.fields.whyQuitPlaceholder
                     }
-                    className="h-8 text-xs"
+                    className="h-11 text-base sm:text-sm"
                   />
                 </div>
 
@@ -608,7 +609,7 @@ export function QuickAddHabitModal({
                     <div className="space-y-1">
                       <Label
                         htmlFor="advanced-trigger"
-                        className="text-[11px] font-medium text-foreground"
+                        className="text-xs font-medium text-foreground"
                       >
                         {dict.form.fields.triggerTitle}
                       </Label>
@@ -617,12 +618,12 @@ export function QuickAddHabitModal({
                         value={triggerCue}
                         onChange={(e) => setTriggerCue(e.target.value)}
                         placeholder={dict.form.fields.triggerPlaceholder}
-                        className="h-8 text-xs"
+                        className="h-11 text-base sm:text-sm"
                       />
                     </div>
 
                     <div className="space-y-1">
-                      <Label className="text-[11px] font-medium text-foreground">
+                      <Label className="text-xs font-medium text-foreground">
                         {dict.form.fields.freqTitle}
                       </Label>
                       <div className="grid grid-cols-4 gap-1">
@@ -646,7 +647,7 @@ export function QuickAddHabitModal({
                             type="button"
                             onClick={() => setTargetFrequency(f.id as any)}
                             className={cn(
-                              "rounded border px-1 py-1 text-center text-[10px] font-medium transition-all",
+                              "min-h-11 rounded-md border px-2 py-2 text-center text-sm font-medium transition-all",
                               targetFrequency === f.id
                                 ? "border-primary bg-primary font-semibold text-primary-foreground"
                                 : "border-border bg-background text-muted-foreground hover:bg-muted"
@@ -662,7 +663,7 @@ export function QuickAddHabitModal({
                       <div className="space-y-1">
                         <Label
                           htmlFor="advanced-unit-label"
-                          className="text-[11px] font-medium text-foreground"
+                          className="text-xs font-medium text-foreground"
                         >
                           {dict.form.fields.unitLabel}
                         </Label>
@@ -675,7 +676,7 @@ export function QuickAddHabitModal({
                               ? dict.form.fields.unitLabelTimePlaceholder
                               : dict.form.fields.unitLabelCountPlaceholder
                           }
-                          className="h-8 text-xs"
+                          className="h-11 text-base sm:text-sm"
                         />
                       </div>
                     )}
@@ -688,7 +689,7 @@ export function QuickAddHabitModal({
                     <div className="space-y-1">
                       <Label
                         htmlFor="advanced-context-tags"
-                        className="text-[11px] font-medium text-foreground"
+                        className="text-xs font-medium text-foreground"
                       >
                         {dict.form.fields.quitContextTitle}
                       </Label>
@@ -697,14 +698,14 @@ export function QuickAddHabitModal({
                         value={contextTags}
                         onChange={(e) => setContextTags(e.target.value)}
                         placeholder={dict.form.fields.quitContextPlaceholder}
-                        className="h-8 text-xs"
+                        className="h-11 text-base sm:text-sm"
                       />
                     </div>
 
                     <div className="space-y-1">
                       <Label
                         htmlFor="advanced-risk-window"
-                        className="text-[11px] font-medium text-foreground"
+                        className="text-xs font-medium text-foreground"
                       >
                         {dict.form.fields.quitRiskWindowTitle}
                       </Label>
@@ -713,7 +714,7 @@ export function QuickAddHabitModal({
                         value={highRiskWindow}
                         onChange={(e) => setHighRiskWindow(e.target.value)}
                         placeholder={dict.form.fields.quitRiskWindowPlaceholder}
-                        className="h-8 text-xs"
+                        className="h-11 text-base sm:text-sm"
                       />
                     </div>
                   </>
@@ -722,7 +723,7 @@ export function QuickAddHabitModal({
                 {/* TODO Specific Advanced Options */}
                 {type === "TODO" && (
                   <div className="space-y-1">
-                    <Label className="text-[11px] font-medium text-foreground">
+                    <Label className="text-xs font-medium text-foreground">
                       {dict.form.fields.todoRecurring}
                     </Label>
                     <div className="grid grid-cols-3 gap-1">
@@ -736,7 +737,7 @@ export function QuickAddHabitModal({
                           type="button"
                           onClick={() => setTodoRecurring(r.id as any)}
                           className={cn(
-                            "rounded border px-2 py-1 text-center text-[10px] font-medium transition-all",
+                            "min-h-11 rounded-md border px-2 py-2 text-center text-sm font-medium transition-all",
                             todoRecurring === r.id
                               ? "border-primary bg-primary font-semibold text-primary-foreground"
                               : "border-border bg-background text-muted-foreground hover:bg-muted"
@@ -751,7 +752,7 @@ export function QuickAddHabitModal({
 
                 {/* Category Selection */}
                 <div className="space-y-1">
-                  <Label className="text-[11px] font-medium text-foreground">
+                  <Label className="text-xs font-medium text-foreground">
                     {dict.form.fields.customCategoryTitle}
                   </Label>
                   {categories.length > 0 && (
@@ -765,7 +766,7 @@ export function QuickAddHabitModal({
                             setCustomCatInput("")
                           }}
                           className={cn(
-                            "rounded-md border px-2 py-0.5 text-[10px] transition-colors",
+                            "min-h-11 rounded-md border px-3 py-2 text-sm transition-colors",
                             selectedCategoryName === cat.name && !customCatInput
                               ? "border-primary bg-primary font-semibold text-primary-foreground"
                               : "border-border bg-background text-muted-foreground hover:bg-muted"
@@ -780,7 +781,7 @@ export function QuickAddHabitModal({
                     value={customCatInput}
                     onChange={(e) => setCustomCatInput(e.target.value)}
                     placeholder={dict.form.fields.customCategoryPlaceholder}
-                    className="h-8 text-xs"
+                    className="h-11 text-base sm:text-sm"
                   />
                 </div>
 
@@ -796,18 +797,18 @@ export function QuickAddHabitModal({
                   }
                   enterHint={dict.form.fields.toolUrlEnterHint}
                   appliedMessage={dict.form.fields.toolUrlApplied}
-                  labelClassName="text-[11px] font-medium text-foreground"
-                  inputClassName="h-8 text-xs"
+                  labelClassName="text-xs font-medium text-foreground"
+                  inputClassName="h-11 text-base sm:text-sm"
                 />
               </div>
             </details>
           </div>
 
-          <DialogFooter className="flex flex-row items-center justify-between border-t pt-3">
+          <DialogFooter className="-mx-4 -mb-4 flex shrink-0 flex-wrap items-center justify-between gap-2 border-t bg-background px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-6 sm:-mb-6 sm:flex-row sm:px-6 sm:pb-6">
             <Link
               href="/items/new"
               onClick={() => setOpen(false)}
-              className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+              className="inline-flex min-h-11 items-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
               {dict.form.fields.linkAdvancedPage}
             </Link>
@@ -816,12 +817,18 @@ export function QuickAddHabitModal({
                 type="button"
                 variant="outline"
                 size="sm"
+                className="min-h-11"
                 onClick={() => setOpen(false)}
                 disabled={isLoading}
               >
                 {dict.common.actions.cancel}
               </Button>
-              <Button type="submit" size="sm" disabled={isLoading}>
+              <Button
+                type="submit"
+                size="sm"
+                className="min-h-11"
+                disabled={isLoading}
+              >
                 {isLoading && (
                   <Icons.spinner className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                 )}

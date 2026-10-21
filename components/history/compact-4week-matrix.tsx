@@ -20,6 +20,54 @@ interface Compact4WeekMatrixProps {
 const Y_AXIS_ZH = ["一", "二", "三", "四", "五", "六", "日"]
 const Y_AXIS_EN = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
+function DaySignal({ day }: { day: GlobalHeatmapDay }) {
+  if (day.isFuture) return null
+  if (day.hasRest) {
+    return (
+      <Icons.rest
+        aria-hidden="true"
+        className="h-4 w-4 text-white"
+        strokeWidth={2}
+      />
+    )
+  }
+  if (day.primaryEnergy === "HIGH") {
+    return (
+      <Icons.star
+        aria-hidden="true"
+        className="h-3.5 w-3.5 fill-current text-white"
+      />
+    )
+  }
+  if (day.primaryEnergy === "LOW") {
+    return (
+      <span
+        aria-hidden="true"
+        className="h-2 w-2 rounded-full bg-amber-950/80 dark:bg-amber-950"
+      />
+    )
+  }
+  if (day.totalCount > 0) {
+    return (
+      <Icons.check
+        aria-hidden="true"
+        className="h-3.5 w-3.5 text-white"
+        strokeWidth={3}
+      />
+    )
+  }
+  return null
+}
+
+function getSignal(day: GlobalHeatmapDay) {
+  if (day.isFuture) return "upcoming"
+  if (day.primaryEnergy === "HIGH") return "high"
+  if (day.primaryEnergy === "LOW") return "low"
+  if (day.totalCount > 0) return "normal"
+  if (day.hasRest) return "rest"
+  return "empty"
+}
+
 export function Compact4WeekMatrix({ days }: Compact4WeekMatrixProps) {
   const { dict, locale } = useI18n()
   const actDict = dict.insights.activityHistory
@@ -66,7 +114,7 @@ export function Compact4WeekMatrix({ days }: Compact4WeekMatrixProps) {
       return "bg-emerald-500 dark:bg-emerald-400 ring-1 ring-emerald-500/30"
     }
     if (day.hasRest) {
-      return "bg-purple-500 dark:bg-purple-400 ring-1 ring-purple-500/30"
+      return "bg-purple-500 bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.45)_0_2px,transparent_2px_5px)] ring-1 ring-purple-500/30 dark:bg-purple-400"
     }
     if (day.isToday) {
       return "border border-dashed border-primary/70 bg-primary/10"
@@ -101,25 +149,33 @@ export function Compact4WeekMatrix({ days }: Compact4WeekMatrixProps) {
       <div className="flex flex-wrap items-center justify-between gap-2 border-b pb-2 text-[11px] text-muted-foreground">
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1.5">
-            <span className="rounded-xs h-2.5 w-2.5 bg-emerald-600 dark:bg-emerald-500" />
+            <span className="rounded-xs flex h-3.5 w-3.5 items-center justify-center bg-emerald-600 text-white dark:bg-emerald-500">
+              <Icons.star className="h-2 w-2 fill-current" />
+            </span>
             <span>
               {heatmapDict.legendHigh || (locale === "zh" ? "充沛" : "High")}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="rounded-xs h-2.5 w-2.5 bg-emerald-500 dark:bg-emerald-400" />
+            <span className="rounded-xs flex h-3.5 w-3.5 items-center justify-center bg-emerald-500 text-white dark:bg-emerald-400">
+              <Icons.check className="h-2 w-2" strokeWidth={3} />
+            </span>
             <span>
               {heatmapDict.legendNormal || (locale === "zh" ? "完成" : "Done")}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="rounded-xs h-2.5 w-2.5 bg-amber-500 dark:bg-amber-400" />
+            <span className="rounded-xs flex h-3.5 w-3.5 items-center justify-center bg-amber-500 dark:bg-amber-400">
+              <span className="h-1 w-1 rounded-full bg-amber-950/80" />
+            </span>
             <span>
               {heatmapDict.legendLow || (locale === "zh" ? "微行动" : "Micro")}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="rounded-xs h-2.5 w-2.5 bg-purple-500 dark:bg-purple-400" />
+            <span className="rounded-xs flex h-3.5 w-3.5 items-center justify-center bg-purple-500 bg-[repeating-linear-gradient(135deg,rgba(255,255,255,0.45)_0_2px,transparent_2px_5px)] text-white dark:bg-purple-400">
+              <Icons.rest className="h-2 w-2" strokeWidth={2.5} />
+            </span>
             <span>
               {heatmapDict.legendRest || (locale === "zh" ? "休整" : "Rest")}
             </span>
@@ -198,16 +254,21 @@ export function Compact4WeekMatrix({ days }: Compact4WeekMatrixProps) {
                               type="button"
                               title={description}
                               aria-label={description}
+                              data-signal={getSignal(day)}
                               aria-current={day.isToday ? "date" : undefined}
                               className="group mx-auto flex h-11 w-full max-w-14 items-center justify-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             >
                               <span
                                 aria-hidden
+                                data-signal={getSignal(day)}
+                                data-testid={`day-signal-${day.dateStr}`}
                                 className={cn(
-                                  "block h-9 w-full max-w-12 rounded-sm transition-transform duration-150 group-hover:scale-105 motion-reduce:transform-none",
+                                  "flex h-9 w-full max-w-12 items-center justify-center rounded-sm transition-transform duration-150 group-hover:scale-105 group-active:scale-95 motion-reduce:transform-none",
                                   getColorClass(day)
                                 )}
-                              />
+                              >
+                                <DaySignal day={day} />
+                              </span>
                             </button>
                           </PopoverTrigger>
                           <PopoverContent
@@ -255,11 +316,11 @@ export function Compact4WeekMatrix({ days }: Compact4WeekMatrixProps) {
             </tbody>
           </table>
         </div>
-        <aside className="border-t pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
+        <aside className="min-w-0 border-t pt-4 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
           <p className="mb-4 text-xs font-medium text-muted-foreground">
             {zh ? "这四周留下的痕迹" : "Traces from these four weeks"}
           </p>
-          <dl className="grid grid-cols-3 gap-3 lg:grid-cols-1 lg:gap-6">
+          <dl className="grid grid-cols-1 gap-3 min-[320px]:grid-cols-3 lg:grid-cols-1 lg:gap-6">
             {[
               [zh ? "有记录的天" : "Days recorded", recordedDays],
               [zh ? "留下连接的周" : "Weeks connected", connectedWeeks],
@@ -269,7 +330,7 @@ export function Compact4WeekMatrix({ days }: Compact4WeekMatrixProps) {
               ],
             ].map(([label, value]) => (
               <div key={label}>
-                <dt className="text-[11px] leading-relaxed text-muted-foreground">
+                <dt className="text-balance text-[11px] leading-relaxed text-muted-foreground">
                   {label}
                 </dt>
                 <dd className="mt-1 text-2xl font-semibold tabular-nums tracking-tight">

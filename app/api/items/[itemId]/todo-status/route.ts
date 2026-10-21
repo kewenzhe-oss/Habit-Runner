@@ -45,8 +45,9 @@ export async function PATCH(req: Request, { params }: RouteProps) {
         data: { status: nextItemStatus, updatedAt: new Date() },
       })
 
+      let todayCheckIn = null
       if (body.status === "COMPLETED") {
-        await tx.checkIn.upsert({
+        todayCheckIn = await tx.checkIn.upsert({
           where: { itemId_date: { itemId, date } },
           update: {
             status: "COMPLETED",
@@ -72,7 +73,7 @@ export async function PATCH(req: Request, { params }: RouteProps) {
         })
       }
 
-      return nextItem
+      return { ...nextItem, todayCheckIn }
     })
 
     return new Response(JSON.stringify(updated), {

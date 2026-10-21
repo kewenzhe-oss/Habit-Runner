@@ -3,8 +3,10 @@
 import * as React from "react"
 import { EnergyLevel, TodayItemDTO } from "@/types"
 
+import { deriveHabitCheckIn } from "@/lib/domain/checkin"
+import { checkInPatch, type MutateDashboardItem } from "@/lib/domain/dashboard"
+import { formatLocalizedUnit, useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
-import { useI18n, formatLocalizedUnit } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -25,6 +27,8 @@ interface RecordActionModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onSuccess: () => void
+  onMutate?: MutateDashboardItem
+  dateStr?: string
 }
 
 export type HabitUnitType = "TIME" | "COUNT" | "BINARY"
@@ -34,6 +38,8 @@ export function RecordActionModal({
   open,
   onOpenChange,
   onSuccess,
+  onMutate,
+  dateStr,
 }: RecordActionModalProps) {
   const { dict, format, locale } = useI18n()
   // Parse unit config from item (prioritizing new dedicated DB columns, fallback to presets/text)
@@ -123,10 +129,11 @@ export function RecordActionModal({
   )
   const [binaryDone, setBinaryDone] = React.useState<boolean>(true)
   const [restReason, setRestReason] = React.useState<string>("")
-  const [customRestNote, setCustomRestNote] = React.useState<string>("")
   const [notes, setNotes] = React.useState<string>("")
   const [nextIntent, setNextIntent] = React.useState<string>("")
   const [isLoading, setIsLoading] = React.useState(false)
+  const [extrasOpen, setExtrasOpen] = React.useState(false)
+  const titleRef = React.useRef<HTMLHeadingElement>(null)
 
   // Reset/sync state on open
   React.useEffect(() => {
@@ -135,7 +142,7 @@ export function RecordActionModal({
     setActualAmount(defaultAmount)
     setBinaryDone(true)
     setRestReason("")
-    setCustomRestNote("")
+    setExtrasOpen(Boolean(item.todayCheckIn?.notes || item.todayCheckIn?.nextIntent || item.todayCheckIn?.restReasonTag))
     setNotes(item.todayCheckIn?.notes || "")
     setNextIntent(item.todayCheckIn?.nextIntent || "")
 
@@ -198,58 +205,51 @@ export function RecordActionModal({
   const handleSave = async () => {
     setIsLoading(true)
     try {
-      const reasonTag = isRestMode ? restReason || dict.action.modal.mapping.restTitle : null
+      const reasonTag = isRestMode
+        ? restReason || dict.action.modal.mapping.restTitle
+        : null
 
-      // Combine user reflection notes
-      let combinedNotes = notes.trim()
-      if (isRestMode && customRestNote.trim()) {
-        combinedNotes = combinedNotes
-          ? `${customRestNote.trim()} | ${combinedNotes}`
-          : customRestNote.trim()
+      const combinedNotes = notes.trim()
+
+      const input = {
+        actualAmount:
+          unitConfig.unitType === "BINARY"
+            ? isRestMode
+              ? 0
+              : 1
+            : actualAmount,
+        restReasonTag: reasonTag,
+        notes: combinedNotes || undefined,
+        nextIntent: nextIntent.trim() || undefined,
+      }
+      const optimistic = deriveHabitCheckIn({ ...item, ...unitConfig }, input)
+      const save = async () => {
+        const res = await fetch(`/api/items/${item.id}/checkin`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...input, date: dateStr }),
+        })
+        if (!res.ok) throw new Error(dict.common.notifications.saveFailed)
+        const { streaks, ...checkIn } = await res.json()
+        return checkInPatch(item, dateStr, checkIn, streaks)
+      }
+      if (onMutate) {
+        await onMutate(
+          item,
+          checkInPatch(item, dateStr, {
+            id: `pending-${item.id}`,
+            ...optimistic,
+          }),
+          save
+        )
+      } else {
+        await save()
+        onSuccess()
       }
 
-      const res = await fetch(`/api/items/${item.id}/checkin`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          actualAmount:
-            unitConfig.unitType === "BINARY"
-              ? isRestMode
-                ? 0
-                : 1
-              : actualAmount,
-          restReasonTag: reasonTag,
-          notes: combinedNotes || undefined,
-          nextIntent: nextIntent.trim() || undefined,
-        }),
-      })
-
-      if (!res.ok) throw new Error(dict.common.notifications.saveFailed)
-
-      toast({
-        title:
-          computedEnergy === "REST"
-            ? dict.action.modal.toast.restTitle
-            : computedEnergy === "LOW"
-              ? dict.action.modal.toast.lowTitle
-              : computedEnergy === "HIGH"
-                ? dict.action.modal.toast.highTitle
-                : dict.action.modal.toast.normalTitle,
-        description:
-          computedEnergy === "REST"
-            ? dict.action.modal.toast.restDesc
-            : computedEnergy === "LOW"
-              ? format(dict.action.modal.toast.lowDesc, {
-                  amount: actualAmount,
-                  unit: formatLocalizedUnit(actualAmount, unitConfig.unitLabel, locale),
-                })
-              : format(dict.action.modal.toast.generalDesc, {
-                  title: item.title,
-                }),
-      })
+      toast({ title: dict.action.modal.saved })
 
       onOpenChange(false)
-      onSuccess()
     } catch (err: any) {
       toast({
         title: dict.common.notifications.saveFailed,
@@ -261,326 +261,60 @@ export function RecordActionModal({
     }
   }
 
+  const shortcutAmounts = Array.from(new Set([
+    Math.max(1, Math.round(unitConfig.targetAmount * 0.5)),
+    unitConfig.targetAmount,
+    Math.max(unitConfig.targetAmount + 1, Math.round(unitConfig.targetAmount * 1.2)),
+  ]))
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-base font-bold">
-              {item.title}
-            </DialogTitle>
-          </div>
-          {item.whyPrompt && (
-            <DialogDescription className="text-xs font-normal text-muted-foreground">
-              “{item.whyPrompt}”
-            </DialogDescription>
-          )}
+      <DialogContent onOpenAutoFocus={(event) => { event.preventDefault(); titleRef.current?.focus() }} className="bottom-0 top-auto flex max-h-[calc(100dvh-0.5rem)] w-full translate-y-0 flex-col overflow-hidden rounded-b-none rounded-t-2xl sm:bottom-auto sm:top-1/2 sm:w-[calc(100%-1rem)] sm:max-w-[420px] sm:-translate-y-1/2 sm:rounded-2xl">
+        <DialogHeader className="shrink-0 pr-10 text-left">
+          <DialogTitle ref={titleRef} tabIndex={-1} className="text-xl font-semibold leading-snug outline-none">{item.title}</DialogTitle>
+          <DialogDescription className="sr-only">{dict.action.modal.description}</DialogDescription>
         </DialogHeader>
-
-        <div className="space-y-4 py-2">
-          {/* External Tool Launch */}
-          {item.toolLinks.length > 0 && (
-            <div className="flex items-center justify-between rounded-lg bg-muted/40 p-2.5 text-xs">
-              <span className="text-muted-foreground">{dict.action.modal.toolLinkPrefix}</span>
-              <div className="flex gap-2">
-                {item.toolLinks.map((tool) => (
-                  <a
-                    key={tool.id}
-                    href={tool.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 font-semibold text-primary hover:underline"
-                  >
-                    <span>{tool.title}</span>
-                    <Icons.externalLink className="h-3 w-3" />
-                  </a>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* MODE A: NUMERICAL HABIT (TIME / COUNT) */}
-          {unitConfig.unitType !== "BINARY" && (
+        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto overscroll-contain py-1">
+          {unitConfig.unitType !== "BINARY" ? (
             <div className="space-y-3">
-              {/* Target info and input */}
-              <div className="flex items-center justify-between">
-                <Label
-                  htmlFor="actual-input"
-                  className="text-xs font-semibold text-foreground"
-                >
-                  {dict.action.modal.actualAmountLabel}
-                </Label>
-                <span className="text-xs text-muted-foreground">
-                  {dict.action.modal.targetBaselinePrefix}
-                  <span className="font-semibold text-foreground">
-                    {unitConfig.targetAmount} {formatLocalizedUnit(unitConfig.targetAmount, unitConfig.unitLabel, locale)}
-                  </span>
-                </span>
+              <div className="flex flex-wrap items-baseline justify-between gap-2">
+                <Label htmlFor="actual-input" className="text-sm font-medium">{dict.action.modal.actualAmountLabel}</Label>
+                <span className="text-sm text-muted-foreground">{dict.action.modal.targetBaselinePrefix}{unitConfig.targetAmount} {formatLocalizedUnit(unitConfig.targetAmount, unitConfig.unitLabel, locale)}</span>
               </div>
-
-              {/* Number Input with unit */}
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    id="actual-input"
-                    type="number"
-                    min="0"
-                    value={actualAmount === 0 && isRestMode ? 0 : actualAmount}
-                    onChange={(e) =>
-                      setActualAmount(Math.max(0, Number(e.target.value)))
-                    }
-                    className="pr-14 text-base font-bold"
-                  />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-muted-foreground">
-                    {formatLocalizedUnit(actualAmount, unitConfig.unitLabel, locale)}
-                  </span>
-                </div>
+              <div className="relative">
+                <Input id="actual-input" type="number" inputMode="decimal" step="any" min="0" value={actualAmount} onChange={(event) => setActualAmount(Math.max(0, Number(event.target.value)))} className="h-16 appearance-none rounded-xl pr-16 text-3xl font-semibold tabular-nums focus-visible:ring-1 sm:text-3xl [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" />
+                <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">{formatLocalizedUnit(actualAmount, unitConfig.unitLabel, locale)}</span>
               </div>
-
-              {/* Quick shortcut pills */}
-              <div className="flex flex-wrap gap-1.5 pt-0.5">
-                {[
-                  {
-                    label: dict.action.modal.shortcuts.half,
-                    amt: Math.round(unitConfig.targetAmount * 0.5),
-                  },
-                  {
-                    label: dict.action.modal.shortcuts.base,
-                    amt: Math.round(unitConfig.targetAmount * 0.8),
-                  },
-                  { label: dict.action.modal.shortcuts.target, amt: unitConfig.targetAmount },
-                  {
-                    label: dict.action.modal.shortcuts.high,
-                    amt: Math.round(unitConfig.targetAmount * 1.2),
-                  },
-                  { label: dict.action.modal.shortcuts.rest, amt: 0 },
-                ].map((p) => (
-                  <button
-                    key={p.label}
-                    type="button"
-                    onClick={() => setActualAmount(p.amt)}
-                    className={cn(
-                      "min-h-11 rounded-md border px-3 py-2 text-xs font-medium transition-colors",
-                      actualAmount === p.amt
-                        ? "border-primary bg-primary font-semibold text-primary-foreground"
-                        : "border-border bg-muted/40 text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    {p.label} ({p.amt}{" "}
-                    {formatLocalizedUnit(p.amt, unitConfig.unitLabel, locale)})
-                  </button>
-                ))}
+              <div className="grid grid-cols-3 gap-2">
+                {shortcutAmounts.map((amount) => <button key={amount} type="button" aria-pressed={actualAmount === amount} onClick={() => setActualAmount(amount)} className={cn("min-h-11 rounded-xl border px-2 py-2 text-sm tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", actualAmount === amount ? "border-foreground bg-foreground font-medium text-background" : "border-input text-muted-foreground hover:bg-muted")}>
+                  {amount} {formatLocalizedUnit(amount, unitConfig.unitLabel, locale)}
+                </button>)}
               </div>
-
-              {/* Live Automatic Energy Mapping Banner */}
-              <div
-                className={cn(
-                  "space-y-1 rounded-lg border p-3 text-xs transition-all",
-                  computedEnergy === "HIGH"
-                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-200"
-                    : computedEnergy === "NORMAL"
-                      ? "border-blue-500/30 bg-blue-500/10 text-blue-900 dark:text-blue-200"
-                      : computedEnergy === "LOW"
-                        ? "border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-200"
-                        : "border-purple-500/30 bg-purple-500/10 text-purple-900 dark:text-purple-200"
-                )}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-1.5 font-bold">
-                    {computedEnergy === "HIGH" && (
-                      <Icons.highEnergy className="h-4 w-4 text-emerald-600" />
-                    )}
-                    {computedEnergy === "NORMAL" && (
-                      <Icons.normalEnergy className="h-4 w-4 text-blue-600" />
-                    )}
-                    {computedEnergy === "LOW" && (
-                      <Icons.lowEnergy className="h-4 w-4 text-amber-600" />
-                    )}
-                    {computedEnergy === "REST" && (
-                      <Icons.rest className="h-4 w-4 text-purple-600" />
-                    )}
-                    <span>
-                      {computedEnergy === "HIGH"
-                        ? format(dict.action.modal.mapping.highTitle, { ratio: completionRatio })
-                        : computedEnergy === "NORMAL"
-                          ? format(dict.action.modal.mapping.normalTitle, { ratio: completionRatio })
-                          : computedEnergy === "LOW"
-                            ? format(dict.action.modal.mapping.lowTitle, { ratio: completionRatio })
-                            : dict.action.modal.mapping.restTitle}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-semibold opacity-80">
-                    {dict.action.modal.mapping.autoMappingTag}
-                  </span>
-                </div>
-                <p className="text-[11px] leading-relaxed opacity-90">
-                  {computedEnergy === "HIGH"
-                    ? dict.action.modal.mapping.highDesc
-                    : computedEnergy === "NORMAL"
-                      ? dict.action.modal.mapping.normalDesc
-                      : computedEnergy === "LOW"
-                        ? dict.action.modal.mapping.lowDesc
-                        : dict.action.modal.mapping.restDesc}
-                </p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <button type="button" aria-pressed={isRestMode} onClick={() => setActualAmount(isRestMode ? unitConfig.targetAmount : 0)} className={cn("inline-flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", isRestMode ? "bg-muted font-medium text-foreground" : "text-muted-foreground hover:bg-muted")}><Icons.rest aria-hidden="true" className="h-4 w-4" />{dict.action.modal.restToggle}{isRestMode && <Icons.check aria-hidden="true" className="h-4 w-4" />}</button>
+                {!isRestMode && <span className="text-xs tabular-nums text-muted-foreground">{dict.common.energy[computedEnergy.toLowerCase() as "high" | "normal" | "low" | "rest"]} · {completionRatio}%</span>}
               </div>
             </div>
-          )}
-
-          {/* MODE B: BINARY HABIT */}
-          {unitConfig.unitType === "BINARY" && (
-            <div className="space-y-2">
-              <Label className="text-xs font-semibold text-foreground">
-                {dict.action.modal.binary.stateLabel}
-              </Label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setBinaryDone(true)}
-                  className={cn(
-                    "flex min-h-14 flex-col items-start rounded-lg border p-3 text-left transition-colors",
-                    binaryDone
-                      ? "border-blue-500 bg-blue-500/10 text-blue-900 ring-1 ring-blue-500 dark:text-blue-200"
-                      : "border-border text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  <div className="flex items-center gap-1.5 text-xs font-bold">
-                    <Icons.check className="h-4 w-4 text-blue-600" />
-                    <span>{dict.action.modal.binary.doneTitle}</span>
-                  </div>
-                  <span className="mt-0.5 text-[10px] opacity-75">
-                    {dict.action.modal.binary.doneSub}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setBinaryDone(false)}
-                  className={cn(
-                    "flex min-h-14 flex-col items-start rounded-lg border p-3 text-left transition-colors",
-                    !binaryDone
-                      ? "border-purple-500 bg-purple-500/10 text-purple-900 ring-1 ring-purple-500 dark:text-purple-200"
-                      : "border-border text-muted-foreground hover:bg-muted"
-                  )}
-                >
-                  <div className="flex items-center gap-1.5 text-xs font-bold">
-                    <Icons.rest className="h-4 w-4 text-purple-600" />
-                    <span>{dict.action.modal.binary.restTitle}</span>
-                  </div>
-                  <span className="mt-0.5 text-[10px] opacity-75">
-                    {dict.action.modal.binary.restSub}
-                  </span>
-                </button>
-              </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2" role="group" aria-label={dict.action.modal.binary.stateLabel}>
+              {[true, false].map((done) => <button key={String(done)} type="button" aria-pressed={binaryDone === done} onClick={() => setBinaryDone(done)} className={cn("flex min-h-14 items-center justify-center gap-2 rounded-xl border px-3 py-3 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring", binaryDone === done ? "border-foreground bg-foreground text-background" : "border-input text-muted-foreground hover:bg-muted")}>
+                {done ? <Icons.check aria-hidden="true" className="h-5 w-5" /> : <Icons.rest aria-hidden="true" className="h-5 w-5" />}{done ? dict.action.modal.binary.doneTitle : dict.action.modal.binary.restTitle}
+              </button>)}
             </div>
           )}
-
-          {/* REST REASON MECHANISM */}
-          {isRestMode && (
-            <div className="space-y-2.5 rounded-lg border border-purple-500/30 bg-purple-500/5 p-3 text-xs">
-              <div className="flex items-center justify-between">
-                <Label className="flex items-center gap-1.5 text-xs font-semibold text-purple-900 dark:text-purple-200">
-                  <Icons.rest className="h-3.5 w-3.5" />
-                  <span>{dict.action.modal.restReason.label}</span>
-                </Label>
-              </div>
-
-              {/* Quick neutral preset pills */}
-              <div className="flex flex-wrap gap-1.5">
-                {restReasonPresets.map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => setRestReason(r)}
-                    className={cn(
-                      "min-h-11 rounded-md border px-3 py-2 text-xs font-medium transition-colors",
-                      restReason === r
-                        ? "shadow-xs border-purple-600 bg-purple-600 font-semibold text-white"
-                        : "border-purple-500/30 bg-background text-purple-900 hover:bg-purple-500/15 dark:text-purple-200"
-                    )}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
-
-              {/* Optional custom rest note */}
-              <div className="space-y-1 pt-1">
-                <Input
-                  value={customRestNote}
-                  onChange={(e) => setCustomRestNote(e.target.value)}
-                  placeholder={dict.action.modal.restReason.customPlaceholder}
-                  className="bg-background text-xs"
-                />
-              </div>
+          <details open={extrasOpen} onToggle={(event) => setExtrasOpen(event.currentTarget.open)} className="group border-t">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-md text-sm text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring [&::-webkit-details-marker]:hidden">{notes || nextIntent || restReason ? dict.action.modal.extrasFilled : dict.action.modal.extras}<Icons.down aria-hidden="true" className="h-4 w-4 transition-transform group-open:rotate-180" /></summary>
+            <div className="space-y-4 pb-2 pt-2">
+              {isRestMode && <div className="space-y-2"><Label className="text-sm">{dict.action.modal.restReason.label}</Label><div className="flex flex-wrap gap-2">{restReasonPresets.map((reason) => <button key={reason} type="button" aria-pressed={restReason === reason} onClick={() => setRestReason(restReason === reason ? "" : reason)} className={cn("min-h-11 rounded-lg border px-3 text-sm", restReason === reason ? "bg-muted font-medium" : "text-muted-foreground")}>{reason}</button>)}</div></div>}
+              <div className="space-y-2"><Label htmlFor="action-notes" className="text-sm">{dict.action.modal.reflection.label}</Label><Textarea id="action-notes" value={notes} onChange={(event) => setNotes(event.target.value)} placeholder={dict.action.modal.reflection.placeholder} rows={2} className="rounded-xl text-base sm:text-sm" /></div>
+              <div className="space-y-2"><Label htmlFor="next-intent" className="text-sm">{dict.action.modal.nextIntentLabel}</Label><Input id="next-intent" value={nextIntent} onChange={(event) => setNextIntent(event.target.value)} placeholder={dict.action.modal.nextIntentPlaceholder} maxLength={200} className="rounded-xl text-base sm:text-sm" /></div>
             </div>
-          )}
-
-          {/* Optional Reflection Note */}
-          <div className="space-y-1">
-            <Label
-              htmlFor="action-notes"
-              className="text-xs font-semibold text-foreground"
-            >
-              {dict.action.modal.reflection.label}
-            </Label>
-            <Textarea
-              id="action-notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder={dict.action.modal.reflection.placeholder}
-              rows={2}
-              className="resize-none text-xs"
-            />
-          </div>
-
-          {/* Next Action Seed — only shown when not resting */}
-          {!isRestMode && (
-            <div className="space-y-1.5 rounded-lg border border-border/60 bg-muted/30 p-3">
-              <Label
-                htmlFor="next-intent"
-                className="flex items-center gap-1.5 text-xs font-semibold text-foreground"
-              >
-                <span className="text-sm leading-none">🌱</span>
-                <span>明日想推进什么？</span>
-                <span className="ml-auto font-normal text-muted-foreground/60">可略过</span>
-              </Label>
-              <Input
-                id="next-intent"
-                value={nextIntent}
-                onChange={(e) => setNextIntent(e.target.value)}
-                placeholder={`一句话即可，例：把数据库迁移脚本跑通`}
-                maxLength={200}
-                className="bg-background text-xs"
-              />
-              {nextIntent.length > 0 && (
-                <p className="text-[10px] text-muted-foreground/60">
-                  明天打开习惯卡片时会直接显示这句话
-                </p>
-              )}
-            </div>
-          )}
+          </details>
+          {item.toolLinks.length > 0 && <div className="flex flex-wrap gap-2">{item.toolLinks.map((tool) => <a key={tool.id} href={tool.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-lg px-2 text-sm text-muted-foreground hover:bg-muted"><Icons.externalLink aria-hidden="true" className="h-4 w-4" />{tool.title}</a>)}</div>}
         </div>
-
-        <DialogFooter className="sticky bottom-0 -mx-4 -mb-4 flex items-stretch justify-between gap-2 border-t bg-background px-4 pb-4 pt-3 sm:static sm:mx-0 sm:mb-0 sm:items-center sm:px-0 sm:pb-0">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-          >
-            {dict.common.actions.cancel}
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleSave}
-            disabled={isLoading}
-          >
-            {isLoading && (
-              <Icons.spinner className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-            )}
-            <span>{dict.action.modal.confirmButton}</span>
+        <DialogFooter className="shrink-0 border-t pt-3 pb-[env(safe-area-inset-bottom)] sm:pb-0">
+          <Button type="button" onClick={handleSave} disabled={isLoading} className="h-12 w-full rounded-xl">
+            {isLoading && <Icons.spinner aria-hidden="true" className="mr-2 h-4 w-4 animate-spin" />}{isLoading ? dict.common.status.saving : isRestMode ? dict.action.modal.saveRest : dict.action.modal.confirmButton}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import {
@@ -179,6 +179,7 @@ describe("Activity History Components", () => {
       name: "2026-08-01 · 1 次完成",
     })
     expect(firstDay).toHaveFocus()
+    expect(firstDay.querySelector('[data-signal="normal"]')).toBeInTheDocument()
     await user.keyboard("{Enter}")
     expect(screen.getByRole("dialog")).toHaveTextContent("2026-08-01")
     await user.keyboard("{Escape}")
@@ -186,7 +187,7 @@ describe("Activity History Components", () => {
     expect(firstDay).toHaveFocus()
   })
 
-  test("renders GlobalActivityHeatmap with 112 days and legend", () => {
+  test("renders GlobalActivityHeatmap with touch buttons, status labels, and keyboard navigation", async () => {
     const mockDays: GlobalHeatmapDay[] = Array.from({ length: 112 }, (_, i) => {
       const d = new Date("2026-05-01")
       d.setDate(d.getDate() + i)
@@ -198,7 +199,7 @@ describe("Activity History Components", () => {
         isFuture: false,
         totalCount: i % 2 === 0 ? 2 : 0,
         hasRest: i % 5 === 0,
-        primaryEnergy: i % 2 === 0 ? "NORMAL" : null,
+        primaryEnergy: i % 2 === 0 ? (i % 4 === 0 ? "HIGH" : "NORMAL") : null,
         statusSummary: i % 2 === 0 ? "COMPLETED" : null,
         actions:
           i % 2 === 0
@@ -221,6 +222,94 @@ describe("Activity History Components", () => {
       screen.getByText(historyDict.heatmap.legendNormal)
     ).toBeInTheDocument()
     expect(screen.getByText(historyDict.heatmap.legendRest)).toBeInTheDocument()
+
+    const dateButtons = screen
+      .getAllByRole("button")
+      .filter((button) =>
+        /^\d{4}-\d{2}-\d{2}/.test(button.getAttribute("aria-label") || "")
+      )
+    expect(dateButtons).toHaveLength(28)
+
+    const firstDay = dateButtons[0]
+    expect(firstDay).toHaveAttribute(
+      "aria-label",
+      expect.stringMatching(/^2026-07-24 · 充沛 · 2 次行动 · 晨跑$/)
+    )
+    expect(firstDay.querySelector('[data-signal="high"]')).toBeInTheDocument()
+
+    firstDay.focus()
+    const user = userEvent.setup()
+    await user.keyboard("{ArrowDown}")
+    expect(dateButtons[1]).toHaveFocus()
+
+    await user.click(firstDay)
+    expect(screen.getByRole("dialog")).toHaveTextContent("晨跑")
+    await user.click(document.body)
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
+  })
+
+  test("keeps the weekday axis sticky and scrolls the heatmap to recent weeks", async () => {
+    const mockDays: GlobalHeatmapDay[] = Array.from({ length: 112 }, (_, i) => {
+      const d = new Date("2026-05-01")
+      d.setDate(d.getDate() + i)
+      return {
+        dateStr: d.toISOString().split("T")[0],
+        dayOfWeek: ((d.getDay() + 6) % 7) + 1,
+        isToday: i === 111,
+        isFuture: false,
+        totalCount: 1,
+        hasRest: false,
+        primaryEnergy: "NORMAL",
+        statusSummary: "COMPLETED",
+        actions: [],
+      }
+    })
+
+    const originalScrollWidth = Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "scrollWidth"
+    )
+    Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+      configurable: true,
+      get() {
+        return this.dataset.testid === "activity-heatmap-scroll" ? 624 : 0
+      },
+    })
+
+    try {
+      const { unmount } = render(
+        <GlobalActivityHeatmap days={mockDays} defaultWindowWeeks={16} />
+      )
+
+      const normalSignals = document.querySelectorAll('[data-signal="normal"]')
+      expect(normalSignals).toHaveLength(112)
+      normalSignals.forEach((signal) => expect(signal).toBeEmptyDOMElement())
+
+      const scrollContainer = screen.getByTestId("activity-heatmap-scroll")
+      expect(scrollContainer.scrollLeft).toBe(624)
+
+      expect(screen.getByText("一").parentElement).toHaveClass(
+        "sticky",
+        "left-0",
+        "z-10",
+        "bg-card"
+      )
+
+      scrollContainer.scrollLeft = 0
+      fireEvent.click(screen.getByRole("button", { name: "近 8 周" }))
+      await waitFor(() => expect(scrollContainer.scrollLeft).toBe(624))
+      unmount()
+    } finally {
+      if (originalScrollWidth) {
+        Object.defineProperty(
+          HTMLElement.prototype,
+          "scrollWidth",
+          originalScrollWidth
+        )
+      } else {
+        delete (HTMLElement.prototype as { scrollWidth?: number }).scrollWidth
+      }
+    }
   })
 
   test("renders ActiveHabitsConsistencyList with active routines and streaks", () => {

@@ -141,8 +141,8 @@ describe("HabitItem", () => {
       />
     )
 
-    expect(screen.getByText(/12\s*天/)).toBeInTheDocument()
-    expect(screen.getByLabelText("This week trace")).toBeInTheDocument()
+    expect(screen.getByText(/连续 12 天/)).toBeInTheDocument()
+    expect(screen.getByRole("img", { name: /本周记录/ })).toBeInTheDocument()
   })
 
   test("does not render external link icon when item has no tool links", () => {

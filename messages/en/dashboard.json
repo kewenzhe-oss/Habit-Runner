@@ -8,22 +8,24 @@
     "titleInProgress": "{count} daily routine{s} remaining today",
     "dayDesc": "Plenty of time today. Proceed steadily at your own pace.",
     "nightDesc": "Running late tonight. A micro action or resting is great.",
-    "badgeCompleted": "✓ Daily Routines Completed · {total}/{total}",
+    "badgeCompleted": "Daily Routines Completed · {total}/{total}",
     "titleCompleted": "All daily routines completed",
     "completedDesc": "Today's rhythm is set. Wrap up with ease and enjoy your time.",
-    "badgeRest": "☕ Rest Mode Active",
+    "badgeRest": "Rest Mode Active",
     "titleRest": "Today is an intentional rest day",
     "restDesc": "Resting and recharging is an essential part of life.",
-    "secondaryTodo": "📋 {count} action task{s} pending",
+    "secondaryTodo": "{count} action task{s} pending",
     "daysLeft": "{count}d left this week",
     "lastDay": "Last day of the week",
-    "badgeEmpty": "🌱 Getting Started",
+    "badgeEmpty": "Getting Started",
     "titleEmpty": "Start your first daily routine",
     "emptyDesc": "Add routines you want to cultivate. Your rhythm will grow with every check-in.",
     "shuffleQuote": "New quote",
     "copyQuote": "Copy quote",
     "quoteCopied": "Quote copied to clipboard",
-    "dailyWisdom": "Daily Wisdom"
+    "dailyWisdom": "Daily Wisdom",
+    "progressLabel": "Today’s routine progress",
+    "expandWisdom": "Daily inspiration"
   },
   "energySelector": {
     "title": "Daily Energy State",
@@ -59,11 +61,18 @@
     "viewHistoryArchive": "View full history in archive",
     "completedCount": "{count} completed",
     "noPendingTodos": "All tasks completed. Great job!",
-    "noHabits": "No routines added yet. Start with a simple action."
+    "noHabits": "No routines added yet. Start with a simple action.",
+    "noMatchingHabits": "No routines match the current filters."
   },
   "actions": {
+    "showAll": "Show all",
+    "showCore": "Show core items",
     "manageCategories": "Manage Categories",
-    "newAction": "New Item"
+    "newAction": "New Item",
+    "lowEnergyNote": "Low energy · {count} non-core items tucked away",
+    "restEnergyNote": "Rest mode · {count} non-core items tucked away",
+    "resetFilters": "Show all actions",
+    "allEnergyNote": "Low energy · Showing all items"
   },
   "categories": {
     "allCategories": "All Categories",
@@ -124,7 +133,17 @@
     "openExternalLinkAria": "Open linked tool in new tab: {domain}",
     "viewDetails": "View Details & Trend",
     "editSettings": "Edit Settings",
-    "deleteConfirm": "Are you sure you want to delete “{title}”?"
+    "deleteConfirm": "Are you sure you want to delete “{title}”?",
+    "recordButton": "Record",
+    "doneButton": "Done",
+    "restButton": "Rested",
+    "loggedButton": "Logged",
+    "adjustButton": "Adjust",
+    "priorityHigh": "Priority",
+    "priorityLow": "Later",
+    "streakLabel": "{count}-day streak",
+    "targetLabel": "Goal: {amount} {unit}",
+    "weekTrace": "This week trace"
   },
   "migration": {
     "bannerTitle": "{count} un-synced local items detected",

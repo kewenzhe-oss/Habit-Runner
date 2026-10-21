@@ -29,7 +29,7 @@ export async function AppLayout({ children }: AppLayoutProps) {
         />
         <main
           id="main-content"
-          className="container max-w-4xl flex-1 px-4 sm:px-6 md:px-8 pb-28 pt-6 sm:pt-8 md:pb-8"
+          className="container max-w-4xl flex-1 px-4 pb-[calc(6rem+env(safe-area-inset-bottom))] pt-5 sm:px-6 sm:pt-8 md:px-8 md:pb-8"
         >
           {children}
         </main>

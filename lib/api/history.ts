@@ -1,12 +1,12 @@
 import { CheckInStatus, EnergyLevel, ItemType, Layer } from "@/types"
 
-import { getUserItems } from "@/lib/api/items"
 import { calculateItemStreaks } from "@/lib/api/checkin"
+import { getUserItems } from "@/lib/api/items"
 import { db } from "@/lib/db"
 import {
   addCalendarDays,
-  calendarDaysInclusive,
   calendarDayOfWeek,
+  calendarDaysInclusive,
   enumerateCalendarDates,
   getCalendarWeekDates,
 } from "@/lib/domain/date"
@@ -91,7 +91,15 @@ export type ActivityHistoryData = {
   completedTodos: CompletedTodoSummary[]
 }
 
-const WEEKDAY_NAMES_ZH = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
+const WEEKDAY_NAMES_ZH = [
+  "周日",
+  "周一",
+  "周二",
+  "周三",
+  "周四",
+  "周五",
+  "周六",
+]
 const WEEKDAY_NAMES_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
 
 export async function getActivityHistoryData(
@@ -107,6 +115,7 @@ export async function getActivityHistoryData(
   // 2. Fetch all user items (filtered to Habits & Quits for streaks/heatmaps)
   const allItems = await getUserItems(userId, {
     status: ["ACTIVE", "COMPLETED"],
+    includeCheckInCount: false,
   })
   const habitItems = allItems.filter(
     (i) => i.type === "HABIT" || i.type === "QUIT_HABIT"
@@ -299,7 +308,10 @@ export async function getActivityHistoryData(
     orderBy: { date: "desc" },
   })
 
-  const item120CheckInsMap = new Map<string, Array<{ date: string; status: string }>>()
+  const item120CheckInsMap = new Map<
+    string,
+    Array<{ date: string; status: string }>
+  >()
   batchCheckIns120.forEach((c) => {
     let list = item120CheckInsMap.get(c.itemId)
     if (!list) {
@@ -358,10 +370,8 @@ export async function getActivityHistoryData(
 
   // Sort active habits: ongoing high streak first
   activeItems.sort((a, b) => {
-    const streakA =
-      a.type === "QUIT_HABIT" ? a.maintainedDays : a.rhythmStreak
-    const streakB =
-      b.type === "QUIT_HABIT" ? b.maintainedDays : b.rhythmStreak
+    const streakA = a.type === "QUIT_HABIT" ? a.maintainedDays : a.rhythmStreak
+    const streakB = b.type === "QUIT_HABIT" ? b.maintainedDays : b.rhythmStreak
     return streakB - streakA || b.totalCompletedCount - a.totalCompletedCount
   })
 

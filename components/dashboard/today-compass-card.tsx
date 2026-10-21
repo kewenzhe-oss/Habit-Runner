@@ -1,14 +1,17 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
 import { EnergyLevel, TodayItemDTO } from "@/types"
+
+import { isTodoCompleted } from "@/lib/domain/dashboard"
+import { calendarDayOfWeek, formatDateInTimeZone } from "@/lib/domain/date"
+import { triggerHaptic } from "@/lib/haptics"
 import { useI18n } from "@/lib/i18n"
-import { Card } from "@/components/ui/card"
-import { Icons } from "@/components/icons"
-import { cn } from "@/lib/utils"
-import { toast } from "@/components/ui/use-toast"
 import { getDailyQuote, getRandomQuote, type QuoteItem } from "@/lib/quotes"
+import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
+import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons"
 
 interface TodayCompassCardProps {
   items: TodayItemDTO[]
@@ -16,6 +19,7 @@ interface TodayCompassCardProps {
   dateStr?: string
   initialEnergy?: EnergyLevel | null
   initialNote?: string | null
+  onEnergyChange?: (energy: EnergyLevel | null) => void
 }
 
 export function TodayCompassCard({
@@ -24,11 +28,10 @@ export function TodayCompassCard({
   dateStr,
   initialEnergy,
   initialNote,
+  onEnergyChange,
 }: TodayCompassCardProps) {
-  const router = useRouter()
   const { dict, format } = useI18n()
   const compassDict = (dict.dashboard as any).compass || {}
-  const [currentHour, setCurrentHour] = React.useState(12)
 
   // Inline energy state
   const [energy, setEnergy] = React.useState<EnergyLevel | null>(
@@ -37,11 +40,13 @@ export function TodayCompassCard({
   const [isSavingEnergy, setIsSavingEnergy] = React.useState(false)
 
   React.useEffect(() => {
-    setCurrentHour(new Date().getHours())
-  }, [])
+    setEnergy(initialEnergy ?? dailyEnergy ?? null)
+  }, [initialEnergy, dailyEnergy])
 
   // Daily Quote state
-  const [quote, setQuote] = React.useState<QuoteItem>(() => getDailyQuote(dateStr))
+  const [quote, setQuote] = React.useState<QuoteItem>(() =>
+    getDailyQuote(dateStr)
+  )
   const [isFading, setIsFading] = React.useState(false)
   const [isRotating, setIsRotating] = React.useState(false)
   const [isCopied, setIsCopied] = React.useState(false)
@@ -75,30 +80,34 @@ export function TodayCompassCard({
   }
 
   const saveEnergy = async (nextEnergy: EnergyLevel) => {
+    if (isSavingEnergy || nextEnergy === energy) return
+    triggerHaptic("light")
     const previous = energy
     setEnergy(nextEnergy)
+    onEnergyChange?.(nextEnergy)
     setIsSavingEnergy(true)
     try {
       const res = await fetch("/api/daily-energy", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          date: dateStr ?? new Date().toISOString().split("T")[0],
+          date: dateStr ?? formatDateInTimeZone(),
           energyLevel: nextEnergy,
           note: initialNote || undefined,
         }),
       })
       if (!res.ok) throw new Error(dict.common.notifications.saveFailed)
-      router.refresh()
     } catch {
       setEnergy(previous)
-      toast({ title: dict.common.notifications.saveFailed, variant: "destructive" })
+      onEnergyChange?.(previous)
+      toast({
+        title: dict.common.notifications.saveFailed,
+        variant: "destructive",
+      })
     } finally {
       setIsSavingEnergy(false)
     }
   }
-
-  const isEvening = currentHour >= 20 || currentHour < 5
 
   // Separate Habits from TODOs
   const habitItems = items.filter(
@@ -111,21 +120,18 @@ export function TodayCompassCard({
       i.todayCheckIn?.status === "COMPLETED" ||
       i.todayCheckIn?.status === "KEPT"
   )
-  const restHabits = habitItems.filter(
-    (i) => i.todayCheckIn?.status === "REST"
-  )
+  const restHabits = habitItems.filter((i) => i.todayCheckIn?.status === "REST")
   const checkedInHabitsCount = completedHabits.length + restHabits.length
   const pendingHabitsCount = totalHabitsCount - checkedInHabitsCount
 
   const pendingTodos = items.filter(
-    (i) => i.type === "TODO" && i.status !== "COMPLETED"
+    (i) => i.type === "TODO" && !isTodoCompleted(i)
   )
   const pendingTodosCount = pendingTodos.length
 
   // Calculate days remaining in the natural week (Mon=1 ... Sun=7)
-  const todayDate = dateStr ? new Date(dateStr) : new Date()
-  const rawDow = todayDate.getDay() // 0 is Sun, 1 is Mon...
-  const isoDow = (rawDow + 6) % 7 + 1 // 1 is Mon ... 7 is Sun
+  const rawDow = calendarDayOfWeek(dateStr || formatDateInTimeZone()) // 0 is Sun, 1 is Mon...
+  const isoDow = ((rawDow + 6) % 7) + 1 // 1 is Mon ... 7 is Sun
   const daysLeftInWeek = Math.max(0, 7 - isoDow)
 
   // 1. Determine State: REST | COMPLETED | IN_PROGRESS | EMPTY
@@ -134,7 +140,7 @@ export function TodayCompassCard({
   if (totalHabitsCount === 0) {
     state = "EMPTY"
   } else if (
-    dailyEnergy === "REST" ||
+    energy === "REST" ||
     (checkedInHabitsCount > 0 &&
       restHabits.length === checkedInHabitsCount &&
       pendingHabitsCount === 0)
@@ -146,185 +152,214 @@ export function TodayCompassCard({
     state = "IN_PROGRESS"
   }
 
+  const stateLabel =
+    state === "IN_PROGRESS"
+      ? format(compassDict.badgeInProgress, {
+          checked: checkedInHabitsCount,
+          total: totalHabitsCount,
+        })
+      : state === "COMPLETED"
+        ? format(compassDict.badgeCompleted, { total: totalHabitsCount })
+        : state === "REST"
+          ? compassDict.badgeRest
+          : compassDict.badgeEmpty
+
   return (
-    <Card className="relative overflow-hidden border-border/80 bg-linear-to-br from-card to-muted/20 p-4 shadow-xs md:p-5">
-      {/* Background subtle accent pulse */}
-      <div
-        className={cn(
-          "pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full blur-2xl",
-          state === "COMPLETED"
-            ? "bg-blue-500/10"
-            : state === "REST"
-              ? "bg-purple-500/10"
-              : "bg-emerald-500/10"
-        )}
-      />
-
+    <Card
+      data-completion-state={state.toLowerCase()}
+      className={cn(
+        "relative overflow-hidden rounded-2xl border-border bg-gradient-to-br from-card to-muted/20 p-4 sm:p-5",
+        state === "COMPLETED" && "border-emerald-500/25"
+      )}
+    >
+      {state === "COMPLETED" && (
+        <>
+          <span
+            aria-hidden="true"
+            className="motion-safe:animate-compass-glow pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-gradient-to-br from-emerald-300/30 via-amber-200/20 to-transparent blur-2xl"
+          />
+          <span
+            aria-hidden="true"
+            className="motion-safe:animate-compass-sheen pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+          />
+        </>
+      )}
       <div className="relative space-y-3">
-        {/* Top Meta Row */}
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-          {/* State Badge */}
-          {state === "IN_PROGRESS" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>
-                {format(
-                  compassDict.badgeInProgress || "今日进行中 · 已完成 {checked}/{total}",
-                  { checked: checkedInHabitsCount, total: totalHabitsCount }
-                )}
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 font-medium",
+              state === "COMPLETED"
+                ? "text-blue-700 dark:text-blue-300"
+                : state === "REST"
+                  ? "text-purple-700 dark:text-purple-300"
+                  : "text-emerald-700 dark:text-emerald-300"
+            )}
+          >
+            {state === "COMPLETED" ? (
+              <span className="motion-safe:animate-compass-badge inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950">
+                <Icons.check aria-hidden="true" className="h-3.5 w-3.5" />
               </span>
-            </span>
-          )}
-
-          {state === "COMPLETED" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-500/40 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:text-blue-400">
-              <Icons.check className="h-3 w-3" />
-              <span>
-                {format(
-                  compassDict.badgeCompleted || "✓ 今日日常已达成 · {total}/{total}",
-                  { total: totalHabitsCount }
-                )}
-              </span>
-            </span>
-          )}
-
-          {state === "REST" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-purple-500/40 px-2.5 py-0.5 text-xs font-semibold text-purple-700 dark:text-purple-400">
-              <span>☕</span>
-              <span>{compassDict.badgeRest || "今日主动休整"}</span>
-            </span>
-          )}
-
-          {state === "EMPTY" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
-              <span>🌱</span>
-              <span>{compassDict.badgeEmpty || "起步中"}</span>
-            </span>
-          )}
-
-          {/* Time Context (Fuzzy) */}
-          <span className="text-[11px] text-muted-foreground/75">
+            ) : state === "REST" ? (
+              <Icons.rest aria-hidden="true" className="h-4 w-4" />
+            ) : (
+              <Icons.circle aria-hidden="true" className="h-3 w-3" />
+            )}
+            {stateLabel}
+          </span>
+          <span className="text-muted-foreground">
             {daysLeftInWeek > 0
-              ? format(compassDict.daysLeft || "本周还剩 {count} 天", {
-                  count: daysLeftInWeek,
-                })
-              : compassDict.lastDay || "本周最后一天"}
+              ? format(compassDict.daysLeft, { count: daysLeftInWeek })
+              : compassDict.lastDay}
           </span>
         </div>
 
-        {/* Daily Wisdom Mode (方案 1：优雅金句沉浸态) */}
-        <div className="relative pt-0.5 pb-0.5">
-          {/* Accessible screen-reader heading for status announcement and test compatibility */}
-          <h2 className="sr-only">
-            {state === "IN_PROGRESS" &&
-              format(
-                compassDict.titleInProgress || "今日还剩 {count} 项日常",
-                {
-                  count: pendingHabitsCount,
-                  s: pendingHabitsCount > 1 ? "s" : "",
-                }
-              )}
-            {state === "COMPLETED" &&
-              (compassDict.titleCompleted || "今天的日常已全部完成")}
-            {state === "REST" &&
-              (compassDict.titleRest || "今天处于主动休整状态")}
-            {state === "EMPTY" &&
-              (compassDict.titleEmpty || "开启你的第一个日常行动")}
-          </h2>
+        <h2 className="text-xl font-semibold leading-snug tracking-tight sm:text-2xl">
+          {state === "IN_PROGRESS" &&
+            format(compassDict.titleInProgress, {
+              count: pendingHabitsCount,
+              s: pendingHabitsCount > 1 ? "s" : "",
+            })}
+          {state === "COMPLETED" && compassDict.titleCompleted}
+          {state === "REST" && compassDict.titleRest}
+          {state === "EMPTY" && compassDict.titleEmpty}
+        </h2>
 
+        {totalHabitsCount > 0 && (
+          <div
+            role="progressbar"
+            aria-label={compassDict.progressLabel}
+            aria-valuemin={0}
+            aria-valuemax={totalHabitsCount}
+            aria-valuenow={checkedInHabitsCount}
+            className="h-1.5 overflow-hidden rounded-full bg-muted"
+          >
+            <div
+              className="h-full rounded-full bg-emerald-600 transition-[width] duration-200 motion-reduce:transition-none dark:bg-emerald-400"
+              style={{
+                width: `${(checkedInHabitsCount / totalHabitsCount) * 100}%`,
+              }}
+            />
+          </div>
+        )}
+        {pendingTodosCount > 0 && (
+          <p className="text-sm text-muted-foreground">
+            {format(compassDict.secondaryTodo, {
+              count: pendingTodosCount,
+              s: pendingTodosCount > 1 ? "s" : "",
+            })}
+          </p>
+        )}
+
+        <div className="space-y-2 pt-1">
+          <div className="flex min-h-5 items-center justify-between gap-2">
+            <span id="today-energy-label" className="text-sm font-medium">
+              {dict.dashboard.energySelector.title}
+            </span>
+            {isSavingEnergy && (
+              <span
+                role="status"
+                className="inline-flex items-center gap-1.5 text-xs text-muted-foreground"
+              >
+                <Icons.spinner
+                  aria-hidden="true"
+                  className="h-3.5 w-3.5 animate-spin"
+                />
+                {dict.dashboard.energySelector.saving}
+              </span>
+            )}
+          </div>
+          <div
+            role="group"
+            aria-labelledby="today-energy-label"
+            className="grid grid-cols-4 gap-2"
+          >
+            {(["HIGH", "NORMAL", "LOW", "REST"] as EnergyLevel[]).map(
+              (level) => (
+                <button
+                  key={level}
+                  type="button"
+                  aria-pressed={energy === level}
+                  disabled={isSavingEnergy}
+                  onClick={() => saveEnergy(level)}
+                  className={cn(
+                    "min-h-11 rounded-xl border px-1.5 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-60",
+                    energy === level
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-input bg-background text-foreground hover:bg-muted active:bg-muted"
+                  )}
+                >
+                  {
+                    dict.common.energy[
+                      level.toLowerCase() as "high" | "normal" | "low" | "rest"
+                    ]
+                  }
+                </button>
+              )
+            )}
+          </div>
+        </div>
+
+        <section
+          aria-labelledby="today-wisdom-title"
+          className="rounded-xl border border-border/70 bg-muted/20 px-3 py-3 sm:px-4"
+        >
+          <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+            <Icons.quotes aria-hidden="true" className="h-4 w-4" />
+            <h3 id="today-wisdom-title">{compassDict.dailyWisdom}</h3>
+          </div>
           <div
             className={cn(
-              "group relative transition-all duration-300",
-              isFading ? "opacity-0 translate-y-0.5" : "opacity-100 translate-y-0"
+              "transition-[opacity,transform] duration-300 ease-out motion-reduce:transform-none",
+              isFading
+                ? "-translate-y-0.5 opacity-0"
+                : "translate-y-0 opacity-100"
             )}
           >
-            <blockquote className="text-sm font-medium leading-relaxed tracking-tight text-foreground/95 sm:text-base md:text-[17px]">
-              <span className="mr-1 select-none font-serif text-base text-muted-foreground/50 sm:text-lg">“</span>
-              <span>{quote.quote}</span>
-              <span className="ml-1 select-none font-serif text-base text-muted-foreground/50 sm:text-lg">”</span>
+            <blockquote className="text-sm leading-relaxed text-foreground/90 sm:text-[15px]">
+              “{quote.quote}”
             </blockquote>
-
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <span className="text-xs font-normal tracking-wide text-muted-foreground/80">
-                —— {quote.author}
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+              <span className="text-xs text-muted-foreground">
+                — {quote.author}
               </span>
-
-              <div className="flex items-center gap-1.5 opacity-70 transition-opacity duration-200 group-hover:opacity-100 sm:opacity-60">
+              <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={handleCopyQuote}
-                  title={compassDict.copyQuote || "复制金句"}
-                  aria-label={compassDict.copyQuote || "复制金句"}
-                  className="inline-flex h-6 w-6 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  title={compassDict.copyQuote}
+                  aria-label={compassDict.copyQuote}
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-border/70 bg-background/70 hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   {isCopied ? (
-                    <Icons.check className="h-3 w-3 text-emerald-500" />
+                    <Icons.check
+                      aria-hidden="true"
+                      className="h-4 w-4 text-emerald-600"
+                    />
                   ) : (
-                    <Icons.copy className="h-3 w-3" />
+                    <Icons.copy aria-hidden="true" className="h-4 w-4" />
                   )}
                 </button>
-
                 <button
                   type="button"
                   onClick={handleShuffleQuote}
-                  title={compassDict.shuffleQuote || "换一句"}
-                  aria-label={compassDict.shuffleQuote || "换一句"}
-                  className="inline-flex items-center gap-1 rounded-full border border-border/50 bg-background/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground hover:border-muted-foreground/40 hover:bg-muted hover:text-foreground transition-all active:scale-95"
+                  title={compassDict.shuffleQuote}
+                  aria-label={compassDict.shuffleQuote}
+                  className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-border/70 bg-background/70 px-3 text-sm hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <Icons.refresh
+                    aria-hidden="true"
                     className={cn(
-                      "h-3 w-3 transition-transform duration-500",
+                      "h-4 w-4 transition-transform motion-reduce:transition-none",
                       isRotating && "rotate-180"
                     )}
                   />
-                  <span>{compassDict.shuffleQuote || "换一句"}</span>
+                  {compassDict.shuffleQuote}
                 </button>
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Secondary TODO Notification (Weak Auxiliary Mention) */}
-        {pendingTodosCount > 0 && (
-          <div className="flex items-center gap-2 border-t border-border/50 pt-2.5 text-xs text-muted-foreground/90">
-            <span className="flex h-4 w-4 items-center justify-center rounded-xs bg-muted/60 text-[10px]">
-              📋
-            </span>
-            <span>
-              {format(
-                compassDict.secondaryTodo || "📋 另有 {count} 个待办任务待处理",
-                {
-                  count: pendingTodosCount,
-                  s: pendingTodosCount > 1 ? "s" : "",
-                }
-              )}
-            </span>
-          </div>
-        )}
-
-        {/* Inline Energy Selector — quiet pill row */}
-        <div className="flex items-center gap-1.5 border-t border-border/40 pt-3">
-          <span className="mr-1 text-[11px] text-muted-foreground/60">
-            {dict.dashboard.energySelector.title}
-          </span>
-          {(["HIGH", "NORMAL", "LOW", "REST"] as EnergyLevel[]).map((level) => (
-            <button
-              key={level}
-              type="button"
-              aria-pressed={energy === level}
-              disabled={isSavingEnergy}
-              onClick={() => saveEnergy(level)}
-              className={cn(
-                "rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors disabled:opacity-50",
-                energy === level
-                  ? "border-foreground bg-foreground text-background"
-                  : "border-border/60 text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground"
-              )}
-            >
-              {dict.common.energy[level.toLowerCase() as "high" | "normal" | "low" | "rest"]}
-            </button>
-          ))}
-        </div>
+        </section>
       </div>
     </Card>
   )

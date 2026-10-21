@@ -3,13 +3,14 @@
 import * as React from "react"
 import Link from "next/link"
 import { EnergyLevel, TodayItemDTO } from "@/types"
-import { Icons } from "@/components/icons"
 
+import { isTodoCompleted, recommendForEnergy } from "@/lib/domain/dashboard"
 import { sortWithinStatusGroup } from "@/lib/domain/item-order"
 import { useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import { useDashboardItems } from "@/hooks/use-dashboard-items"
 import { useLocalMigration } from "@/hooks/use-local-migration"
-import { EmptyPlaceholder } from "@/components/empty-placeholder"
+import { Icons } from "@/components/icons"
 import { LocalMigrationBanner } from "@/components/migration/local-migration-banner"
 import { LocalMigrationDialog } from "@/components/migration/local-migration-dialog"
 
@@ -24,6 +25,8 @@ interface Category {
   colorCode?: string | null
 }
 
+const EMPTY_CATEGORIES: Category[] = []
+
 interface HabitListProps {
   initialItems: TodayItemDTO[]
   initialCategories?: Category[]
@@ -35,7 +38,7 @@ interface HabitListProps {
 
 export function HabitList({
   initialItems,
-  initialCategories = [],
+  initialCategories = EMPTY_CATEGORIES,
   dailyEnergy,
   dailyEnergyNote,
   dateStr,
@@ -43,11 +46,21 @@ export function HabitList({
 }: HabitListProps) {
   const { dict, format } = useI18n()
   const secDict = dict.dashboard.sections
-  const [items, setItems] = React.useState<TodayItemDTO[]>(initialItems)
-  const [categories, setCategories] = React.useState<Category[]>(initialCategories)
-  const [activeTypeTab, setActiveTypeTab] = React.useState<
-    "ALL" | "HABIT" | "QUIT_HABIT" | "TODO"
-  >("ALL")
+  const {
+    items: savedItems,
+    setItems,
+    pendingIds,
+    mutateItem,
+  } = useDashboardItems(initialItems)
+  const [energy, setEnergy] = React.useState(dailyEnergy)
+  const [showAllEnergy, setShowAllEnergy] = React.useState(false)
+  const items = React.useMemo(
+    () =>
+      savedItems.map((item) => recommendForEnergy(item, energy || "NORMAL")),
+    [savedItems, energy]
+  )
+  const [categories, setCategories] =
+    React.useState<Category[]>(initialCategories)
   const [selectedCategory, setSelectedCategory] = React.useState<string>("ALL")
   const [recordingItem, setRecordingItem] = React.useState<TodayItemDTO | null>(
     null
@@ -71,8 +84,8 @@ export function HabitList({
 
   const refreshItems = async () => {
     try {
-      const todayStr = new Date().toISOString().split("T")[0]
-      const res = await fetch(`/api/dashboard/today?date=${todayStr}`)
+      const query = dateStr ? `?date=${encodeURIComponent(dateStr)}` : ""
+      const res = await fetch(`/api/dashboard/today${query}`)
       if (res.ok) {
         const data = await res.json()
         setItems(data.items || [])
@@ -80,18 +93,22 @@ export function HabitList({
     } catch (e) {
       console.error("Failed to refresh items", e)
     }
-    fetchCategories()
   }
 
   React.useEffect(() => {
-    if (initialCategories.length === 0) {
-      fetchCategories()
-    }
-  }, [initialCategories.length])
+    setCategories(initialCategories)
+  }, [initialCategories])
+
+  React.useEffect(() => {
+    setEnergy(dailyEnergy)
+  }, [dailyEnergy])
+
+  const hasHabits = items.some(
+    (item) => item.type === "HABIT" || item.type === "QUIT_HABIT"
+  )
 
   // Low / Rest energy mode — only P0 + QUIT_HABIT survive
-  const isLowEnergyMode =
-    dailyEnergy === "LOW" || dailyEnergy === "REST"
+  const isLowEnergyMode = energy === "LOW" || energy === "REST"
 
   // Filter items by category
   const categoryFiltered = items.filter((item) => {
@@ -103,44 +120,37 @@ export function HabitList({
   })
 
   // Energy gate: in Low/Rest mode keep only P0 habits and all QUIT_HABIT
-  const energyFiltered = isLowEnergyMode
-    ? categoryFiltered.filter(
-        (i) =>
-          i.type === "QUIT_HABIT" ||
-          (i.type === "HABIT" && i.priority === "HIGH")
-      )
-    : categoryFiltered
+  const energyFiltered =
+    isLowEnergyMode && !showAllEnergy
+      ? categoryFiltered.filter(
+          (i) =>
+            i.type === "QUIT_HABIT" ||
+            (i.type === "HABIT" && i.priority === "HIGH")
+        )
+      : categoryFiltered
 
   // Separate Habits from TODOs, then split by check-in state
   const allHabits = sortWithinStatusGroup(
-    energyFiltered.filter(
-      (i) => i.type === "HABIT" || i.type === "QUIT_HABIT"
-    )
+    energyFiltered.filter((i) => i.type === "HABIT" || i.type === "QUIT_HABIT")
   )
   // Pending habits float to top; checked-in (done / rest / lapsed) sink to bottom
-  const pendingHabits = allHabits.filter(
-    (i) => !i.todayCheckIn
-  )
-  const checkedHabits = allHabits.filter(
-    (i) => !!i.todayCheckIn
-  )
+  const pendingHabits = allHabits.filter((i) => !i.todayCheckIn)
+  const checkedHabits = allHabits.filter((i) => !!i.todayCheckIn)
   // Combined ordered list used for the count badge
   const activeHabits = [...pendingHabits, ...checkedHabits]
   const pendingTodos = sortWithinStatusGroup(
     // TODOs: in low-energy mode, only P0 TODOs
-    (isLowEnergyMode
+    isLowEnergyMode && !showAllEnergy
       ? categoryFiltered.filter(
-          (i) => i.type === "TODO" && i.priority === "HIGH" && i.status !== "COMPLETED"
+          (i) =>
+            i.type === "TODO" && i.priority === "HIGH" && !isTodoCompleted(i)
         )
-      : categoryFiltered.filter(
-          (i) => i.type === "TODO" && i.status !== "COMPLETED"
-        )
-    )
+      : categoryFiltered.filter((i) => i.type === "TODO" && !isTodoCompleted(i))
   )
   // Sort completed TODOs by completion/updated date descending (newest completed first)
   const completedTodos = React.useMemo(() => {
     return categoryFiltered
-      .filter((i) => i.type === "TODO" && i.status === "COMPLETED")
+      .filter((i) => i.type === "TODO" && isTodoCompleted(i))
       .sort((a, b) => {
         const timeA = new Date(a.updatedAt || a.createdAt).getTime()
         const timeB = new Date(b.updatedAt || b.createdAt).getTime()
@@ -152,20 +162,17 @@ export function HabitList({
   const visibleCompletedTodos = showAllCompleted
     ? completedTodos
     : completedTodos.slice(0, MAX_COMPLETED_TODOS)
-  const archivedCompletedCount = Math.max(0, completedTodos.length - MAX_COMPLETED_TODOS)
-
-  const habitsCount = items.filter((i) => i.type === "HABIT").length
-  const quitsCount = items.filter((i) => i.type === "QUIT_HABIT").length
-  const todosCount = items.filter(
-    (i) => i.type === "TODO" && i.status !== "COMPLETED"
-  ).length
+  const archivedCompletedCount = Math.max(
+    0,
+    completedTodos.length - MAX_COMPLETED_TODOS
+  )
 
   // Count hidden items in low-energy mode for the banner
   const hiddenHabitsCount = isLowEnergyMode
     ? categoryFiltered.filter(
         (i) =>
           (i.type === "HABIT" && i.priority !== "HIGH") ||
-          (i.type === "TODO" && i.priority !== "HIGH" && i.status !== "COMPLETED")
+          (i.type === "TODO" && i.priority !== "HIGH" && !isTodoCompleted(i))
       ).length
     : 0
 
@@ -175,7 +182,7 @@ export function HabitList({
   })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Local Migration Banner (shown if un-migrated local items exist) */}
       {migration.isEligible && (
         <LocalMigrationBanner
@@ -189,69 +196,93 @@ export function HabitList({
       {/* 0. Today & Weekly Progress Compass Card (includes inline energy selector) */}
       <TodayCompassCard
         items={items}
-        dailyEnergy={dailyEnergy}
+        dailyEnergy={energy}
         dateStr={dateStr}
-        initialEnergy={dailyEnergy}
+        initialEnergy={energy}
+        onEnergyChange={setEnergy}
         initialNote={dailyEnergyNote}
       />
 
       {/* Low / Rest energy mode banner */}
       {isLowEnergyMode && hiddenHabitsCount > 0 && (
-        <div className="flex items-center gap-2 rounded-lg border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-sm text-amber-800 dark:text-amber-300">
           <span className="text-base leading-none">
-            {dailyEnergy === "REST" ? "☕" : "🌿"}
+            {energy === "REST" ? "☕" : "🌿"}
           </span>
           <span className="flex-1">
-            {dailyEnergy === "REST"
-              ? `休整模式 · 已为你收起 ${hiddenHabitsCount} 项非核心事务，专注休养`
-              : `低能量模式 · 已为你收起 ${hiddenHabitsCount} 项，仅显示 P0 与戒断打卡`}
+            {showAllEnergy
+              ? dict.dashboard.actions.allEnergyNote
+              : energy === "REST"
+                ? format(dict.dashboard.actions.restEnergyNote, {
+                    count: hiddenHabitsCount,
+                  })
+                : format(dict.dashboard.actions.lowEnergyNote, {
+                    count: hiddenHabitsCount,
+                  })}
           </span>
-          <Icons.down className="h-3 w-3 shrink-0 opacity-50" />
+          <button
+            type="button"
+            onClick={() => setShowAllEnergy((value) => !value)}
+            className="min-h-11 shrink-0 rounded-md px-2 text-sm font-medium underline underline-offset-4"
+          >
+            {showAllEnergy
+              ? dict.dashboard.actions.showCore
+              : dict.dashboard.actions.showAll}
+          </button>
         </div>
       )}
 
       {/* 1. Category Filter Toolbar */}
       {categories.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setSelectedCategory("ALL")}
-            className={cn(
-              "rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors",
-              selectedCategory === "ALL"
-                ? "border-foreground bg-foreground text-background"
-                : "border-border text-muted-foreground hover:bg-muted"
-            )}
+        <div className="flex min-w-0 items-center gap-2">
+          <div
+            role="group"
+            aria-label={dict.dashboard.categories.allCategories}
+            className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-1 [scrollbar-width:thin]"
           >
-            {dict.dashboard.categories.allCategories}
-          </button>
-          {categories.map((cat) => (
             <button
-              key={cat.id}
               type="button"
-              onClick={() => setSelectedCategory(cat.name)}
+              onClick={() => setSelectedCategory("ALL")}
+              aria-pressed={selectedCategory === "ALL"}
               className={cn(
-                "flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors",
-                selectedCategory === cat.name
+                "min-h-11 shrink-0 whitespace-nowrap rounded-full border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                selectedCategory === "ALL"
                   ? "border-foreground bg-foreground text-background"
                   : "border-border text-muted-foreground hover:bg-muted"
               )}
             >
-              {cat.colorCode && (
-                <span
-                  className="h-1.5 w-1.5 rounded-full"
-                  style={{ backgroundColor: cat.colorCode }}
-                />
-              )}
-              <span>{cat.name}</span>
+              {dict.dashboard.categories.allCategories}
             </button>
-          ))}
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setSelectedCategory(cat.name)}
+                aria-pressed={selectedCategory === cat.name}
+                className={cn(
+                  "flex min-h-11 shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring",
+                  selectedCategory === cat.name
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground hover:bg-muted"
+                )}
+              >
+                {cat.colorCode && (
+                  <span
+                    className="h-1.5 w-1.5 rounded-full"
+                    style={{ backgroundColor: cat.colorCode }}
+                  />
+                )}
+                <span>{cat.name}</span>
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             onClick={() => setCategoryModalOpen(true)}
-            className="ml-1 text-[11px] text-muted-foreground/60 hover:text-muted-foreground"
+            aria-label={dict.dashboard.actions.manageCategories}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-muted-foreground hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <Icons.settings className="h-3 w-3" />
+            <Icons.settings className="h-4 w-4" />
           </button>
         </div>
       )}
@@ -259,10 +290,10 @@ export function HabitList({
       {/* 2. Daily Routines — divider list */}
       <section>
         <div className="mb-2 flex items-center justify-between">
-          <h2 className="text-xs font-medium text-muted-foreground">
+          <h2 className="text-sm font-semibold text-foreground">
             {secDict.habitsTitle}
             {activeHabits.length > 0 && (
-              <span className="ml-1.5 font-normal opacity-60">
+              <span className="ml-1.5 font-normal text-muted-foreground">
                 ({activeHabits.length})
               </span>
             )}
@@ -271,7 +302,28 @@ export function HabitList({
 
         {activeHabits.length === 0 ? (
           <div className="rounded-xl border border-dashed py-8 text-center text-xs text-muted-foreground">
-            <p>{secDict.noHabits}</p>
+            <p className="text-sm">
+              {hasHabits ? secDict.noMatchingHabits : secDict.noHabits}
+            </p>
+            {hasHabits ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory("ALL")
+                  setShowAllEnergy(true)
+                }}
+                className="mt-3 min-h-11 rounded-lg border px-4 py-2 text-sm font-medium"
+              >
+                {dict.dashboard.actions.resetFilters}
+              </button>
+            ) : null}
+            <Link
+              href="/items/new"
+              className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+            >
+              <Icons.add className="h-4 w-4" />
+              {dict.dashboard.actions.newAction}
+            </Link>
           </div>
         ) : (
           <div className="rounded-xl border border-border/50 bg-card px-4">
@@ -286,6 +338,9 @@ export function HabitList({
                   setRecordModalOpen(true)
                 }}
                 onRefresh={refreshItems}
+                onMutate={mutateItem}
+                isPending={pendingIds.has(item.id)}
+                dateStr={dateStr}
               />
             ))}
 
@@ -293,10 +348,10 @@ export function HabitList({
             {pendingHabits.length > 0 && checkedHabits.length > 0 && (
               <div className="flex items-center gap-2 py-1">
                 <div className="h-px flex-1 bg-border/40" />
-                <span className="text-[10px] text-muted-foreground/40">
-                  {checkedHabits.length === 1
-                    ? "1 项已完成"
-                    : `${checkedHabits.length} 项已完成`}
+                <span className="text-xs text-muted-foreground">
+                  {format(secDict.completedCount, {
+                    count: checkedHabits.length,
+                  })}
                 </span>
                 <div className="h-px flex-1 bg-border/40" />
               </div>
@@ -314,6 +369,9 @@ export function HabitList({
                   setRecordModalOpen(true)
                 }}
                 onRefresh={refreshItems}
+                onMutate={mutateItem}
+                isPending={pendingIds.has(item.id)}
+                dateStr={dateStr}
               />
             ))}
           </div>
@@ -324,9 +382,9 @@ export function HabitList({
       {pendingTodos.length > 0 && (
         <section>
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-xs font-medium text-muted-foreground">
+            <h2 className="text-sm font-semibold text-foreground">
               {secDict.todosTitle}
-              <span className="ml-1.5 font-normal opacity-60">
+              <span className="ml-1.5 font-normal text-muted-foreground">
                 ({pendingTodos.length})
               </span>
             </h2>
@@ -343,6 +401,9 @@ export function HabitList({
                   setRecordModalOpen(true)
                 }}
                 onRefresh={refreshItems}
+                onMutate={mutateItem}
+                isPending={pendingIds.has(item.id)}
+                dateStr={dateStr}
               />
             ))}
           </div>
@@ -355,14 +416,15 @@ export function HabitList({
           <button
             type="button"
             onClick={() => setCompletedTodosOpen(!completedTodosOpen)}
-            className="flex w-full items-center gap-2 py-2 text-xs text-muted-foreground/60 transition-colors hover:text-muted-foreground"
+            aria-expanded={completedTodosOpen}
+            className="flex min-h-11 w-full items-center gap-2 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             <Icons.check className="h-3 w-3" />
             <span>
               {secDict.completedTodosTitle} ({completedTodos.length})
             </span>
             {archivedCompletedCount > 0 && !showAllCompleted && (
-              <span className="text-[10px] text-muted-foreground/50 font-normal">
+              <span className="text-xs font-normal text-muted-foreground">
                 {format(secDict.completedArchiveNotice, {
                   max: MAX_COMPLETED_TODOS,
                   archived: archivedCompletedCount,
@@ -379,7 +441,7 @@ export function HabitList({
 
           {completedTodosOpen && (
             <div className="space-y-2">
-              <div className="rounded-xl border border-border/30 bg-card px-4 opacity-60">
+              <div className="rounded-xl border border-border/30 bg-card px-4">
                 {visibleCompletedTodos.map((item) => (
                   <HabitItem
                     key={item.id}
@@ -390,6 +452,9 @@ export function HabitList({
                       setRecordModalOpen(true)
                     }}
                     onRefresh={refreshItems}
+                    onMutate={mutateItem}
+                    isPending={pendingIds.has(item.id)}
+                    dateStr={dateStr}
                   />
                 ))}
               </div>
@@ -441,6 +506,8 @@ export function HabitList({
         open={recordModalOpen}
         onOpenChange={setRecordModalOpen}
         onSuccess={refreshItems}
+        onMutate={mutateItem}
+        dateStr={dateStr}
       />
 
       {/* 7. Category Manager Modal */}
@@ -448,7 +515,9 @@ export function HabitList({
         open={categoryModalOpen}
         onOpenChange={setCategoryModalOpen}
         categories={categories}
-        onRefresh={fetchCategories}
+        onRefresh={() => {
+          void Promise.all([fetchCategories(), refreshItems()])
+        }}
       />
 
       {/* 8. Local Data Migration & Conflict Resolution Dialog */}

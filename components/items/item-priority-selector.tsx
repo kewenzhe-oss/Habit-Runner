@@ -20,9 +20,9 @@ export function ItemPrioritySelector({
   const { locale } = useI18n()
   const zh = locale === "zh"
   const options: { value: ItemPriority; label: string }[] = [
-    { value: "HIGH", label: zh ? "P0 · 优先" : "P0 · First" },
-    { value: "NORMAL", label: zh ? "P1 · 常规" : "P1 · Normal" },
-    { value: "LOW", label: zh ? "P2 · 稍后" : "P2 · Later" },
+    { value: "HIGH", label: zh ? "优先" : "Priority" },
+    { value: "NORMAL", label: zh ? "常规" : "Normal" },
+    { value: "LOW", label: zh ? "稍后" : "Later" },
   ]
   return (
     <fieldset
@@ -30,7 +30,7 @@ export function ItemPrioritySelector({
       className="space-y-1.5"
       aria-describedby={`${id}-hint`}
     >
-      <legend className="text-xs font-semibold">
+      <legend className="text-sm font-semibold">
         {zh ? "显示优先级" : "Display priority"}
       </legend>
       <div className="grid grid-cols-3 gap-1.5">
@@ -63,7 +63,7 @@ export function ItemPrioritySelector({
             />
             <span
               className={cn(
-                "flex min-h-11 items-center justify-center rounded-md border px-1 text-xs peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-disabled:opacity-50",
+                "flex min-h-11 items-center justify-center rounded-md border px-1 text-sm peer-focus-visible:ring-2 peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-disabled:opacity-50",
                 value === option.value
                   ? "border-foreground bg-muted font-semibold text-foreground"
                   : "border-border text-muted-foreground hover:bg-muted/60"
@@ -74,7 +74,7 @@ export function ItemPrioritySelector({
           </label>
         ))}
       </div>
-      <p id={`${id}-hint`} className="text-[11px] text-muted-foreground">
+      <p id={`${id}-hint`} className="text-xs text-muted-foreground">
         {zh
           ? "调整同一分组内的显示顺序，同级保持原顺序。"
           : "Orders items within each group. Equal priorities keep their original order."}

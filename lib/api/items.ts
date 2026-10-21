@@ -1,3 +1,4 @@
+import { cache } from "react"
 import { ItemStatus, ItemType, ItemWithDetails, Layer } from "@/types"
 import { z } from "zod"
 
@@ -10,6 +11,7 @@ export async function getUserItems(
     type?: ItemType
     layer?: Layer
     status?: ItemStatus | ItemStatus[]
+    includeCheckInCount?: boolean
   }
 ): Promise<ItemWithDetails[]> {
   const where: any = {
@@ -41,9 +43,12 @@ export async function getUserItems(
       toolLinks: {
         orderBy: { sortOrder: "asc" },
       },
-      _count: {
-        select: { checkIns: true },
-      },
+      _count:
+        options?.includeCheckInCount === false
+          ? undefined
+          : {
+              select: { checkIns: true },
+            },
     },
     orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
   })
@@ -51,7 +56,7 @@ export async function getUserItems(
   return items as ItemWithDetails[]
 }
 
-export async function getUserItemById(
+export const getUserItemById = cache(async function getUserItemById(
   itemId: string,
   userId: string
 ): Promise<ItemWithDetails | null> {
@@ -74,7 +79,7 @@ export async function getUserItemById(
   })
 
   return item as ItemWithDetails | null
-}
+})
 
 export async function createItem(
   userId: string,

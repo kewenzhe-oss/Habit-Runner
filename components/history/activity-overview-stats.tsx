@@ -18,9 +18,9 @@ export function ActivityOverviewStats({ overview }: ActivityOverviewStatsProps) 
   const statsDict = dict.insights.activityHistory.stats
 
   return (
-    <div className="grid grid-cols-3 divide-x divide-border/40 rounded-xl border border-border/50 bg-card p-2 shadow-2xs">
+    <div className="grid grid-cols-1 divide-y divide-border/40 rounded-xl border border-border/50 bg-card p-2 shadow-2xs min-[360px]:grid-cols-3 min-[360px]:divide-x min-[360px]:divide-y-0">
       {/* 1. 累计完成行动次数 */}
-      <div className="flex flex-col items-center justify-center p-3 text-center sm:flex-row sm:gap-3 sm:text-left">
+      <div className="flex min-w-0 flex-col items-center justify-center p-3 text-center sm:flex-row sm:gap-3 sm:text-left">
         <Icons.check className="hidden h-4 w-4 shrink-0 text-muted-foreground/50 sm:block" />
         <div className="space-y-0.5">
           <p className="text-[11px] font-medium text-muted-foreground">
@@ -38,7 +38,7 @@ export function ActivityOverviewStats({ overview }: ActivityOverviewStatsProps) 
       </div>
 
       {/* 2. 留下痕迹天数 */}
-      <div className="flex flex-col items-center justify-center p-3 text-center sm:flex-row sm:gap-3 sm:text-left">
+      <div className="flex min-w-0 flex-col items-center justify-center p-3 text-center sm:flex-row sm:gap-3 sm:text-left">
         <Icons.calendar className="hidden h-4 w-4 shrink-0 text-muted-foreground/50 sm:block" />
         <div className="space-y-0.5">
           <p className="text-[11px] font-medium text-muted-foreground">
@@ -56,7 +56,7 @@ export function ActivityOverviewStats({ overview }: ActivityOverviewStatsProps) 
       </div>
 
       {/* 3. 当前最高连续 */}
-      <div className="flex flex-col items-center justify-center p-3 text-center sm:flex-row sm:gap-3 sm:text-left">
+      <div className="flex min-w-0 flex-col items-center justify-center p-3 text-center sm:flex-row sm:gap-3 sm:text-left">
         <Icons.fire className="hidden h-4 w-4 shrink-0 text-amber-500/70 sm:block" />
         <div className="space-y-0.5">
           <p className="text-[11px] font-medium text-muted-foreground">

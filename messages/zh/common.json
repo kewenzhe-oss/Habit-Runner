@@ -9,10 +9,10 @@
     "system": "跟随系统"
   },
   "energy": {
-    "high": "High",
-    "normal": "Normal",
-    "low": "Low",
-    "rest": "Rest"
+    "high": "充沛",
+    "normal": "日常",
+    "low": "微行动",
+    "rest": "休整"
   },
   "energyDescriptions": {
     "high": "状态饱满，适合攻坚或高投入任务",

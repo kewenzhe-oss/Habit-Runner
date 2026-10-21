@@ -125,17 +125,18 @@ export const authOptions: NextAuthOptions = {
         return token
       }
 
-      const dbUser = await db.user.findFirst({
-        where: {
-          email: token.email,
-        },
-      })
+      // Signed tokens already carry the identity. Only recover older tokens
+      // that predate the id claim; profile reads belong to the page request.
+      if (token.id || !token.email) return token
+
+      const dbUser = await db.user.findUnique({ where: { email: token.email } })
 
       if (!dbUser) {
         return token
       }
 
       return {
+        ...token,
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,

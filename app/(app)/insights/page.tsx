@@ -5,13 +5,13 @@ import { getActivityHistoryData } from "@/lib/api/history"
 import { getUserToday } from "@/lib/api/user-date"
 import { authOptions } from "@/lib/auth"
 import { getCurrentUser } from "@/lib/session"
-import { ActivityOverviewStats } from "@/components/history/activity-overview-stats"
 import { ActiveHabitsConsistencyList } from "@/components/history/active-habits-consistency-list"
-import { CompletedTodosCard } from "@/components/history/completed-todos-card"
-import { StarterWeeklyCard } from "@/components/history/starter-weekly-card"
+import { ActivityOverviewStats } from "@/components/history/activity-overview-stats"
 import { Compact4WeekMatrix } from "@/components/history/compact-4week-matrix"
+import { CompletedTodosCard } from "@/components/history/completed-todos-card"
 import { GlobalActivityHeatmap } from "@/components/history/global-activity-heatmap"
 import { HistoryPageHeader } from "@/components/history/history-page-header"
+import { StarterWeeklyCard } from "@/components/history/starter-weekly-card"
 import { Shell } from "@/components/layout/shell"
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default async function InsightsPage() {
     redirect(authOptions?.pages?.signIn || "/signin")
   }
 
-  const todayStr = await getUserToday(user.id)
+  const todayStr = await getUserToday(user.id, new Date(), user.timezone)
   const historyData = await getActivityHistoryData(user.id, todayStr)
 
   return (
@@ -50,11 +50,13 @@ export default async function InsightsPage() {
       )}
 
       {historyData.stage === "MATURE" && (
-        <GlobalActivityHeatmap
-          days={historyData.heatmapDays}
-          defaultWindowWeeks={historyData.overview.defaultWindowWeeks}
-          effectiveSpanDays={historyData.overview.effectiveSpanDays}
-        />
+        <div className="min-w-0 max-w-full">
+          <GlobalActivityHeatmap
+            days={historyData.heatmapDays}
+            defaultWindowWeeks={historyData.overview.defaultWindowWeeks}
+            effectiveSpanDays={historyData.overview.effectiveSpanDays}
+          />
+        </div>
       )}
 
       {/* 4. Active Routines & Consistency List (Habits only) */}

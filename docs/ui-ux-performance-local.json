@@ -1,0 +1,98 @@
+{
+  "database": "habit_runner_perf",
+  "date": "2026-10-20",
+  "kind": "authenticated HTTP; warmed production servers",
+  "rows": [
+    {
+      "operation": "today API",
+      "before": {
+        "samples": 7,
+        "medianMs": 14.5,
+        "maxMs": 15.7
+      },
+      "after": {
+        "samples": 7,
+        "medianMs": 13.4,
+        "maxMs": 13.8
+      }
+    },
+    {
+      "operation": "dashboard HTML",
+      "before": {
+        "samples": 7,
+        "medianMs": 28.2,
+        "maxMs": 36
+      },
+      "after": {
+        "samples": 7,
+        "medianMs": 27.1,
+        "maxMs": 30.6
+      }
+    },
+    {
+      "operation": "history HTML",
+      "before": {
+        "samples": 7,
+        "medianMs": 40.7,
+        "maxMs": 57.7
+      },
+      "after": {
+        "samples": 7,
+        "medianMs": 41.8,
+        "maxMs": 45.4
+      }
+    },
+    {
+      "operation": "settings HTML",
+      "before": {
+        "samples": 7,
+        "medianMs": 9.7,
+        "maxMs": 12
+      },
+      "after": {
+        "samples": 7,
+        "medianMs": 13.8,
+        "maxMs": 15.1
+      }
+    },
+    {
+      "operation": "item detail HTML",
+      "before": {
+        "samples": 7,
+        "medianMs": 24.5,
+        "maxMs": 34.6
+      },
+      "after": {
+        "samples": 7,
+        "medianMs": 22.7,
+        "maxMs": 23.2
+      }
+    },
+    {
+      "operation": "todo save-to-data-ready",
+      "before": {
+        "samples": 7,
+        "medianMs": 16.5,
+        "maxMs": 19.5
+      },
+      "after": {
+        "samples": 7,
+        "medianMs": 5.2,
+        "maxMs": 5.3
+      }
+    },
+    {
+      "operation": "energy save-to-data-ready",
+      "before": {
+        "samples": 7,
+        "medianMs": 24,
+        "maxMs": 26.2
+      },
+      "after": {
+        "samples": 7,
+        "medianMs": 3.1,
+        "maxMs": 4.3
+      }
+    }
+  ]
+}

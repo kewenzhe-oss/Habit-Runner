@@ -1,18 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { Icons } from "@/components/icons"
+
+import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
+import { Icons } from "@/components/icons"
 
 export function DataBackupCard() {
+  const { dict, format } = useI18n()
+  const copy = dict.item.settingsPage.backup
   const [isExporting, setIsExporting] = React.useState(false)
   const [isImporting, setIsImporting] = React.useState(false)
   const fileInputRef = React.useRef<HTMLInputElement | null>(null)
@@ -37,14 +35,12 @@ export function DataBackupCard() {
       URL.revokeObjectURL(url)
 
       toast({
-        title: "数据导出成功",
-        description: `已成功导出全部习惯与打卡历史数据文件。`,
+        title: copy.exportSuccess,
       })
     } catch {
       toast({
         variant: "destructive",
-        title: "导出失败",
-        description: "获取备份数据时发生错误，请稍后重试。",
+        title: copy.exportError,
       })
     } finally {
       setIsExporting(false)
@@ -70,8 +66,11 @@ export function DataBackupCard() {
       const result = await res.json()
 
       toast({
-        title: "数据导入成功！",
-        description: `已成功导入 ${result.itemsImported} 个习惯事项，${result.checkInsImported} 条打卡记录。`,
+        title: copy.importSuccess,
+        description: format(copy.importSummary, {
+          items: result.itemsImported,
+          checkIns: result.checkInsImported,
+        }),
       })
 
       setTimeout(() => {
@@ -80,8 +79,7 @@ export function DataBackupCard() {
     } catch {
       toast({
         variant: "destructive",
-        title: "导入失败",
-        description: "备份文件格式不正确或解析失败，请检查文件。",
+        title: copy.importError,
       })
     } finally {
       setIsImporting(false)
@@ -92,57 +90,61 @@ export function DataBackupCard() {
   }
 
   return (
-    <Card className="border-border">
-      <CardHeader>
-        <CardTitle className="text-base font-medium flex items-center gap-2">
-          <Icons.download className="h-4 w-4 text-primary" />
-          数据备份与恢复 (Data Backup & Recovery)
-        </CardTitle>
-        <CardDescription className="text-xs">
-          一键导出当前账号的所有习惯设定与打卡历史，或从备份文件快速恢复数据。
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="flex flex-wrap items-center gap-3">
+    <Card>
+      <details className="group">
+        <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 rounded-lg p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:p-5 [&::-webkit-details-marker]:hidden">
+          <Icons.download
+            aria-hidden="true"
+            className="h-5 w-5 shrink-0 text-muted-foreground"
+          />
+          <div className="min-w-0 flex-1 space-y-1">
+            <h2 className="text-base font-semibold">{copy.title}</h2>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {copy.description}
+            </p>
+          </div>
+          <Icons.down
+            aria-hidden="true"
+            className="h-5 w-5 shrink-0 transition-transform group-open:rotate-180"
+          />
+        </summary>
+        <div className="grid gap-3 border-t p-4 sm:grid-cols-2 sm:p-5">
           <Button
             variant="outline"
-            size="sm"
             onClick={handleExport}
             disabled={isExporting || isImporting}
-            className="gap-2"
+            className="min-h-11 gap-2"
           >
             {isExporting ? (
-              <Icons.spinner className="h-3.5 w-3.5 animate-spin" />
+              <Icons.spinner className="h-4 w-4 animate-spin" />
             ) : (
-              <Icons.download className="h-3.5 w-3.5" />
+              <Icons.download className="h-4 w-4" />
             )}
-            导出完整数据 (Export JSON)
+            {copy.export}
           </Button>
-
           <Button
-            variant="default"
-            size="sm"
+            variant="outline"
             onClick={() => fileInputRef.current?.click()}
             disabled={isExporting || isImporting}
-            className="gap-2"
+            className="min-h-11 gap-2"
           >
             {isImporting ? (
-              <Icons.spinner className="h-3.5 w-3.5 animate-spin" />
+              <Icons.spinner className="h-4 w-4 animate-spin" />
             ) : (
-              <Icons.add className="h-3.5 w-3.5" />
+              <Icons.upload className="h-4 w-4" />
             )}
-            导入数据文件 (Import JSON)
+            {copy.import}
           </Button>
-
           <input
             ref={fileInputRef}
             type="file"
             accept=".json,application/json"
             onChange={handleFileChange}
             className="hidden"
+            aria-label={copy.import}
           />
         </div>
-      </CardContent>
+      </details>
     </Card>
   )
 }

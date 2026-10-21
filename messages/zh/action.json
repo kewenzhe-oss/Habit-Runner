@@ -1,7 +1,7 @@
 {
   "modal": {
-    "actualAmountLabel": "今日实际完成量",
-    "targetBaselinePrefix": "目标基线：",
+    "actualAmountLabel": "完成量",
+    "targetBaselinePrefix": "目标 ",
     "toolLinkPrefix": "关联外部工具：",
     "shortcuts": {
       "half": "50% 半量",
@@ -12,38 +12,38 @@
     },
     "mapping": {
       "autoMappingTag": "系统自动映射",
-      "highTitle": "充沛超额推进 (High · {ratio}%)",
+      "highTitle": "充沛推进 · {ratio}%",
       "highDesc": "状态充沛！超额完成了预设目标，为生活系统带来强劲势能。",
-      "normalTitle": "标准平稳执行 (Normal · {ratio}%)",
+      "normalTitle": "日常完成 · {ratio}%",
       "normalDesc": "标准达成，保持了平稳、可持续的日常执行节律。",
-      "lowTitle": "微小连接推进 (Low · {ratio}%)",
+      "lowTitle": "微行动 · {ratio}%",
       "lowDesc": "完成微小连接！疲惫时的微行动同样是真实的推进，系统予以完全承认。",
-      "restTitle": "有意识休整恢复 (Rest)",
+      "restTitle": "主动休整",
       "restDesc": "完成度为 0，系统将按有意识休整恢复记录，不计断签。"
     },
     "binary": {
       "stateLabel": "今日执行状态",
-      "doneTitle": "今日已完成",
-      "doneSub": "标准执行 (Normal)",
-      "restTitle": "今日休整未做",
-      "restSub": "主动休整恢复 (Rest)"
+      "doneTitle": "已完成",
+      "doneSub": "日常完成",
+      "restTitle": "今天休整",
+      "restSub": "主动休整"
     },
     "restReason": {
-      "label": "选择休整理由（客观记录，安心蓄能）",
+      "label": "休整原因",
       "customPlaceholder": "补充说明（可选，例如：今晚头痛早睡、行程临时调整...）",
       "presets": {
-        "sickness": "身体不适 / 需恢复",
-        "timeConflict": "时间冲突 / 优先它事",
-        "lowMood": "情绪低落 / 能量见底",
-        "unexpectedEvent": "计划外突发事件",
-        "intentionalEmpty": "单纯不想做 / 主动放空"
+        "sickness": "身体不适",
+        "timeConflict": "时间冲突",
+        "lowMood": "情绪低落",
+        "unexpectedEvent": "临时安排",
+        "intentionalEmpty": "主动休息"
       }
     },
     "reflection": {
-      "label": "随手反思 / 感受 (可选)",
-      "placeholder": "例如：今天推进节奏很稳，状态很舒服..."
+      "label": "今天的感想",
+      "placeholder": "想记下什么？"
     },
-    "confirmButton": "确认记录本次行动",
+    "confirmButton": "保存记录",
     "toast": {
       "restTitle": "已记录主动恢复休整",
       "restDesc": "安心休整恢复，系统节律连接已保持。",
@@ -52,6 +52,14 @@
       "highTitle": "已记录充沛超额推进",
       "normalTitle": "已记录标准日常行动",
       "generalDesc": "“{title}” 今日记录完成。"
-    }
+    },
+    "saveRest": "保存休整",
+    "saved": "已记录",
+    "description": "记录今天的行动",
+    "extras": "补充记录",
+    "extrasFilled": "补充记录 · 已填写",
+    "nextIntentLabel": "明天想做什么？",
+    "nextIntentPlaceholder": "留一个小计划",
+    "restToggle": "今天休整"
   }
 }

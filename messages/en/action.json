@@ -1,7 +1,7 @@
 {
   "modal": {
-    "actualAmountLabel": "Actual Volume Today",
-    "targetBaselinePrefix": "Target Baseline: ",
+    "actualAmountLabel": "Amount",
+    "targetBaselinePrefix": "Goal: ",
     "toolLinkPrefix": "Connected Tool: ",
     "shortcuts": {
       "half": "50% Half",
@@ -23,9 +23,9 @@
     },
     "binary": {
       "stateLabel": "Execution Status Today",
-      "doneTitle": "Completed Today",
+      "doneTitle": "Done",
       "doneSub": "Standard Execution (Normal)",
-      "restTitle": "Rested Today",
+      "restTitle": "Rest today",
       "restSub": "Intentional Rest (Rest)"
     },
     "restReason": {
@@ -40,10 +40,10 @@
       }
     },
     "reflection": {
-      "label": "Quick Reflection / Notes (Optional)",
-      "placeholder": "e.g. Steady rhythm today, felt comfortable..."
+      "label": "Reflection",
+      "placeholder": "Anything to remember?"
     },
-    "confirmButton": "Confirm & Record Action",
+    "confirmButton": "Save record",
     "toast": {
       "restTitle": "Rest & Recharge Logged",
       "restDesc": "Rest comfortably. System rhythm connection is preserved.",
@@ -52,6 +52,14 @@
       "highTitle": "High Energy Progress Logged",
       "normalTitle": "Standard Daily Action Logged",
       "generalDesc": "Check-in for \"{title}\" recorded."
-    }
+    },
+    "saveRest": "Save rest day",
+    "saved": "Recorded",
+    "description": "Record today’s action",
+    "extras": "Add a note",
+    "extrasFilled": "Notes added",
+    "nextIntentLabel": "What’s next?",
+    "nextIntentPlaceholder": "Leave a small plan",
+    "restToggle": "Rest today"
   }
 }

@@ -4,7 +4,14 @@ import * as React from "react"
 import Link from "next/link"
 import { ItemRecentDayStatus, TodayItemDTO } from "@/types"
 
-import { formatLocalizedDate, useI18n } from "@/lib/i18n"
+import {
+  checkInPatch,
+  isTodoCompleted,
+  type MutateDashboardItem,
+} from "@/lib/domain/dashboard"
+import { addCalendarDays, formatDateInTimeZone } from "@/lib/domain/date"
+import { triggerHaptic } from "@/lib/haptics"
+import { formatLocalizedDate, formatLocalizedUnit, useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -21,6 +28,9 @@ interface HabitItemProps {
   item: TodayItemDTO
   onOpenRecord: (item: TodayItemDTO) => void
   onRefresh: () => void
+  onMutate?: MutateDashboardItem
+  isPending?: boolean
+  dateStr?: string
   /** When true, list is in low/rest energy mode — P0 items get extra visual weight */
   isLowEnergyMode?: boolean
   /** When true, this habit has already been checked in today — dims the card */
@@ -30,10 +40,7 @@ interface HabitItemProps {
 const WEEKDAY_SHORT_ZH = ["一", "二", "三", "四", "五", "六", "日"]
 const WEEKDAY_SHORT_EN = ["M", "T", "W", "T", "F", "S", "S"]
 
-/**
- * Simplified 7-day trace bar.
- * No "本周" label wrapper — the dots themselves convey the week.
- */
+/** A readable weekly trace with shape and text alternatives for every state. */
 function ThisWeekTraceBar({
   days,
   locale,
@@ -41,70 +48,79 @@ function ThisWeekTraceBar({
   days?: ItemRecentDayStatus[]
   locale: string
 }) {
-  if (!days || days.length === 0) return null
+  if (!days?.length) return null
   const labels = locale === "zh" ? WEEKDAY_SHORT_ZH : WEEKDAY_SHORT_EN
-
+  const states = days.map((day, index) => {
+    const done = day.status === "COMPLETED" || day.status === "KEPT"
+    const resting = day.status === "REST"
+    const interrupted = day.status === "LAPSED" || day.status === "SKIPPED"
+    const description = done
+      ? locale === "zh"
+        ? "已完成"
+        : "Done"
+      : resting
+        ? locale === "zh"
+          ? "休整"
+          : "Rest"
+        : interrupted
+          ? locale === "zh"
+            ? "已记录"
+            : "Logged"
+          : day.isFuture
+            ? locale === "zh"
+              ? "未到来"
+              : "Upcoming"
+            : day.isToday
+              ? locale === "zh"
+                ? "今日待记录"
+                : "Today pending"
+              : locale === "zh"
+                ? "未记录"
+                : "No record"
+    return {
+      day,
+      label: labels[index],
+      done,
+      resting,
+      interrupted,
+      description,
+    }
+  })
   return (
-    <div className="flex items-center gap-1.5" aria-label="This week trace">
-      {days.map((day, idx) => {
-        const isToday = Boolean(day.isToday)
-        const isFuture = Boolean(day.isFuture)
-        const label = labels[idx] || ""
-
-        let dotClass = "bg-muted-foreground/20"
-        let statusTitle = `${day.date} (${label})`
-
-        if (day.status === "COMPLETED" || day.status === "KEPT") {
-          dotClass =
-            day.actualEnergy === "HIGH"
-              ? "bg-emerald-500"
-              : day.actualEnergy === "LOW"
-                ? "bg-amber-400"
-                : "bg-emerald-500"
-          statusTitle += `: ${locale === "zh" ? "已完成" : "Done"}`
-        } else if (day.status === "REST") {
-          dotClass = "bg-muted-foreground/35"
-          statusTitle += `: ${locale === "zh" ? "休整" : "Rest"}`
-        } else if (day.status === "LAPSED") {
-          dotClass = "bg-orange-400/60"
-          statusTitle += `: ${locale === "zh" ? "中断" : "Lapsed"}`
-        } else if (isToday) {
-          dotClass =
-            "border border-dashed border-primary/70 bg-primary/10 animate-pulse"
-          statusTitle += `: ${locale === "zh" ? "今日待打卡" : "Today pending"}`
-        } else if (isFuture) {
-          dotClass = "border border-dashed border-muted-foreground/20"
-          statusTitle += `: ${locale === "zh" ? "未到来" : "Upcoming"}`
-        }
-
-        return (
-          <div
-            key={day.date}
-            title={statusTitle}
-            className="flex flex-col items-center gap-0.5"
-          >
-            <span
-              className={cn(
-                "text-[8px] leading-none",
-                isToday
-                  ? "font-bold text-primary"
-                  : isFuture
-                    ? "text-muted-foreground/30"
-                    : "text-muted-foreground/50"
-              )}
-            >
-              {label}
+    <div
+      role="img"
+      aria-label={`${locale === "zh" ? "本周记录" : "This week trace"}: ${states.map(({ day, label, description }) => `${day.date} (${label}) ${description}`).join("; ")}`}
+      className="flex w-full min-w-0 shrink-0 justify-between gap-1 max-[375px]:gap-0.5 sm:w-auto sm:justify-start"
+    >
+      {states.map(({ day, label, done, resting, interrupted, description }) => (
+        <span
+          key={day.date}
+          title={`${day.date}: ${description}`}
+          aria-hidden="true"
+          className={cn(
+            "flex w-5 flex-col items-center gap-1 rounded-md py-1 text-xs text-muted-foreground",
+            day.isToday && "bg-muted font-semibold text-foreground"
+          )}
+        >
+          <span className="leading-none">{label}</span>
+          {done ? (
+            <Icons.check className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400" />
+          ) : resting ? (
+            <Icons.rest className="h-3.5 w-3.5" />
+          ) : interrupted ? (
+            <Icons.close className="h-3.5 w-3.5 text-orange-700 dark:text-orange-400" />
+          ) : (
+            <span className="flex h-3.5 w-3.5 items-center justify-center">
+              <span
+                className={cn(
+                  "h-2 w-2 rounded-full border border-muted-foreground",
+                  day.isFuture && "border-dashed"
+                )}
+              />
             </span>
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full transition-all",
-                dotClass,
-                isToday && "h-2 w-2"
-              )}
-            />
-          </div>
-        )
-      })}
+          )}
+        </span>
+      ))}
     </div>
   )
 }
@@ -118,9 +134,26 @@ function getDomainFromUrl(url: string): string {
   }
 }
 
-export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = false, isDimmed = false }: HabitItemProps) {
+export function HabitItem({
+  item,
+  onOpenRecord,
+  onRefresh,
+  onMutate,
+  isPending = false,
+  dateStr,
+  isLowEnergyMode = false,
+  isDimmed = false,
+}: HabitItemProps) {
   const { dict, format, locale } = useI18n()
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isSaving, setIsLoading] = React.useState(false)
+  const isLoading = isSaving || isPending
+  const todoCompleted = isTodoCompleted(item)
+  const mutate: MutateDashboardItem =
+    onMutate ||
+    (async (_item, _optimistic, save) => {
+      await save()
+      onRefresh()
+    })
   const isCheckedIn = !!item.todayCheckIn
   const checkInStatus = item.todayCheckIn?.status
   const actualEnergy = item.todayCheckIn?.actualEnergy
@@ -156,13 +189,22 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
     e.stopPropagation()
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/items/${item.id}/quit-status`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+      const optimistic = {
+        id: `pending-${item.id}`,
+        status,
+        actualEnergy: null,
+      }
+      await mutate(item, checkInPatch(item, dateStr, optimistic), async () => {
+        const res = await fetch(`/api/items/${item.id}/quit-status`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status, date: dateStr }),
+        })
+        if (!res.ok) throw new Error(dict.common.notifications.saveFailed)
+        const { streaks, ...checkIn } = await res.json()
+        return checkInPatch(item, dateStr, checkIn, streaks)
       })
-
-      if (!res.ok) throw new Error(dict.common.notifications.saveFailed)
+      triggerHaptic("success")
 
       toast({
         title:
@@ -176,7 +218,6 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
               })
             : dict.dashboard.habitItem.quitLapsedToastDesc,
       })
-      onRefresh()
     } catch (err: any) {
       toast({
         title: dict.common.notifications.saveFailed,
@@ -191,16 +232,41 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
   // Todo status toggle
   const handleTodoToggle = async (e: React.MouseEvent) => {
     e.stopPropagation()
-    const nextStatus = item.status === "COMPLETED" ? "ACTIVE" : "COMPLETED"
+    const nextStatus = todoCompleted ? "ACTIVE" : "COMPLETED"
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/items/${item.id}/todo-status`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: nextStatus }),
+      const recurring =
+        item.todoRecurrence === "WEEKLY" || item.todoRecurrence === "MONTHLY"
+      const optimistic: Partial<TodayItemDTO> = {
+        status:
+          recurring && nextStatus === "COMPLETED"
+            ? ("ACTIVE" as const)
+            : nextStatus,
+        todayCheckIn:
+          nextStatus === "COMPLETED"
+            ? {
+                id: `pending-${item.id}`,
+                status: "COMPLETED" as const,
+                actualEnergy: "NORMAL" as const,
+              }
+            : null,
+        updatedAt: new Date().toISOString(),
+      }
+      await mutate(item, optimistic, async () => {
+        const res = await fetch(`/api/items/${item.id}/todo-status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: nextStatus, date: dateStr }),
+        })
+        if (!res.ok) throw new Error(dict.common.notifications.updateFailed)
+        const updated = await res.json()
+        return {
+          status: updated.status,
+          todayCheckIn: updated.todayCheckIn,
+          updatedAt: updated.updatedAt,
+        }
       })
-
-      if (!res.ok) throw new Error(dict.common.notifications.updateFailed)
+      triggerHaptic(nextStatus === "COMPLETED" ? "success" : "light")
 
       toast({
         title:
@@ -208,7 +274,6 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
             ? dict.dashboard.habitItem.todoCompletedToast
             : dict.dashboard.habitItem.todoReopenedToast,
       })
-      onRefresh()
     } catch (err: any) {
       toast({
         title: dict.common.notifications.updateFailed,
@@ -225,17 +290,21 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
     e.stopPropagation()
     setIsLoading(true)
     try {
-      const currentDue = item.dueDate ? new Date(item.dueDate) : new Date()
-      currentDue.setDate(currentDue.getDate() + daysToAdd)
-      const nextDateStr = currentDue.toISOString().split("T")[0]
-
-      const res = await fetch(`/api/items/${item.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ dueDate: nextDateStr }),
+      const nextDateStr = addCalendarDays(
+        item.dueDate || dateStr || formatDateInTimeZone(),
+        daysToAdd
+      )
+      await mutate(item, { dueDate: nextDateStr }, async () => {
+        const res = await fetch(`/api/items/${item.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ dueDate: nextDateStr }),
+        })
+        if (!res.ok) throw new Error(dict.common.notifications.updateFailed)
+        const updated = await res.json()
+        return { dueDate: updated.dueDate, updatedAt: updated.updatedAt }
       })
-
-      if (!res.ok) throw new Error(dict.common.notifications.updateFailed)
+      triggerHaptic("light")
 
       toast({
         title: format(dict.dashboard.habitItem.postponeToastTitle, {
@@ -243,7 +312,6 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
         }),
         description: dict.dashboard.habitItem.postponeToastDesc,
       })
-      onRefresh()
     } catch (err: any) {
       toast({
         title: dict.common.notifications.updateFailed,
@@ -267,10 +335,13 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
       return
     setIsLoading(true)
     try {
-      const res = await fetch(`/api/items/${item.id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error(dict.common.notifications.deleteFailed)
+      await mutate(item, null, async () => {
+        const res = await fetch(`/api/items/${item.id}`, { method: "DELETE" })
+        if (!res.ok) throw new Error(dict.common.notifications.deleteFailed)
+        return null
+      })
+      triggerHaptic("medium")
       toast({ title: dict.common.notifications.deleteSuccess })
-      onRefresh()
     } catch (err: any) {
       toast({
         title: dict.common.notifications.deleteFailed,
@@ -305,54 +376,109 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
 
   const isP0 = item.priority === "HIGH"
   const highlightP0 = isLowEnergyMode && isP0
+  const completedItem =
+    todoCompleted ||
+    checkInStatus === "COMPLETED" ||
+    checkInStatus === "KEPT"
+
+  const itemCopy = dict.dashboard.habitItem
+  const goal =
+    isLowEnergyMode && item.recommendedAction
+      ? item.recommendedAction
+      : item.targetAmount && item.unitLabel
+        ? format(itemCopy.targetLabel, {
+            amount: item.targetAmount,
+            unit: formatLocalizedUnit(
+              item.targetAmount,
+              item.unitLabel,
+              locale
+            ),
+          })
+        : item.recommendedAction
+  const checkedLabel =
+    checkInStatus === "REST"
+      ? itemCopy.restButton
+      : checkInStatus === "COMPLETED" || checkInStatus === "KEPT"
+        ? itemCopy.doneButton
+        : itemCopy.loggedButton
 
   return (
     <article
+      aria-busy={isLoading}
+      data-completed={completedItem || undefined}
       className={cn(
-        "group flex items-center gap-3 border-b border-border/40 px-0 py-3 transition-all duration-300 last:border-b-0 hover:bg-muted/20",
-        item.status === "COMPLETED" && "opacity-50",
-        highlightP0 && "rounded-lg border border-amber-500/30 bg-amber-500/5 px-2 hover:bg-amber-500/10",
-        isDimmed && !highlightP0 && "opacity-50 hover:opacity-70"
+        "relative space-y-2 border-b border-border py-4 transition-[background-color,color,opacity] duration-300 ease-out last:border-b-0",
+        completedItem && "bg-muted/20 opacity-90",
+        highlightP0 && "bg-amber-500/5",
+        isDimmed && "bg-muted/10"
       )}
     >
-      {/* 2px color bar — type/color indicator */}
-      {item.type !== "TODO" && (
-        <span
-          className="h-6 w-0.5 shrink-0 rounded-full opacity-60 transition-opacity group-hover:opacity-90"
-          style={{ backgroundColor: item.colorCode || "#10B981" }}
-        />
-      )}
-
-      {/* Left content: title + trace */}
-      <div className="min-w-0 flex-1 space-y-1.5">
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Title */}
-          <Link
-            href={`/items/${item.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className={cn(
-              "truncate text-sm font-medium text-foreground transition-colors hover:text-primary",
-              item.status === "COMPLETED" &&
-                "text-muted-foreground line-through decoration-muted-foreground/40"
-            )}
-          >
-            {item.title}
-          </Link>
-
-          {/* Priority badge */}
+      <div className="min-w-0 space-y-1.5 pr-10 sm:pr-12">
+        <Link
+          href={`/items/${item.id}`}
+          onClick={(e) => e.stopPropagation()}
+          className={cn(
+            "line-clamp-2 break-words text-base font-semibold leading-6 text-foreground transition-[color,opacity] duration-300 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+            completedItem &&
+              "font-medium text-muted-foreground line-through decoration-muted-foreground/35"
+          )}
+        >
+          {item.title}
+        </Link>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {item.priority && item.priority !== "NORMAL" && (
             <span
               className={cn(
-                "shrink-0 rounded border px-1.5 py-0.5 font-mono text-[10px]",
-                highlightP0
-                  ? "border-amber-500/50 bg-amber-500/10 font-bold text-amber-700 dark:text-amber-400"
-                  : "border-border text-muted-foreground"
+                "rounded-md px-2 py-1 font-medium",
+                isP0
+                  ? "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200"
+                  : "bg-muted text-muted-foreground"
               )}
-              aria-label={`${locale === "zh" ? "显示优先级" : "Display priority"} ${item.priority === "HIGH" ? "P0" : "P2"}`}
             >
-              {item.priority === "HIGH" ? "P0" : "P2"}
+              {isP0 ? itemCopy.priorityHigh : itemCopy.priorityLow}
             </span>
           )}
+          {item.type !== "TODO" && streakCount > 0 && (
+            <span>{format(itemCopy.streakLabel, { count: streakCount })}</span>
+          )}
+          {item.type === "TODO" && item.dueDate && (
+            <span>
+              {itemCopy.duePrefix}
+              {formatLocalizedDate(item.dueDate, locale)}
+            </span>
+          )}
+        </div>
+        {item.type === "HABIT" && goal && (
+          <p className="break-words text-sm leading-relaxed text-muted-foreground">
+            {goal}
+          </p>
+        )}
+        {item.tomorrowHint && !item.todayCheckIn && (
+          <p className="break-words text-sm leading-relaxed text-emerald-800 dark:text-emerald-300">
+            {locale === "zh" ? "今日方向：" : "Today: "}
+            {item.tomorrowHint}
+          </p>
+        )}
+        {item.todayCheckIn?.nextIntent && (
+          <p className="break-words text-sm leading-relaxed text-muted-foreground">
+            {locale === "zh" ? "明日预演：" : "Tomorrow: "}
+            {item.todayCheckIn.nextIntent}
+          </p>
+        )}
+      </div>
+
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 max-[375px]:grid max-[375px]:grid-cols-1 max-[375px]:gap-3">
+        {item.type !== "TODO" && (
+          <div className="min-w-0 max-[375px]:w-full">
+            <ThisWeekTraceBar days={item.recent7Days} locale={locale} />
+          </div>
+        )}
+        <div
+          className={cn(
+            "ml-auto flex min-w-0 items-center justify-end gap-2 max-[375px]:ml-0 max-[375px]:w-full max-[375px]:justify-stretch",
+            item.type === "QUIT_HABIT" && !isCheckedIn && "w-full sm:w-auto"
+          )}
+        >
           {primaryToolLink?.url && (
             <a
               href={primaryToolLink.url}
@@ -366,162 +492,109 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
                   : `Open linked tool: ${toolDomain}`)
               }
               title={toolTooltip}
-              className="group/link inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-muted-foreground/40 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <Icons.externalLink className="h-3.5 w-3.5 transition-transform group-hover/link:scale-110" />
+              <Icons.externalLink aria-hidden="true" className="h-4 w-4" />
             </a>
           )}
-
-          {/* Streak count — unstyled, appears on hover */}
-          {item.type !== "TODO" && streakCount > 0 && (
-            <span className="text-[11px] text-muted-foreground/0 transition-colors group-hover:text-muted-foreground/60">
-              {streakCount}
-              {locale === "zh" ? "天" : "d"}
-            </span>
-          )}
-        </div>
-
-        {/* 7-day trace — second row, no label */}
-        {item.type !== "TODO" && (
-          <ThisWeekTraceBar days={item.recent7Days} locale={locale} />
-        )}
-
-        {/* Morning Activation Hint — yesterday's "next intent" for today (before check-in) */}
-        {item.tomorrowHint && !item.todayCheckIn && (
-          <p className="flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-300 font-medium leading-snug">
-            <span className="shrink-0 leading-none">🌱</span>
-            <span className="text-[10px] text-muted-foreground font-normal">今日方向：</span>
-            <span className="truncate">{item.tomorrowHint}</span>
-          </p>
-        )}
-
-        {/* Evening Shutdown Seed — today's "next intent" for tomorrow (after check-in) */}
-        {item.todayCheckIn?.nextIntent && (
-          <p className="flex items-center gap-1.5 text-[11px] text-muted-foreground leading-snug">
-            <span className="shrink-0 leading-none text-emerald-600">🌱</span>
-            <span className="text-[10px] text-muted-foreground/70 font-medium">明日预演：</span>
-            <span className="truncate text-foreground/80">{item.todayCheckIn.nextIntent}</span>
-          </p>
-        )}
-
-        {/* TODO due date */}
-        {item.type === "TODO" && item.dueDate && (
-          <p className="text-[11px] text-muted-foreground/70">
-            {dict.dashboard.habitItem.duePrefix}
-            {item.dueDate}
-          </p>
-        )}
-      </div>
-
-      {/* Right: state control + options menu */}
-      <div className="flex shrink-0 items-center gap-0">
-        {/* ——— HABIT: state dot ——— */}
-        {item.type === "HABIT" && (
-          <button
-            type="button"
-            onClick={() => onOpenRecord(item)}
-            aria-label={stateDotLabel}
-            title={stateDotLabel}
-            disabled={isLoading}
-            className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-muted/50 disabled:opacity-50"
-          >
-            <span
+          {item.type === "HABIT" && (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic("light")
+                onOpenRecord(item)
+              }}
+              aria-label={stateDotLabel}
+              title={stateDotLabel}
+              disabled={isLoading}
               className={cn(
-                "h-4 w-4 rounded-full border-2 transition-all",
+                "inline-flex min-h-11 min-w-20 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 max-[375px]:flex-1",
                 isCheckedIn
-                  ? "scale-100 border-transparent"
-                  : "scale-90 border-muted-foreground/25 bg-transparent hover:border-muted-foreground/50"
+                  ? "border-input bg-background hover:bg-muted"
+                  : "border-primary bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary/80"
               )}
-              style={
-                isCheckedIn && checkInStatus !== "REST"
-                  ? { backgroundColor: item.colorCode || "#10B981" }
-                  : isCheckedIn && checkInStatus === "REST"
-                    ? { backgroundColor: "hsl(var(--muted-foreground) / 0.35)" }
-                    : {}
-              }
-            />
-          </button>
-        )}
-
-        {/* ——— QUIT_HABIT: dot when checked, inline text buttons when not ——— */}
-        {item.type === "QUIT_HABIT" && (
-          <>
-            {isCheckedIn ? (
+            >
+              {isLoading ? (
+                <Icons.spinner
+                  aria-hidden="true"
+                  className="h-4 w-4 animate-spin"
+                />
+              ) : isCheckedIn ? (
+                <Icons.check aria-hidden="true" className="h-4 w-4" />
+              ) : (
+                <Icons.add aria-hidden="true" className="h-4 w-4" />
+              )}
+              {isCheckedIn ? checkedLabel : itemCopy.recordButton}
+            </button>
+          )}
+          {item.type === "QUIT_HABIT" &&
+            (isCheckedIn ? (
               <button
                 type="button"
-                onClick={() => onOpenRecord(item)}
+                onClick={() => {
+                  triggerHaptic("light")
+                  onOpenRecord(item)
+                }}
+                disabled={isLoading}
                 title={
                   checkInStatus === "KEPT"
-                    ? dict.dashboard.habitItem.quitKeptDone
-                    : dict.dashboard.habitItem.quitLapsedDone
+                    ? itemCopy.quitKeptDone
+                    : itemCopy.quitLapsedDone
                 }
-                className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-muted/50"
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 max-[375px]:flex-1"
               >
-                <span
-                  className={cn(
-                    "h-4 w-4 rounded-full transition-all",
-                    checkInStatus === "KEPT"
-                      ? "bg-emerald-500"
-                      : "bg-orange-400/80"
-                  )}
-                />
+                <Icons.check aria-hidden="true" className="h-4 w-4" />
+                {checkedLabel}
               </button>
             ) : (
-              <div className="flex items-center gap-1 pr-1">
+              <>
                 <button
                   type="button"
                   onClick={(e) => handleQuitStatus("KEPT", e)}
                   disabled={isLoading}
-                  className="rounded px-2 py-1 text-[11px] font-medium text-emerald-700 transition-colors hover:bg-emerald-50 disabled:opacity-50 dark:text-emerald-400 dark:hover:bg-emerald-950/40"
+                  className="min-h-11 flex-1 rounded-xl border border-emerald-700 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 dark:border-emerald-500 dark:bg-emerald-950 dark:text-emerald-200"
                 >
-                  {dict.dashboard.habitItem.quitKeptButton}
+                  {itemCopy.quitKeptButton}
                 </button>
                 <button
                   type="button"
                   onClick={(e) => handleQuitStatus("LAPSED", e)}
                   disabled={isLoading}
-                  className="rounded px-2 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground disabled:opacity-50"
+                  className="min-h-11 flex-1 rounded-xl border border-input px-3 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
                 >
-                  {dict.dashboard.habitItem.quitLapsedButton}
+                  {itemCopy.quitLapsedButton}
                 </button>
-              </div>
-            )}
-          </>
-        )}
-
-        {/* ——— TODO: square checkbox dot ——— */}
-        {item.type === "TODO" && (
-          <button
-            type="button"
-            onClick={handleTodoToggle}
-            disabled={isLoading}
-            aria-label={
-              item.status === "COMPLETED"
-                ? format(dict.dashboard.habitItem.todoReopenAria, {
-                    title: item.title,
-                  })
-                : format(dict.dashboard.habitItem.todoCompleteAria, {
-                    title: item.title,
-                  })
-            }
-            className="flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:bg-muted/50 disabled:opacity-50"
-          >
-            <span
-              className={cn(
-                "flex h-4 w-4 items-center justify-center rounded border-2 transition-all",
-                item.status === "COMPLETED"
-                  ? "border-transparent bg-primary"
-                  : "border-muted-foreground/25 bg-transparent hover:border-muted-foreground/50"
+              </>
+            ))}
+          {item.type === "TODO" && (
+            <button
+              type="button"
+              onClick={handleTodoToggle}
+              disabled={isLoading}
+              aria-label={format(
+                todoCompleted
+                  ? itemCopy.todoReopenAria
+                  : itemCopy.todoCompleteAria,
+                { title: item.title }
               )}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-input px-4 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 max-[375px]:w-full"
             >
-              {item.status === "COMPLETED" && (
-                <Icons.check className="h-2.5 w-2.5 text-primary-foreground" />
+              {isLoading ? (
+                <Icons.spinner
+                  aria-hidden="true"
+                  className="h-4 w-4 animate-spin"
+                />
+              ) : todoCompleted ? (
+                <Icons.refresh aria-hidden="true" className="h-4 w-4" />
+              ) : (
+                <Icons.check aria-hidden="true" className="h-4 w-4" />
               )}
-            </span>
-          </button>
-        )}
-
-        {/* ——— Options menu — hidden until hover ——— */}
+              {todoCompleted ? itemCopy.todoResetBtn : itemCopy.todoCompleteBtn}
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="absolute -right-2 top-2 !mt-0">
         <DropdownMenu>
           <DropdownMenuTrigger
             aria-label={format(dict.dashboard.habitItem.moreOptionsAria, {
@@ -529,12 +602,15 @@ export function HabitItem({ item, onOpenRecord, onRefresh, isLowEnergyMode = fal
             })}
             className={cn(
               buttonVariants({ variant: "ghost", size: "sm" }),
-              "h-9 w-9 p-0 text-muted-foreground opacity-0 transition-opacity hover:text-foreground group-hover:opacity-100"
+              "h-11 w-11 p-0 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
             )}
           >
             <Icons.ellipsis className="h-4 w-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent
+            align="end"
+            className="[&_[role=menuitem]]:min-h-11"
+          >
             <DropdownMenuItem asChild>
               <Link href={`/items/${item.id}`} className="cursor-pointer">
                 {dict.dashboard.habitItem.viewDetails}

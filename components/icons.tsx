@@ -10,55 +10,55 @@
  *  - Status indicators: h-3 w-3 (12px)
  */
 import {
-  RiLayoutGridLine,       // dashboard
-  RiBarChart2Line,        // history / insights
-  RiSettings3Line,        // settings
-  RiAddLine,              // add
-  RiCheckLine,            // check
-  RiCheckboxCircleFill,   // checkCircle (filled — confirmed state)
-  RiCircleLine,           // circle
-  RiCloseCircleFill,      // xCircle (filled — cancelled state)
-  RiCloseLine,            // close
-  RiArrowLeftSLine,       // back
-  RiArrowRightSLine,      // next
-  RiArrowUpSLine,         // up
-  RiArrowDownSLine,       // down
-  RiDeleteBinLine,        // trash
-  RiMore2Line,            // ellipsis
-  RiErrorWarningLine,     // warning
-  RiLogoutBoxRLine,       // signout
-  RiCalendarLine,         // calendar
-  RiExternalLinkLine,     // externalLink
-  RiArrowRightUpLine,     // arrowUpRight
-  RiLoader4Line,          // spinner
-  RiGlobalLine,           // globe
-  RiUserLine,             // userAlt
-  RiArrowUpDownLine,      // sort
-  RiStarLine,             // star
-  RiFireLine,             // fire
-  RiBarChartLine,         // statsBar
-  RiEqualizer2Line,       // mixer
-  RiFocus3Line,           // habit
-  RiShieldCheckLine,      // quitHabit
-  RiCheckboxLine,         // todo
-  RiFlashlightLine,       // highEnergy
-  RiBatteryChargeLine,    // normalEnergy
-  RiBatteryLowLine,       // lowEnergy
-  RiCupLine,              // rest
-  RiSparklingLine,        // sparkles
-  RiLeafLine,             // spa
-  RiStackLine,            // layers
-  RiCompass3Line,         // compass
-  RiMentalHealthLine,     // selfImprovement
-  RiSunLine,              // sun
-  RiMoonLine,             // moon
-  RiGoogleFill,           // google (fill — brand logo)
-  RiGithubFill,           // github (fill — brand logo)
-  RiDownload2Line,        // download
-  RiUpload2Line,          // upload
-  RiRefreshLine,          // refresh
-  RiFileCopyLine,         // copy
-  RiDoubleQuotesL,        // quotes
+  RiAddLine, // add
+  RiArrowDownSLine, // down
+  RiArrowLeftSLine, // back
+  RiArrowRightSLine, // next
+  RiArrowRightUpLine, // arrowUpRight
+  RiArrowUpDownLine, // sort
+  RiArrowUpSLine, // up
+  RiBarChart2Line, // history / insights
+  RiBarChartLine, // statsBar
+  RiBatteryChargeLine, // normalEnergy
+  RiBatteryLowLine, // lowEnergy
+  RiCalendarLine, // calendar
+  RiCheckboxCircleFill, // checkCircle (filled — confirmed state)
+  RiCheckboxLine, // todo
+  RiCheckLine, // check
+  RiCircleLine, // circle
+  RiCloseCircleFill, // xCircle (filled — cancelled state)
+  RiCloseLine, // close
+  RiCompass3Line, // compass
+  RiCupLine, // rest
+  RiDeleteBinLine, // trash
+  RiDoubleQuotesL, // quotes
+  RiDownload2Line, // download
+  RiEqualizer2Line, // mixer
+  RiErrorWarningLine, // warning
+  RiExternalLinkLine, // externalLink
+  RiFileCopyLine, // copy
+  RiFireLine, // fire
+  RiFlashlightLine, // highEnergy
+  RiFocus3Line, // habit
+  RiGithubFill, // github (fill — brand logo)
+  RiGlobalLine, // globe
+  RiGoogleFill, // google (fill — brand logo)
+  RiLayoutGridLine, // dashboard
+  RiLeafLine, // spa
+  RiLoader4Line, // spinner
+  RiLogoutBoxRLine, // signout
+  RiMentalHealthLine, // selfImprovement
+  RiMoonLine, // moon
+  RiMore2Line, // ellipsis
+  RiRefreshLine, // refresh
+  RiSettings3Line, // settings
+  RiShieldCheckLine, // quitHabit
+  RiSparklingLine, // sparkles
+  RiStackLine, // layers
+  RiStarLine, // star
+  RiSunLine, // sun
+  RiUpload2Line, // upload
+  RiUserLine, // userAlt
 } from "@remixicon/react"
 
 export type IconKeys = keyof typeof icons
@@ -86,6 +86,7 @@ const icons = {
   // Navigation & Actions
   back: RiArrowLeftSLine,
   next: RiArrowRightSLine,
+  chevronRight: RiArrowRightSLine,
   up: RiArrowUpSLine,
   down: RiArrowDownSLine,
   close: RiCloseLine,

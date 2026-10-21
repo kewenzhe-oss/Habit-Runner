@@ -83,6 +83,7 @@ export type TodayItemDTO = {
   status: ItemStatus
   colorCode?: string | null
   dueDate?: string | null
+  todoRecurrence?: string | null
 
   // Unit metadata
   unitType?: string | null
@@ -101,6 +102,7 @@ export type TodayItemDTO = {
   // Today checkin status
   todayCheckIn?: {
     id: string
+    updatedAt?: string
     status: CheckInStatus
     actualEnergy?: EnergyLevel | null
     actionText?: string | null
@@ -151,4 +153,3 @@ export type LayerInfo = {
   description: string
   color: string
 }
-

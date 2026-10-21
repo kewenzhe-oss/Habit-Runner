@@ -18,7 +18,11 @@ export async function calculateItemStreaks(
   itemId: string,
   todayStr: string,
   preloaded?: {
-    item?: { createdAt: Date; frequencyDays?: string | null; targetPerWeek?: number | null }
+    item?: {
+      createdAt: Date
+      frequencyDays?: string | null
+      targetPerWeek?: number | null
+    }
     checkIns?: Array<{ date: string; status: string }>
   }
 ): Promise<{
@@ -210,15 +214,6 @@ async function recordCheckIn(
     nextIntent?: string
   }
 ) {
-  // Verify item ownership
-  const item = await db.item.findFirst({
-    where: { id: itemId, userId },
-  })
-
-  if (!item) {
-    throw new Error("Item not found or unauthorized")
-  }
-
   return await db.checkIn.upsert({
     where: {
       itemId_date: {
@@ -266,7 +261,18 @@ export async function recordHabitCheckIn(
   if (item.type !== "HABIT")
     throw new Error("Item type does not support habit check-ins")
 
-  return recordCheckIn(userId, itemId, date, deriveHabitCheckIn(item, input))
+  const checkIn = await recordCheckIn(
+    userId,
+    itemId,
+    date,
+    deriveHabitCheckIn(item, input)
+  )
+  // The write has succeeded. Optional display metrics must not turn a saved
+  // record into a failed response if the follow-up read is unavailable.
+  const streaks = await calculateItemStreaks(itemId, date, { item }).catch(
+    () => undefined
+  )
+  return { ...checkIn, streaks }
 }
 
 export async function recordQuitStatus(
@@ -281,7 +287,11 @@ export async function recordQuitStatus(
   if (item.type !== "QUIT_HABIT") {
     throw new Error("Item type does not support quit-habit check-ins")
   }
-  return recordCheckIn(userId, itemId, date, { status, notes })
+  const checkIn = await recordCheckIn(userId, itemId, date, { status, notes })
+  const streaks = await calculateItemStreaks(itemId, date, { item }).catch(
+    () => undefined
+  )
+  return { ...checkIn, streaks }
 }
 
 /**
@@ -291,36 +301,48 @@ export async function getTodayDashboardData(
   userId: string,
   dateStr: string
 ): Promise<TodayDashboardData> {
-  // 1. Fetch user's daily energy state for today (optional)
-  const dailyEnergyState = await db.dailyEnergyState.findUnique({
-    where: {
-      userId_date: {
-        userId,
-        date: dateStr,
-      },
-    },
-  })
-
-  const currentEnergy: EnergyLevel = dailyEnergyState?.energyLevel || "NORMAL"
-
-  // 2. Fetch all active items for the user
-  const allItems = await getUserItems(userId, {
-    status: ["ACTIVE", "COMPLETED"],
-  })
-
-  // 3. Generate natural calendar week (Mon-Sun) containing dateStr
   const weekDates = getCalendarWeekDates(dateStr)
   const mondayStr = weekDates[0]
   const sundayStr = weekDates[6]
+  const yesterdayStr = addCalendarDays(dateStr, -1)
+  const earliestLookbackDate = addCalendarDays(dateStr, -120)
 
-  // Fetch checkins for the natural week across all active items
-  const recentCheckIns = await db.checkIn.findMany({
-    where: {
-      userId,
-      date: { gte: mondayStr, lte: sundayStr },
-      itemId: { in: allItems.map((i) => i.id) },
-    },
-  })
+  // These reads have no dependency on each other. Keep long-history rows
+  // narrow, and combine the week + yesterday reads into a single round trip.
+  const [dailyEnergyState, allItems, windowCheckIns, batchCheckIns120] =
+    await Promise.all([
+      db.dailyEnergyState.findUnique({
+        where: { userId_date: { userId, date: dateStr } },
+      }),
+      getUserItems(userId, {
+        status: ["ACTIVE", "COMPLETED"],
+        includeCheckInCount: false,
+      }),
+      db.checkIn.findMany({
+        where: {
+          userId,
+          item: { status: { in: ["ACTIVE", "COMPLETED"] } },
+          OR: [
+            { date: { gte: mondayStr, lte: sundayStr } },
+            { date: yesterdayStr, nextIntent: { not: null } },
+          ],
+        },
+      }),
+      db.checkIn.findMany({
+        where: {
+          userId,
+          item: { status: { in: ["ACTIVE", "COMPLETED"] } },
+          date: { gte: earliestLookbackDate, lte: dateStr },
+        },
+        select: { itemId: true, date: true, status: true },
+        orderBy: { date: "desc" },
+      }),
+    ])
+
+  const currentEnergy: EnergyLevel = dailyEnergyState?.energyLevel || "NORMAL"
+  const recentCheckIns = windowCheckIns.filter(
+    (c) => c.date >= mondayStr && c.date <= sundayStr
+  )
 
   const checkInMap = new Map<string, (typeof recentCheckIns)[0]>()
   const recentCheckInMap = new Map<string, (typeof recentCheckIns)[0]>()
@@ -332,17 +354,9 @@ export async function getTodayDashboardData(
     }
   })
 
-  // Fetch yesterday's check-ins to extract nextIntent ("Next Action Seed")
-  const yesterdayStr = addCalendarDays(dateStr, -1)
-  const yesterdayCheckIns = await db.checkIn.findMany({
-    where: {
-      userId,
-      date: yesterdayStr,
-      itemId: { in: allItems.map((i) => i.id) },
-      nextIntent: { not: null },
-    },
-    select: { itemId: true, nextIntent: true },
-  })
+  const yesterdayCheckIns = windowCheckIns.filter(
+    (c) => c.date === yesterdayStr && c.nextIntent
+  )
   const nextIntentMap = new Map<string, string>()
   yesterdayCheckIns.forEach((c) => {
     if (c.nextIntent) nextIntentMap.set(c.itemId, c.nextIntent)
@@ -351,9 +365,7 @@ export async function getTodayDashboardData(
   // For completed TODOs, retain those completed within the current natural week or today.
   // Older completed items are archived to keep the dashboard focused.
   const completedThisWeekItemIds = new Set(
-    recentCheckIns
-      .filter((c) => c.status === "COMPLETED")
-      .map((c) => c.itemId)
+    recentCheckIns.filter((c) => c.status === "COMPLETED").map((c) => c.itemId)
   )
 
   const items = allItems.filter(
@@ -365,19 +377,10 @@ export async function getTodayDashboardData(
           checkInMap.get(item.id)?.status === "COMPLETED"))
   )
 
-  // Batch fetch lookback check-ins for streak calculations (eliminates N+1 queries)
-  const earliestLookbackDate = addCalendarDays(dateStr, -120)
-  const batchCheckIns120 = await db.checkIn.findMany({
-    where: {
-      userId,
-      itemId: { in: items.map((i) => i.id) },
-      date: { gte: earliestLookbackDate, lte: dateStr },
-    },
-    select: { itemId: true, date: true, status: true },
-    orderBy: { date: "desc" },
-  })
-
-  const item120CheckInsMap = new Map<string, Array<{ date: string; status: string }>>()
+  const item120CheckInsMap = new Map<
+    string,
+    Array<{ date: string; status: string }>
+  >()
   batchCheckIns120.forEach((c) => {
     let list = item120CheckInsMap.get(c.itemId)
     if (!list) {
@@ -446,6 +449,7 @@ export async function getTodayDashboardData(
         status: item.status,
         colorCode: item.colorCode,
         dueDate: item.dueDate,
+        todoRecurrence: item.todoRecurrence || item.frequencyDays,
         unitType: item.unitType || null,
         targetAmount: item.targetAmount || null,
         unitLabel: item.unitLabel || null,
@@ -457,6 +461,7 @@ export async function getTodayDashboardData(
         todayCheckIn: checkIn
           ? {
               id: checkIn.id,
+              updatedAt: checkIn.updatedAt.toISOString(),
               status: checkIn.status as CheckInStatus,
               actualEnergy: checkIn.actualEnergy as EnergyLevel,
               actionText: checkIn.actionText,

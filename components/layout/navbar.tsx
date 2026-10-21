@@ -11,6 +11,7 @@ import { getDictionary, Locale, useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 import { QuickAddHabitModal } from "@/components/dashboard/quick-add-habit-modal"
 import { Icons } from "@/components/icons"
+import { NavigationPending } from "@/components/layout/navigation-pending"
 import { UserNavDisplay } from "@/components/user/user-nav-display"
 
 interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -87,11 +88,12 @@ export default function Navbar({
   return (
     <>
       <header className="sticky top-0 z-40 w-full select-none border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <nav className="mx-auto flex h-16 items-center justify-between px-4 sm:px-6 md:px-8 max-w-4xl">
+        <nav className="mx-auto flex h-16 max-w-4xl items-center justify-between px-4 sm:px-6 md:px-8">
           {/* Brand */}
           <div className="flex items-center gap-6">
             <Link
               href={variant === "public" ? "/" : "/dashboard"}
+              aria-label={dict.nav.brand || siteConfig.name}
               className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Image
@@ -103,7 +105,7 @@ export default function Navbar({
                 priority
                 className="h-8 w-8 rounded-lg shadow-sm"
               />
-              <span className="text-base font-bold tracking-tight text-foreground">
+              <span className="hidden text-base font-bold tracking-tight text-foreground min-[360px]:inline">
                 {dict.nav.brand || siteConfig.name}
               </span>
             </Link>
@@ -124,12 +126,13 @@ export default function Navbar({
                     rel={item.external ? "noreferrer" : undefined}
                     aria-current={isActive ? "page" : undefined}
                     className={cn(
-                      "min-h-11 rounded-lg px-3 py-3 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "inline-flex min-h-11 items-center gap-2 rounded-lg px-3 py-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       isActive
                         ? "bg-muted font-semibold text-foreground"
                         : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
                     )}
                   >
+                    <NavigationPending />
                     {item.title}
                   </Link>
                 )
@@ -145,7 +148,7 @@ export default function Navbar({
               trigger={
                 <button
                   type="button"
-                  className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 active:bg-primary/80"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 active:bg-primary/80"
                 >
                   <Icons.add className="h-3.5 w-3.5" />
                   <span>{dict.nav.actions.addItem}</span>
@@ -186,13 +189,15 @@ export default function Navbar({
                 href={item.href}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-[11px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  "flex min-h-14 flex-col items-center justify-center gap-1 rounded-lg px-2 py-2 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   isActive
                     ? "text-primary"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <NavigationPending>
+                  <Icon className="h-5 w-5" />
+                </NavigationPending>
                 <span>{item.title}</span>
               </Link>
             )

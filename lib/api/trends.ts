@@ -1,4 +1,5 @@
 import { CheckInStatus, EnergyLevel, ItemType } from "@/types"
+import type { Item } from "@prisma/client"
 
 import { getUserTimeZone } from "@/lib/api/user-date"
 import { db } from "@/lib/db"
@@ -84,12 +85,16 @@ export interface ItemTrendData {
 export async function getItemTrendData(
   itemId: string,
   userId: string,
-  rangeDays: number = 30
+  rangeDays: number = 30,
+  preloadedItem?: Item,
+  preloadedTimeZone?: string
 ): Promise<ItemTrendData | null> {
-  const item = await db.item.findFirst({ where: { id: itemId, userId } })
+  const item =
+    preloadedItem ||
+    (await db.item.findFirst({ where: { id: itemId, userId } }))
   if (!item || item.type === "TODO") return null
 
-  const timeZone = await getUserTimeZone(userId)
+  const timeZone = preloadedTimeZone || (await getUserTimeZone(userId))
   const endDateStr = formatDateInTimeZone(new Date(), timeZone)
   const requestedStart = addCalendarDays(endDateStr, -(rangeDays - 1))
   const createdDate = createdAtCalendarDate(item.createdAt, timeZone)
@@ -189,9 +194,7 @@ export async function getItemTrendData(
       ? countScheduledOpportunities(startDateStr, endDateStr, item)
       : dates.length
   const positiveDays =
-    item.type === "QUIT_HABIT"
-      ? totalKeptDays
-      : totalCompleted + totalRestDays
+    item.type === "QUIT_HABIT" ? totalKeptDays : totalCompleted + totalRestDays
 
   return {
     itemId: item.id,
