@@ -396,7 +396,9 @@ export function HabitItem({
           })
         : item.recommendedAction
   const checkedLabel =
-    checkInStatus === "REST"
+    item.type === "QUIT_HABIT"
+      ? checkInStatus === "KEPT" ? itemCopy.quitKeptDone : itemCopy.quitLapsedDone
+      : checkInStatus === "REST"
       ? itemCopy.restButton
       : checkInStatus === "COMPLETED" || checkInStatus === "KEPT"
         ? itemCopy.doneButton
@@ -547,12 +549,14 @@ export function HabitItem({
                 {checkedLabel}
               </button>
             ) : (
-              <>
+              <div className="flex flex-col gap-2">
+                <span className="text-xs text-muted-foreground">{itemCopy.quitQuestion}</span>
+                <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={(e) => handleQuitStatus("KEPT", e)}
                   disabled={isLoading}
-                  className="min-h-11 flex-1 rounded-xl border border-emerald-700 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 dark:border-emerald-500 dark:bg-emerald-950 dark:text-emerald-200"
+                  className="min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border border-emerald-700 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60 dark:border-emerald-500 dark:bg-emerald-950 dark:text-emerald-200"
                 >
                   {itemCopy.quitKeptButton}
                 </button>
@@ -560,11 +564,12 @@ export function HabitItem({
                   type="button"
                   onClick={(e) => handleQuitStatus("LAPSED", e)}
                   disabled={isLoading}
-                  className="min-h-11 flex-1 rounded-xl border border-input px-3 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                  className="min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border border-input px-3 py-2 text-sm font-medium hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
                 >
                   {itemCopy.quitLapsedButton}
                 </button>
-              </>
+                </div>
+              </div>
             ))}
           {item.type === "TODO" && (
             <button
