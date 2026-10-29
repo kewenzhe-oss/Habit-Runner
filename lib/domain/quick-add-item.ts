@@ -8,6 +8,7 @@ export type QuickAddFrequency = "DAILY" | "WEEKDAYS" | "3_4_TIMES" | "WEEKENDS"
 
 export type QuickAddFormState = {
   priority: ItemPriority
+  locale?: "zh" | "en"
   title: string
   whyPrompt: string
   type: QuickAddItemType
@@ -45,6 +46,7 @@ export function buildQuickAddItemPayload(
           : "#10B981",
   }
 
+  const zh = state.locale !== "en"
   if (state.type === "HABIT") {
     const frequencyMap: Record<
       QuickAddFrequency,
@@ -57,7 +59,14 @@ export function buildQuickAddItemPayload(
     }
     const frequency = frequencyMap[state.targetFrequency]
     const effectiveUnitLabel =
-      state.unitLabel.trim() || (state.unitType === "TIME" ? "分钟" : "个")
+      state.unitLabel.trim() ||
+      (state.unitType === "TIME"
+        ? zh
+          ? "分钟"
+          : "minutes"
+        : zh
+          ? "个"
+          : "items")
     const effectiveTarget =
       state.unitType === "BINARY" ? null : Number(state.targetAmount) || 1
     const unitMeta = JSON.stringify({
@@ -66,19 +75,27 @@ export function buildQuickAddItemPayload(
       unitLabel: effectiveUnitLabel,
     })
     const triggerPrefix = state.triggerCue.trim()
-      ? `[触发：${state.triggerCue.trim()}] `
+      ? zh
+        ? `[触发：${state.triggerCue.trim()}] `
+        : `[Cue: ${state.triggerCue.trim()}] `
       : ""
     const highTarget =
       state.unitType === "BINARY"
-        ? "深度完成"
+        ? zh
+          ? "深度完成"
+          : "A deeper session"
         : `${Math.round((state.targetAmount || 20) * 1.2)} ${effectiveUnitLabel}`
     const normalTarget =
       state.unitType === "BINARY"
-        ? "标准完成"
+        ? zh
+          ? "标准完成"
+          : "Completed"
         : `${state.targetAmount || 20} ${effectiveUnitLabel}`
     const lowTarget =
       state.unitType === "BINARY"
-        ? "3分钟微行动"
+        ? zh
+          ? "3分钟微行动"
+          : "A small step"
         : `${Math.max(1, Math.round((state.targetAmount || 20) * 0.3))} ${effectiveUnitLabel}`
 
     payload.frequencyDays = frequency.days
@@ -90,50 +107,64 @@ export function buildQuickAddItemPayload(
     payload.actionPresets = [
       {
         energyLevel: "HIGH",
-        actionText: `${triggerPrefix}充沛推进：${state.title.trim()} (${highTarget})`,
+        actionText: `${triggerPrefix}${zh ? "充沛推进" : "More energy"}：${state.title.trim()} (${highTarget})`,
         description: unitMeta,
       },
       {
         energyLevel: "NORMAL",
-        actionText: `${triggerPrefix}标准执行：${state.title.trim()} (${normalTarget})`,
+        actionText: `${triggerPrefix}${zh ? "标准执行" : "Regular pace"}：${state.title.trim()} (${normalTarget})`,
         description: unitMeta,
       },
       {
         energyLevel: "LOW",
-        actionText: `微小连接：${state.title.trim()} (${lowTarget})`,
+        actionText: `${zh ? "微小连接" : "Small step"}：${state.title.trim()} (${lowTarget})`,
         description: unitMeta,
       },
       {
         energyLevel: "REST",
-        actionText: "有意识休整恢复与蓄能",
+        actionText: zh ? "有意识休整恢复与蓄能" : "Rest and recharge",
         description: unitMeta,
       },
     ]
   } else if (state.type === "QUIT_HABIT") {
     const contextDescription = state.contextTags.trim()
-      ? `情境诱因：${state.contextTags.trim()}`
+      ? `${zh ? "情境诱因" : "Trigger"}：${state.contextTags.trim()}`
       : ""
     const windowDescription = state.highRiskWindow.trim()
-      ? `高风险时段：${state.highRiskWindow.trim()}`
+      ? `${zh ? "高风险时段" : "High-risk time"}：${state.highRiskWindow.trim()}`
       : ""
 
     payload.quitContext = state.contextTags.trim() || null
     payload.highRiskWindow = state.highRiskWindow.trim() || null
     payload.actionPresets = [
-      { energyLevel: "HIGH", actionText: "全天平稳自律，无冲动发生" },
+      {
+        energyLevel: "HIGH",
+        actionText: zh
+          ? "全天平稳自律，无冲动发生"
+          : "Notice and manage urges throughout the day",
+      },
       {
         energyLevel: "NORMAL",
         actionText: windowDescription
-          ? `重点注意 ${windowDescription}`
-          : "识别诱因并主动远离",
+          ? `${zh ? "重点注意" : "Pay attention to"} ${windowDescription}`
+          : zh
+            ? "识别诱因并主动远离"
+            : "Notice triggers and step away",
       },
       {
         energyLevel: "LOW",
         actionText: contextDescription
-          ? `在 ${contextDescription} 中保持觉察与停顿`
-          : "觉察当下冲动，深呼吸暂停",
+          ? zh
+            ? `在 ${contextDescription} 中保持觉察与停顿`
+            : `Pause and notice: ${contextDescription}`
+          : zh
+            ? "觉察当下冲动，深呼吸暂停"
+            : "Notice the urge, breathe and pause",
       },
-      { energyLevel: "REST", actionText: "身心放松与主动减压" },
+      {
+        energyLevel: "REST",
+        actionText: zh ? "身心放松与主动减压" : "Take time to relax and unwind",
+      },
     ]
   } else {
     payload.dueDate = state.dueDate || undefined
@@ -141,7 +172,12 @@ export function buildQuickAddItemPayload(
   }
 
   if (state.toolUrl.trim()) {
-    payload.toolLinks = [{ title: "打开关联工具", url: state.toolUrl.trim() }]
+    payload.toolLinks = [
+      {
+        title: zh ? "打开关联工具" : "Open linked tool",
+        url: state.toolUrl.trim(),
+      },
+    ]
   }
 
   return payload

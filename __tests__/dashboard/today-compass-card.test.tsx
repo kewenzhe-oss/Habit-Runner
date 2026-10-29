@@ -111,7 +111,7 @@ describe("TodayCompassCard", () => {
     expect(screen.getByText(/今日主动休整/)).toBeInTheDocument()
   })
 
-  test("always shows the daily wisdom quote and supports copy and shuffle", async () => {
+  test("reveals the daily wisdom quote and supports copy and shuffle", async () => {
     const writeText = jest.fn().mockResolvedValue(undefined)
     const user = userEvent.setup({ writeToClipboard: false })
     Object.defineProperty(navigator, "clipboard", {
@@ -129,10 +129,9 @@ describe("TodayCompassCard", () => {
     const blockquote = container.querySelector("blockquote")
     expect(blockquote).toBeInTheDocument()
     expect(blockquote?.textContent).toBeTruthy()
-    expect(screen.getByRole("heading", { name: "每日灵感" })).toBeVisible()
-    expect(
-      screen.queryByRole("button", { name: "每日灵感" })
-    ).not.toBeInTheDocument()
+    expect(blockquote).not.toBeVisible()
+    await user.click(screen.getByText("每日灵感"))
+    expect(blockquote).toBeVisible()
 
     const copyButton = screen.getByRole("button", { name: /复制金句/i })
     await user.click(copyButton)

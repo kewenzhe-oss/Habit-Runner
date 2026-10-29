@@ -63,4 +63,15 @@ describe("quick-add item payload", () => {
       todoRecurrence: "WEEKLY",
     })
   })
+  it("uses English for generated guidance when the form is in English", () => {
+    const payload = buildQuickAddItemPayload({
+      ...shared,
+      locale: "en",
+      type: "HABIT",
+      unitLabel: "pages",
+    })
+    expect(payload.actionPresets?.[1].actionText).toContain("Regular pace")
+    expect(payload.actionPresets?.[3].actionText).toBe("Rest and recharge")
+    expect(payload.toolLinks?.[0].title).toBe("Open linked tool")
+  })
 })

@@ -357,7 +357,7 @@ export function ItemDetailView({
 
                     {/* Reflection and notes */}
                     {c.notes && (
-                      <blockquote className="rounded-lg border-l-2 border-primary/40 bg-muted/30 px-3 py-2 text-[11px] italic text-muted-foreground leading-relaxed">
+                      <blockquote className="rounded-lg bg-muted/30 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
                         “{c.notes}”
                       </blockquote>
                     )}

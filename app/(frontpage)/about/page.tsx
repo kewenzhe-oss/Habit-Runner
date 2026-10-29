@@ -258,7 +258,7 @@ export default function AboutPage() {
               estimate. When samples are too small, the product favors “data is
               still accumulating” over a confident growth judgment.
             </p>
-            <div className="rounded-xl border-l-4 border-l-primary bg-muted/40 p-5 text-sm leading-6 text-foreground">
+            <div className="rounded-xl bg-muted/40 p-5 text-sm leading-6 text-foreground">
               A connection rate or trend is evidence about recorded behavior in
               a defined period. It is not a complete description of a person,
               their health, or the value of their life.

@@ -3,6 +3,7 @@ import { render, screen, waitFor } from "@testing-library/react"
 import {
   PENDING_NEW_ITEM_KEY,
   savePendingNewItem,
+  saveQuickAddTransfer,
 } from "@/lib/pending-new-item"
 import { RestorableNewItemForm } from "@/components/items/restorable-new-item-form"
 
@@ -41,6 +42,7 @@ const payload = {
 describe("restorable new-item flow", () => {
   beforeEach(() => {
     localStorage.clear()
+    sessionStorage.clear()
     mockReplace.mockClear()
     mockRefresh.mockClear()
     mockToast.mockClear()
@@ -63,7 +65,7 @@ describe("restorable new-item flow", () => {
     )
     expect(localStorage.getItem(PENDING_NEW_ITEM_KEY)).toBeNull()
     expect(mockToast).toHaveBeenCalledWith(
-      expect.objectContaining({ title: "已为你保存刚才填写的事项" })
+      expect.objectContaining({ title: "你的承诺已保存" })
     )
   })
 
@@ -87,5 +89,14 @@ describe("restorable new-item flow", () => {
         description: "目标量需要调整",
       })
     )
+  })
+  it("opens a transferred draft for editing without creating an item", async () => {
+    expect(saveQuickAddTransfer(payload)).toBe(true)
+    render(<RestorableNewItemForm restore={false} transfer />)
+    expect(await screen.findByTestId("item-form")).toHaveTextContent(
+      payload.title
+    )
+    expect(global.fetch).not.toHaveBeenCalled()
+    expect(sessionStorage.getItem("quick_add_transfer_draft")).not.toBeNull()
   })
 })

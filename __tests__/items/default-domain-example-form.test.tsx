@@ -48,6 +48,15 @@ describe("life-layer default URL examples", () => {
     )
   })
 
+  it("allows the target to be cleared before entering a new value", () => {
+    render(<ItemForm mode="create" />)
+    const target = screen.getByLabelText("目标量 *")
+    fireEvent.change(target, { target: { value: "" } })
+    expect(target).toHaveValue(null)
+    fireEvent.change(target, { target: { value: "2222" } })
+    expect(target).toHaveValue(2222)
+  })
+
   it("fills an empty full-form URL with Enter and tracks it as a recommendation", () => {
     render(<ItemForm mode="create" />)
 
@@ -80,8 +89,8 @@ describe("life-layer default URL examples", () => {
     )
 
     fireEvent.click(screen.getByRole("button", { name: "打开快速新建" }))
-    fireEvent.click(screen.getByRole("button", { name: "决策与方向" }))
     fireEvent.click(screen.getByText("更多补充配置（动机、触发提示、分类等）"))
+    fireEvent.click(screen.getByRole("button", { name: "决策与方向" }))
 
     expect(
       screen.getByLabelText("关联外部工具 HTTPS 网址 (可选)")

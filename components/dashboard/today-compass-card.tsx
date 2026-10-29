@@ -168,22 +168,10 @@ export function TodayCompassCard({
     <Card
       data-completion-state={state.toLowerCase()}
       className={cn(
-        "relative overflow-hidden rounded-2xl border-border bg-gradient-to-br from-card to-muted/20 p-4 sm:p-5",
+        "relative rounded-xl border-border bg-card p-4 sm:p-5",
         state === "COMPLETED" && "border-emerald-500/25"
       )}
     >
-      {state === "COMPLETED" && (
-        <>
-          <span
-            aria-hidden="true"
-            className="motion-safe:animate-compass-glow pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-gradient-to-br from-emerald-300/30 via-amber-200/20 to-transparent blur-2xl"
-          />
-          <span
-            aria-hidden="true"
-            className="motion-safe:animate-compass-sheen pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-          />
-        </>
-      )}
       <div className="relative space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
           <span
@@ -197,7 +185,7 @@ export function TodayCompassCard({
             )}
           >
             {state === "COMPLETED" ? (
-              <span className="motion-safe:animate-compass-badge inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950">
                 <Icons.check aria-hidden="true" className="h-3.5 w-3.5" />
               </span>
             ) : state === "REST" ? (
@@ -300,14 +288,10 @@ export function TodayCompassCard({
           </div>
         </div>
 
-        <section
-          aria-labelledby="today-wisdom-title"
-          className="rounded-xl border border-border/70 bg-muted/20 px-3 py-3 sm:px-4"
-        >
-          <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Icons.quotes aria-hidden="true" className="h-4 w-4" />
-            <h3 id="today-wisdom-title">{compassDict.dailyWisdom}</h3>
-          </div>
+        <details className="border-t pt-2 text-sm">
+          <summary className="min-h-11 cursor-pointer py-3 font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            {compassDict.dailyWisdom}
+          </summary>
           <div
             className={cn(
               "transition-[opacity,transform] duration-300 ease-out motion-reduce:transform-none",
@@ -359,7 +343,7 @@ export function TodayCompassCard({
               </div>
             </div>
           </div>
-        </section>
+        </details>
       </div>
     </Card>
   )

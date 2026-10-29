@@ -1,10 +1,12 @@
 import { Metadata } from "next"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
 import { env } from "@/env.mjs"
 import { buildSignInUrl, resolvePostSignInPath } from "@/lib/auth-redirect"
 import { getDictionary } from "@/lib/i18n"
 import { PRIVATE_ROBOTS } from "@/lib/seo"
+import { getCurrentUser } from "@/lib/session"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 import { Icons } from "@/components/icons"
@@ -29,6 +31,8 @@ export default async function Signup({ searchParams }: SignupProps) {
   const dict = getDictionary("en")
   const params = searchParams ? await searchParams : {}
   const callbackUrl = resolvePostSignInPath(params)
+  const user = await getCurrentUser()
+  if (user) redirect(callbackUrl)
 
   return (
     <main className="container flex h-screen w-screen flex-col items-center justify-center">

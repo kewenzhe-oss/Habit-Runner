@@ -9,6 +9,7 @@ import {
   clearPendingNewItem,
   PendingNewItemPayload,
   readPendingNewItem,
+  readQuickAddTransfer,
 } from "@/lib/pending-new-item"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "@/components/ui/use-toast"
@@ -18,6 +19,7 @@ import { ItemForm } from "./item-form"
 
 interface RestorableNewItemFormProps {
   restore: boolean
+  transfer?: boolean
 }
 
 type DraftState = PendingNewItemPayload | null | undefined
@@ -26,13 +28,24 @@ function removeRestoreQuery() {
   window.history.replaceState(null, "", "/items/new")
 }
 
-export function RestorableNewItemForm({ restore }: RestorableNewItemFormProps) {
+export function RestorableNewItemForm({
+  restore,
+  transfer = false,
+}: RestorableNewItemFormProps) {
   const router = useRouter()
   const { dict } = useI18n()
   const [draft, setDraft] = React.useState<DraftState>(
-    restore ? undefined : null
+    restore || transfer ? undefined : null
   )
+  const [transferCategory, setTransferCategory] = React.useState("")
   const didRestore = React.useRef(false)
+
+  React.useEffect(() => {
+    if (!transfer || restore) return
+    const transferred = readQuickAddTransfer()
+    setTransferCategory(transferred?.customCategoryInput || "")
+    setDraft(transferred?.payload || null)
+  }, [transfer, restore])
 
   React.useEffect(() => {
     if (!restore || didRestore.current) return
@@ -136,5 +149,11 @@ export function RestorableNewItemForm({ restore }: RestorableNewItemFormProps) {
     )
   }
 
-  return <ItemForm mode="create" initialDraft={draft || undefined} />
+  return (
+    <ItemForm
+      mode="create"
+      initialDraft={draft || undefined}
+      initialCustomCategory={transferCategory}
+    />
+  )
 }

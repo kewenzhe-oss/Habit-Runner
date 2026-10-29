@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
 import { withAuth } from "next-auth/middleware"
 
-import { buildSignInUrl, getSafeRedirectPath } from "@/lib/auth-redirect"
+import { buildSignInUrl } from "@/lib/auth-redirect"
 
 export default withAuth(
   async function middleware(req) {
@@ -12,17 +12,9 @@ export default withAuth(
       req.nextUrl.pathname.startsWith("/signin") ||
       req.nextUrl.pathname.startsWith("/signup")
 
-    if (isAuthPage) {
-      if (isAuth) {
-        return NextResponse.redirect(
-          new URL(
-            getSafeRedirectPath(req.nextUrl.searchParams.get("redirect")),
-            req.url
-          )
-        )
-      }
-      return null
-    }
+    // A signed token may outlive the user record (for example after changing
+    // databases). Let the sign-in page check the actual user before redirecting.
+    if (isAuthPage) return null
 
     if (!isAuth) {
       let from = req.nextUrl.pathname

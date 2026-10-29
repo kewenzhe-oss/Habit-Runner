@@ -59,7 +59,7 @@
     "expandArchived": "展开更早已归档待办 (+{count})",
     "collapseArchived": "收起归档待办",
     "viewHistoryArchive": "前往历史库查看全部",
-    "completedCount": "已办结 {count} 项",
+    "completedCount": "已记录 {count} 项",
     "noPendingTodos": "待办任务已全部清空，太棒了。",
     "noHabits": "还没有添加日常。先建一个简单的行动吧。",
     "noMatchingHabits": "当前筛选下没有日常行动。"

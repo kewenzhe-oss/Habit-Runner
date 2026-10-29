@@ -13,7 +13,11 @@ import {
   QuickAddUnitType,
 } from "@/lib/domain/quick-add-item"
 import { useI18n } from "@/lib/i18n"
-import { readPendingNewItem, savePendingNewItem } from "@/lib/pending-new-item"
+import {
+  readPendingNewItem,
+  savePendingNewItem,
+  saveQuickAddTransfer,
+} from "@/lib/pending-new-item"
 import { cn } from "@/lib/utils"
 import { itemCreateSchema } from "@/lib/validations/item"
 import { Button } from "@/components/ui/button"
@@ -64,7 +68,7 @@ export function QuickAddHabitModal({
   const [title, setTitle] = React.useState("")
   const [priority, setPriority] = React.useState<ItemPriority>("NORMAL")
   const [unitType, setUnitType] = React.useState<HabitUnitType>("TIME")
-  const [targetAmount, setTargetAmount] = React.useState<number>(20)
+  const [targetAmount, setTargetAmount] = React.useState("20")
   const [dueDate, setDueDate] = React.useState("")
   const [selectedLayer, setSelectedLayer] = React.useState<Layer>("LIFE")
 
@@ -74,7 +78,9 @@ export function QuickAddHabitModal({
   const [targetFrequency, setTargetFrequency] = React.useState<
     "DAILY" | "WEEKDAYS" | "3_4_TIMES" | "WEEKENDS"
   >("DAILY")
-  const [unitLabel, setUnitLabel] = React.useState("分钟")
+  const [unitLabel, setUnitLabel] = React.useState(
+    locale === "zh" ? "分钟" : "minutes"
+  )
   const [contextTags, setContextTags] = React.useState("")
   const [highRiskWindow, setHighRiskWindow] = React.useState("")
   const [todoRecurring, setTodoRecurring] = React.useState<
@@ -131,8 +137,8 @@ export function QuickAddHabitModal({
     setTriggerCue("")
     setTargetFrequency("DAILY")
     setUnitType("TIME")
-    setTargetAmount(20)
-    setUnitLabel("分钟")
+    setTargetAmount("20")
+    setUnitLabel(locale === "zh" ? "分钟" : "minutes")
     setContextTags("")
     setHighRiskWindow("")
     setDueDate("")
@@ -143,7 +149,10 @@ export function QuickAddHabitModal({
   const setQuickDate = (daysFromToday: number) => {
     const d = new Date()
     d.setDate(d.getDate() + daysFromToday)
-    setDueDate(d.toISOString().split("T")[0])
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    setDueDate(`${year}-${month}-${day}`)
   }
 
   // Handle Form Submission
@@ -159,7 +168,9 @@ export function QuickAddHabitModal({
     if (
       type === "HABIT" &&
       unitType !== "BINARY" &&
-      (!targetAmount || targetAmount <= 0)
+      (!targetAmount ||
+        !Number.isFinite(Number(targetAmount)) ||
+        Number(targetAmount) <= 0)
     ) {
       return toast({
         title:
@@ -188,6 +199,7 @@ export function QuickAddHabitModal({
       (category) => category.name === finalCategory
     )?.id
     const formState = {
+      locale,
       priority,
       title,
       whyPrompt,
@@ -196,7 +208,7 @@ export function QuickAddHabitModal({
       finalCategory,
       categoryId: initialCategoryId,
       unitType,
-      targetAmount,
+      targetAmount: Number(targetAmount),
       unitLabel,
       targetFrequency,
       triggerCue,
@@ -275,7 +287,13 @@ export function QuickAddHabitModal({
       })
 
       if (res.status === 401) {
-        savePendingNewItem(payload)
+        if (!savePendingNewItem(payload)) {
+          throw new Error(
+            locale === "zh"
+              ? "无法暂存填写内容，请允许浏览器使用本地存储后重试。"
+              : "Your draft could not be saved. Allow local browser storage and try again."
+          )
+        }
         setOpen(false)
         router.push(buildSignInUrl("/items/new?restore=1"))
         return
@@ -292,7 +310,7 @@ export function QuickAddHabitModal({
       }
 
       toast({
-        title: locale === "zh" ? "已创建新事项" : "Item Created",
+        title: locale === "zh" ? "承诺已保存" : "Promise saved",
         description: `“${title.trim()}” ${locale === "zh" ? "已加入你的行动列表。" : "has been added to your actions."}`,
       })
 
@@ -337,10 +355,15 @@ export function QuickAddHabitModal({
               <Label className="text-sm font-semibold text-foreground">
                 {dict.form.fields.itemType}
               </Label>
-              <div className="grid grid-cols-3 gap-1.5 rounded-lg border bg-muted/30 p-1">
+              <div
+                role="group"
+                aria-label={dict.form.fields.itemType}
+                className="grid grid-cols-3 gap-1.5 rounded-lg border bg-muted/30 p-1"
+              >
                 <button
                   type="button"
                   onClick={() => setType("HABIT")}
+                  aria-pressed={type === "HABIT"}
                   className={cn(
                     "flex min-h-11 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-all",
                     type === "HABIT"
@@ -355,6 +378,7 @@ export function QuickAddHabitModal({
                 <button
                   type="button"
                   onClick={() => setType("QUIT_HABIT")}
+                  aria-pressed={type === "QUIT_HABIT"}
                   className={cn(
                     "flex min-h-11 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-all",
                     type === "QUIT_HABIT"
@@ -369,6 +393,7 @@ export function QuickAddHabitModal({
                 <button
                   type="button"
                   onClick={() => setType("TODO")}
+                  aria-pressed={type === "TODO"}
                   className={cn(
                     "flex min-h-11 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-semibold transition-all",
                     type === "TODO"
@@ -405,18 +430,13 @@ export function QuickAddHabitModal({
                       ? dict.form.fields.quitPlaceholder
                       : dict.form.fields.todoPlaceholder
                 }
-                autoFocus
-                className="text-base sm:text-sm"
+                required
+                maxLength={64}
+                className="min-h-11 text-base sm:text-sm"
               />
             </div>
 
             {/* 3. TYPE-SPECIFIC MINIMUM FIELDS */}
-            <ItemPrioritySelector
-              value={priority}
-              onChange={setPriority}
-              disabled={isLoading}
-            />
-
             {/* A. HABIT: Unit Type + Target Amount */}
             {type === "HABIT" && (
               <div className="space-y-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
@@ -436,9 +456,12 @@ export function QuickAddHabitModal({
                       type="button"
                       onClick={() => {
                         setUnitType(u.id as HabitUnitType)
-                        if (u.id === "TIME") setUnitLabel("分钟")
-                        if (u.id === "COUNT") setUnitLabel("个")
+                        if (u.id === "TIME")
+                          setUnitLabel(locale === "zh" ? "分钟" : "minutes")
+                        if (u.id === "COUNT")
+                          setUnitLabel(locale === "zh" ? "个" : "items")
                       }}
+                      aria-pressed={unitType === u.id}
                       className={cn(
                         "min-h-11 rounded-md border py-2 text-center text-sm font-medium transition-all",
                         unitType === u.id
@@ -465,25 +488,67 @@ export function QuickAddHabitModal({
                         id="quick-target-amount"
                         type="number"
                         inputMode="decimal"
-                        min="1"
+                        min="0.01"
+                        max="1000000"
+                        step="any"
+                        required
                         value={targetAmount}
-                        onChange={(e) =>
-                          setTargetAmount(Number(e.target.value) || 0)
-                        }
+                        onChange={(e) => setTargetAmount(e.target.value)}
                         className="h-11 bg-background pr-12 text-base font-semibold sm:text-sm"
                       />
-                      <span className="absolute right-2.5 top-1.5 text-sm text-muted-foreground">
-                        {unitType === "TIME"
-                          ? locale === "zh"
-                            ? "分钟"
-                            : "mins"
-                          : locale === "zh"
-                            ? "个"
-                            : "items"}
+                      <span className="absolute right-2.5 top-1.5 max-w-16 truncate text-sm text-muted-foreground">
+                        {unitLabel ||
+                          (unitType === "TIME"
+                            ? locale === "zh"
+                              ? "分钟"
+                              : "minutes"
+                            : locale === "zh"
+                              ? "个"
+                              : "items")}
                       </span>
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {type === "HABIT" && (
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-foreground">
+                  {dict.form.fields.freqTitle}
+                </Label>
+                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+                  {[
+                    { id: "DAILY", label: dict.form.fields.freqDaily },
+                    {
+                      id: "WEEKDAYS",
+                      label: dict.form.fields.freqWeekdays,
+                    },
+                    {
+                      id: "3_4_TIMES",
+                      label: dict.form.fields.freqTimes,
+                    },
+                    {
+                      id: "WEEKENDS",
+                      label: dict.form.fields.freqWeekends,
+                    },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setTargetFrequency(f.id as any)}
+                      aria-pressed={targetFrequency === f.id}
+                      className={cn(
+                        "min-h-11 rounded-md border px-2 py-2 text-center text-sm font-medium transition-all",
+                        targetFrequency === f.id
+                          ? "border-primary bg-primary font-semibold text-primary-foreground"
+                          : "border-border bg-background text-muted-foreground hover:bg-muted"
+                      )}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
 
@@ -538,42 +603,9 @@ export function QuickAddHabitModal({
               </div>
             )}
 
-            {/* 4. Life Layer (Optional, De-emphasized Compact Selector) */}
-            <div className="space-y-1.5 pt-0.5">
-              <div className="flex items-center justify-between text-sm">
-                <Label className="font-normal text-muted-foreground">
-                  {dict.form.fields.layerTitle}
-                </Label>
-                <span className="text-xs text-muted-foreground">
-                  {dict.form.fields.optionalTag}
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {LAYER_LIST.map((l) => (
-                  <button
-                    key={l.key}
-                    type="button"
-                    onClick={() => setSelectedLayer(l.key as Layer)}
-                    className={cn(
-                      "flex min-h-11 items-center gap-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
-                      selectedLayer === l.key
-                        ? "border-primary bg-primary/10 font-semibold text-primary ring-1 ring-primary/40"
-                        : "border-border/70 bg-background text-muted-foreground hover:bg-muted"
-                    )}
-                  >
-                    <span
-                      className="h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: l.color }}
-                    />
-                    <span>{locale === "zh" ? l.zhLabel : l.label}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* 5. ADVANCED / OPTIONAL SECTION (Collapsed Accordion) */}
             <details className="group rounded-lg border border-border/70 bg-muted/15 text-sm transition-all">
-              <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between px-3 py-2 font-medium text-muted-foreground transition-colors hover:text-foreground">
                 <div className="flex items-center gap-1.5">
                   <Icons.settings className="h-3.5 w-3.5 text-muted-foreground" />
                   <span>{dict.form.fields.moreOptionsTitle}</span>
@@ -582,6 +614,50 @@ export function QuickAddHabitModal({
               </summary>
 
               <div className="space-y-3 border-t border-border/50 p-3 pt-2.5">
+                <ItemPrioritySelector
+                  value={priority}
+                  onChange={setPriority}
+                  disabled={isLoading}
+                />
+
+                {/* 4. Life Layer (Optional, De-emphasized Compact Selector) */}
+                <div className="space-y-1.5 pt-0.5">
+                  <div className="flex items-center justify-between text-sm">
+                    <Label className="font-normal text-muted-foreground">
+                      {dict.form.fields.layerTitle}
+                    </Label>
+                    <span className="text-xs text-muted-foreground">
+                      {dict.form.fields.optionalTag}
+                    </span>
+                  </div>
+                  <div
+                    role="group"
+                    aria-label={dict.form.fields.layerTitle}
+                    className="flex flex-wrap gap-1"
+                  >
+                    {LAYER_LIST.map((l) => (
+                      <button
+                        key={l.key}
+                        type="button"
+                        onClick={() => setSelectedLayer(l.key as Layer)}
+                        aria-pressed={selectedLayer === l.key}
+                        className={cn(
+                          "flex min-h-11 items-center gap-1 rounded-md border px-3 py-2 text-sm font-medium transition-colors",
+                          selectedLayer === l.key
+                            ? "border-primary bg-primary/10 font-semibold text-primary ring-1 ring-primary/40"
+                            : "border-border/70 bg-background text-muted-foreground hover:bg-muted"
+                        )}
+                      >
+                        <span
+                          className="h-1.5 w-1.5 shrink-0 rounded-full"
+                          style={{ backgroundColor: l.color }}
+                        />
+                        <span>{locale === "zh" ? l.zhLabel : l.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Motivation / Why Prompt */}
                 <div className="space-y-1">
                   <Label
@@ -620,43 +696,6 @@ export function QuickAddHabitModal({
                         placeholder={dict.form.fields.triggerPlaceholder}
                         className="h-11 text-base sm:text-sm"
                       />
-                    </div>
-
-                    <div className="space-y-1">
-                      <Label className="text-xs font-medium text-foreground">
-                        {dict.form.fields.freqTitle}
-                      </Label>
-                      <div className="grid grid-cols-4 gap-1">
-                        {[
-                          { id: "DAILY", label: dict.form.fields.freqDaily },
-                          {
-                            id: "WEEKDAYS",
-                            label: dict.form.fields.freqWeekdays,
-                          },
-                          {
-                            id: "3_4_TIMES",
-                            label: dict.form.fields.freqTimes,
-                          },
-                          {
-                            id: "WEEKENDS",
-                            label: dict.form.fields.freqWeekends,
-                          },
-                        ].map((f) => (
-                          <button
-                            key={f.id}
-                            type="button"
-                            onClick={() => setTargetFrequency(f.id as any)}
-                            className={cn(
-                              "min-h-11 rounded-md border px-2 py-2 text-center text-sm font-medium transition-all",
-                              targetFrequency === f.id
-                                ? "border-primary bg-primary font-semibold text-primary-foreground"
-                                : "border-border bg-background text-muted-foreground hover:bg-muted"
-                            )}
-                          >
-                            {f.label}
-                          </button>
-                        ))}
-                      </div>
                     </div>
 
                     {unitType !== "BINARY" && (
@@ -736,6 +775,7 @@ export function QuickAddHabitModal({
                           key={r.id}
                           type="button"
                           onClick={() => setTodoRecurring(r.id as any)}
+                          aria-pressed={todoRecurring === r.id}
                           className={cn(
                             "min-h-11 rounded-md border px-2 py-2 text-center text-sm font-medium transition-all",
                             todoRecurring === r.id
@@ -752,7 +792,10 @@ export function QuickAddHabitModal({
 
                 {/* Category Selection */}
                 <div className="space-y-1">
-                  <Label className="text-xs font-medium text-foreground">
+                  <Label
+                    htmlFor="quick-custom-category"
+                    className="text-sm font-medium text-foreground"
+                  >
                     {dict.form.fields.customCategoryTitle}
                   </Label>
                   {categories.length > 0 && (
@@ -765,6 +808,9 @@ export function QuickAddHabitModal({
                             setSelectedCategoryName(cat.name)
                             setCustomCatInput("")
                           }}
+                          aria-pressed={
+                            selectedCategoryName === cat.name && !customCatInput
+                          }
                           className={cn(
                             "min-h-11 rounded-md border px-3 py-2 text-sm transition-colors",
                             selectedCategoryName === cat.name && !customCatInput
@@ -778,6 +824,8 @@ export function QuickAddHabitModal({
                     </div>
                   )}
                   <Input
+                    id="quick-custom-category"
+                    maxLength={32}
                     value={customCatInput}
                     onChange={(e) => setCustomCatInput(e.target.value)}
                     placeholder={dict.form.fields.customCategoryPlaceholder}
@@ -806,8 +854,58 @@ export function QuickAddHabitModal({
 
           <DialogFooter className="-mx-4 -mb-4 flex shrink-0 flex-wrap items-center justify-between gap-2 border-t bg-background px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-6 sm:-mb-6 sm:flex-row sm:px-6 sm:pb-6">
             <Link
-              href="/items/new"
-              onClick={() => setOpen(false)}
+              href="/items/new?draft=1"
+              onClick={(event) => {
+                const finalCategory =
+                  customCatInput.trim() ||
+                  selectedCategoryName.trim() ||
+                  (locale === "zh" ? "生活日常" : "Daily Life")
+                const payload = buildQuickAddItemPayload({
+                  locale,
+                  priority,
+                  title,
+                  whyPrompt,
+                  type,
+                  layer: selectedLayer,
+                  finalCategory,
+                  categoryId: categories.find(
+                    (category) => category.name === finalCategory
+                  )?.id,
+                  unitType,
+                  targetAmount: Number(targetAmount),
+                  unitLabel,
+                  targetFrequency,
+                  triggerCue,
+                  contextTags,
+                  highRiskWindow,
+                  dueDate,
+                  todoRecurring,
+                  toolUrl,
+                })
+                if (
+                  (type === "HABIT" &&
+                    unitType !== "BINARY" &&
+                    (!Number.isFinite(Number(targetAmount)) ||
+                      Number(targetAmount) <= 0 ||
+                      Number(targetAmount) > 1000000)) ||
+                  !saveQuickAddTransfer(payload, customCatInput.trim())
+                ) {
+                  event.preventDefault()
+                  toast({
+                    title:
+                      locale === "zh"
+                        ? "无法带入当前内容"
+                        : "Could not transfer your draft",
+                    description:
+                      locale === "zh"
+                        ? "请检查填写内容，并允许浏览器使用本地存储后重试。"
+                        : "Check your entries and allow browser storage, then try again.",
+                    variant: "destructive",
+                  })
+                  return
+                }
+                setOpen(false)
+              }}
               className="inline-flex min-h-11 items-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
             >
               {dict.form.fields.linkAdvancedPage}
@@ -832,7 +930,13 @@ export function QuickAddHabitModal({
                 {isLoading && (
                   <Icons.spinner className="mr-1.5 h-3.5 w-3.5 animate-spin" />
                 )}
-                <span>{dict.form.fields.saveImmediate}</span>
+                <span>
+                  {isAuthenticated
+                    ? dict.form.fields.saveImmediate
+                    : locale === "zh"
+                      ? "登录并保存"
+                      : "Sign in to save"}
+                </span>
               </Button>
             </div>
           </DialogFooter>

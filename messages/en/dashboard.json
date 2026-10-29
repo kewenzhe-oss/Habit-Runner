@@ -59,7 +59,7 @@
     "expandArchived": "Expand older archived tasks (+{count})",
     "collapseArchived": "Collapse archived tasks",
     "viewHistoryArchive": "View full history in archive",
-    "completedCount": "{count} completed",
+    "completedCount": "{count} recorded",
     "noPendingTodos": "All tasks completed. Great job!",
     "noHabits": "No routines added yet. Start with a simple action.",
     "noMatchingHabits": "No routines match the current filters."

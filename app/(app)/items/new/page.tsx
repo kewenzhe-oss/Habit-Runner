@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 }
 
 interface NewItemPageProps {
-  searchParams?: Promise<{ restore?: string }>
+  searchParams?: Promise<{ restore?: string; draft?: string }>
 }
 
 export default async function NewItemPage({ searchParams }: NewItemPageProps) {
@@ -25,13 +25,22 @@ export default async function NewItemPage({ searchParams }: NewItemPageProps) {
 
   if (!user) {
     redirect(
-      buildSignInUrl(shouldRestore ? "/items/new?restore=1" : "/items/new")
+      buildSignInUrl(
+        shouldRestore
+          ? "/items/new?restore=1"
+          : params.draft === "1"
+            ? "/items/new?draft=1"
+            : "/items/new"
+      )
     )
   }
 
   return (
     <Shell className="max-w-3xl">
-      <RestorableNewItemForm restore={shouldRestore} />
+      <RestorableNewItemForm
+        restore={shouldRestore}
+        transfer={params.draft === "1"}
+      />
     </Shell>
   )
 }

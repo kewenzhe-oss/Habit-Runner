@@ -96,3 +96,58 @@ export function clearPendingNewItem(
 ): void {
   if (storage) removePendingKey(storage)
 }
+
+// A separate, tab-scoped draft lets the full form open without submitting it.
+const TRANSFER_DRAFT_KEY = "quick_add_transfer_draft"
+const transferDraftSchema = itemCreateSchema.extend({
+  title: z.string().max(64),
+})
+
+export function saveQuickAddTransfer(
+  payload: PendingNewItemPayload,
+  customCategoryInput = ""
+): boolean {
+  try {
+    const parsed = transferDraftSchema.safeParse(payload)
+    if (!parsed.success) return false
+    window.sessionStorage.setItem(
+      TRANSFER_DRAFT_KEY,
+      JSON.stringify({ payload: parsed.data, customCategoryInput })
+    )
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function readQuickAddTransfer(): {
+  payload: PendingNewItemPayload
+  customCategoryInput: string
+} | null {
+  try {
+    const raw = window.sessionStorage.getItem(TRANSFER_DRAFT_KEY)
+    if (!raw) return null
+    const stored = JSON.parse(raw)
+    const parsed = transferDraftSchema.safeParse(stored.payload)
+    if (
+      !parsed.success ||
+      typeof stored.customCategoryInput !== "string" ||
+      stored.customCategoryInput.length > 32
+    )
+      return null
+    return {
+      payload: parsed.data,
+      customCategoryInput: stored.customCategoryInput,
+    }
+  } catch {
+    return null
+  }
+}
+
+export function clearQuickAddTransfer(): void {
+  try {
+    window.sessionStorage.removeItem(TRANSFER_DRAFT_KEY)
+  } catch {
+    // Storage access may be blocked.
+  }
+}

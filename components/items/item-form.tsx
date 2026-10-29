@@ -6,9 +6,11 @@ import { ItemDetailDTO, ItemPriority, Layer } from "@/types"
 
 import { LAYER_LIST } from "@/config/layers"
 import { getDefaultDomainExample } from "@/lib/defaultDomainExamples"
+import { buildQuickAddItemPayload } from "@/lib/domain/quick-add-item"
 import { useI18n } from "@/lib/i18n"
 import {
   clearPendingNewItem,
+  clearQuickAddTransfer,
   PendingNewItemPayload,
 } from "@/lib/pending-new-item"
 import { cn } from "@/lib/utils"
@@ -36,6 +38,7 @@ export type HabitUnitType = "TIME" | "COUNT" | "BINARY"
 
 interface ItemFormProps {
   initialDraft?: PendingNewItemPayload
+  initialCustomCategory?: string
   initialItem?: ItemDetailDTO
   mode: "create" | "edit"
 }
@@ -47,9 +50,14 @@ function frequencyFromDays(frequencyDays?: string | null) {
   return "DAILY" as const
 }
 
-export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
+export function ItemForm({
+  initialDraft,
+  initialItem,
+  mode,
+  initialCustomCategory = "",
+}: ItemFormProps) {
   const router = useRouter()
-  const { dict } = useI18n()
+  const { dict, locale } = useI18n()
   const [type, setType] = React.useState<"HABIT" | "QUIT_HABIT" | "TODO">(
     initialItem?.type || initialDraft?.type || "HABIT"
   )
@@ -72,7 +80,9 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
   const [selectedCategoryName, setSelectedCategoryName] = React.useState(
     initialItem?.customCategory || initialDraft?.customCategory || ""
   )
-  const [customCatInput, setCustomCatInput] = React.useState("")
+  const [customCatInput, setCustomCatInput] = React.useState(
+    initialCustomCategory
+  )
   const [toolUrl, setToolUrl] = React.useState(
     initialItem?.toolLinks?.[0]?.url || initialDraft?.toolLinks?.[0]?.url || ""
   )
@@ -98,7 +108,14 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
         targetAmount:
           source.targetAmount || (source.unitType === "BINARY" ? 1 : 20),
         unitLabel:
-          source.unitLabel || (source.unitType === "TIME" ? "分钟" : "个"),
+          source.unitLabel ||
+          (source.unitType === "TIME"
+            ? locale === "zh"
+              ? "分钟"
+              : "minutes"
+            : locale === "zh"
+              ? "个"
+              : "items"),
       }
     }
     const normalPreset = source?.actionPresets?.find(
@@ -115,15 +132,15 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
     return {
       unitType: "TIME" as HabitUnitType,
       targetAmount: 20,
-      unitLabel: "分钟",
+      unitLabel: locale === "zh" ? "分钟" : "minutes",
     }
-  }, [initialDraft, initialItem])
+  }, [initialDraft, initialItem, locale])
 
   const [unitType, setUnitType] = React.useState<HabitUnitType>(
     initialUnitConfig.unitType
   )
-  const [targetAmount, setTargetAmount] = React.useState<number>(
-    initialUnitConfig.targetAmount
+  const [targetAmount, setTargetAmount] = React.useState(
+    String(initialUnitConfig.targetAmount)
   )
   const [unitLabel, setUnitLabel] = React.useState(initialUnitConfig.unitLabel)
 
@@ -150,7 +167,10 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
   // Load Categories
   React.useEffect(() => {
     fetch("/api/categories")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to load categories")
+        return res.json()
+      })
       .then((data) => {
         setCategories(data)
         if (data.length > 0 && !selectedCategoryName && mode === "create") {
@@ -163,23 +183,34 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!title.trim()) {
-      return toast({ title: "请填写事项名称", variant: "destructive" })
+      return toast({
+        title: dict.common.notifications.titleRequired,
+        variant: "destructive",
+      })
     }
 
     if (
       type === "HABIT" &&
       unitType !== "BINARY" &&
-      (!targetAmount || targetAmount <= 0)
+      (!targetAmount ||
+        !Number.isFinite(Number(targetAmount)) ||
+        Number(targetAmount) <= 0)
     ) {
       return toast({
-        title: "请填写有效的目标量数值",
+        title:
+          locale === "zh"
+            ? "请填写有效的目标量数值"
+            : "Please enter a valid target amount",
         variant: "destructive",
       })
     }
 
     if (toolUrl.trim() && !toolUrl.startsWith("https://")) {
       return toast({
-        title: "关联工具网址必须以 https:// 开头",
+        title:
+          locale === "zh"
+            ? "关联工具网址必须以 https:// 开头"
+            : "Tool URL must start with https://",
         variant: "destructive",
       })
     }
@@ -187,7 +218,9 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
     setIsLoading(true)
     try {
       const finalCat =
-        customCatInput.trim() || selectedCategoryName.trim() || "生活日常"
+        customCatInput.trim() ||
+        selectedCategoryName.trim() ||
+        (locale === "zh" ? "生活日常" : "Daily Life")
       let categoryId = categories.find((c) => c.name === finalCat)?.id
 
       if (customCatInput.trim()) {
@@ -206,123 +239,26 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
         }
       }
 
-      const payload: PendingNewItemPayload = {
+      const payload = buildQuickAddItemPayload({
+        locale,
         priority,
-        title: title.trim(),
-        whyPrompt: whyPrompt.trim() || undefined,
+        title,
+        whyPrompt,
         type,
         layer,
-        customCategory: finalCat,
+        finalCategory: finalCat,
         categoryId,
-        colorCode:
-          type === "QUIT_HABIT"
-            ? "#EA580C"
-            : type === "TODO"
-              ? "#2563EB"
-              : "#10B981",
-      }
-
-      if (type === "HABIT") {
-        const freqMap: Record<string, { days: string; target: number }> = {
-          DAILY: { days: "0,1,2,3,4,5,6", target: 7 },
-          WEEKDAYS: { days: "1,2,3,4,5", target: 5 },
-          "3_4_TIMES": { days: "3_4_DAYS", target: 4 },
-          WEEKENDS: { days: "0,6", target: 2 },
-        }
-        const freqConfig = freqMap[targetFrequency] || freqMap.DAILY
-        payload.frequencyDays = freqConfig.days
-        payload.targetPerWeek = freqConfig.target
-        payload.triggerCue = triggerCue.trim() || null
-
-        // Dedicated DB Columns
-        payload.unitType = unitType
-        payload.targetAmount =
-          unitType === "BINARY" ? null : Number(targetAmount) || 1
-        payload.unitLabel =
-          unitType === "BINARY"
-            ? null
-            : unitLabel.trim() || (unitType === "TIME" ? "分钟" : "个")
-
-        const triggerPrefix = triggerCue.trim()
-          ? `[触发：${triggerCue.trim()}] `
-          : ""
-
-        const unitConfig = {
-          unitType,
-          targetAmount: payload.targetAmount,
-          unitLabel: payload.unitLabel,
-        }
-        const unitMetaStr = JSON.stringify(unitConfig)
-
-        const highTarget =
-          unitType === "BINARY"
-            ? "深度完成"
-            : `${Math.round((targetAmount || 20) * 1.2)} ${unitLabel}`
-        const normalTarget =
-          unitType === "BINARY"
-            ? "标准完成"
-            : `${targetAmount || 20} ${unitLabel}`
-        const lowTarget =
-          unitType === "BINARY"
-            ? "3分钟微行动"
-            : `${Math.max(1, Math.round((targetAmount || 20) * 0.3))} ${unitLabel}`
-
-        payload.actionPresets = [
-          {
-            energyLevel: "HIGH",
-            actionText: `${triggerPrefix}充沛推进：${title.trim()} (${highTarget})`,
-            description: unitMetaStr,
-          },
-          {
-            energyLevel: "NORMAL",
-            actionText: `${triggerPrefix}标准执行：${title.trim()} (${normalTarget})`,
-            description: unitMetaStr,
-          },
-          {
-            energyLevel: "LOW",
-            actionText: `微小连接：${title.trim()} (${lowTarget})`,
-            description: unitMetaStr,
-          },
-          {
-            energyLevel: "REST",
-            actionText: "有意识休整恢复与蓄能",
-            description: unitMetaStr,
-          },
-        ]
-      } else if (type === "QUIT_HABIT") {
-        payload.quitContext = contextTags.trim() || null
-        payload.highRiskWindow = highRiskWindow.trim() || null
-        const contextDesc = contextTags.trim()
-          ? `情境诱因：${contextTags.trim()}`
-          : ""
-        const windowDesc = highRiskWindow.trim()
-          ? `高风险时段：${highRiskWindow.trim()}`
-          : ""
-
-        payload.actionPresets = [
-          { energyLevel: "HIGH", actionText: "全天平稳自律，无冲动发生" },
-          {
-            energyLevel: "NORMAL",
-            actionText: windowDesc
-              ? `重点注意 ${windowDesc}`
-              : "识别诱因并主动远离",
-          },
-          {
-            energyLevel: "LOW",
-            actionText: contextDesc
-              ? `在 ${contextDesc} 中保持觉察与停顿`
-              : "觉察当下冲动，深呼吸暂停",
-          },
-          { energyLevel: "REST", actionText: "身心放松与主动减压" },
-        ]
-      } else if (type === "TODO") {
-        payload.dueDate = dueDate || undefined
-        payload.todoRecurrence = todoRecurring
-      }
-
-      if (toolUrl.trim()) {
-        payload.toolLinks = [{ title: "打开关联工具", url: toolUrl.trim() }]
-      }
+        unitType,
+        targetAmount: Number(targetAmount),
+        unitLabel,
+        targetFrequency,
+        triggerCue,
+        contextTags,
+        highRiskWindow,
+        dueDate,
+        todoRecurring,
+        toolUrl,
+      })
 
       const endpoint =
         mode === "edit" ? `/api/items/${initialItem?.id}` : "/api/items"
@@ -337,11 +273,24 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
       if (!res.ok) throw new Error(dict.common.notifications.saveFailed)
 
       toast({
-        title: mode === "edit" ? "事项设置已更新" : "新事项已创建",
-        description: `“${title.trim()}” 已成功保存。`,
+        title:
+          locale === "zh"
+            ? mode === "edit"
+              ? "事项设置已更新"
+              : "新事项已创建"
+            : mode === "edit"
+              ? "Item updated"
+              : "Item created",
+        description:
+          locale === "zh"
+            ? `“${title.trim()}” 已成功保存。`
+            : `“${title.trim()}” has been saved.`,
       })
 
-      if (mode === "create") clearPendingNewItem()
+      if (mode === "create") {
+        clearPendingNewItem()
+        clearQuickAddTransfer()
+      }
       router.push("/dashboard")
       router.refresh()
     } catch (err: any) {
@@ -380,6 +329,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
               <button
                 type="button"
                 onClick={() => setType("HABIT")}
+                aria-pressed={type === "HABIT"}
                 className={cn(
                   "rounded-lg border p-3 text-center text-xs font-semibold transition-all",
                   type === "HABIT"
@@ -391,7 +341,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   <Icons.habit className="h-4 w-4" />
                   <span>{dict.form.types.habit.title}</span>
                 </div>
-                <span className="mt-0.5 block text-[10px] font-normal opacity-75">
+                <span className="mt-0.5 block text-xs font-normal opacity-75">
                   {dict.form.types.habit.sub}
                 </span>
               </button>
@@ -399,6 +349,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
               <button
                 type="button"
                 onClick={() => setType("QUIT_HABIT")}
+                aria-pressed={type === "QUIT_HABIT"}
                 className={cn(
                   "rounded-lg border p-3 text-center text-xs font-semibold transition-all",
                   type === "QUIT_HABIT"
@@ -410,7 +361,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   <Icons.quitHabit className="h-4 w-4" />
                   <span>{dict.form.types.quitHabit.title}</span>
                 </div>
-                <span className="mt-0.5 block text-[10px] font-normal opacity-75">
+                <span className="mt-0.5 block text-xs font-normal opacity-75">
                   {dict.form.types.quitHabit.sub}
                 </span>
               </button>
@@ -418,6 +369,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
               <button
                 type="button"
                 onClick={() => setType("TODO")}
+                aria-pressed={type === "TODO"}
                 className={cn(
                   "rounded-lg border p-3 text-center text-xs font-semibold transition-all",
                   type === "TODO"
@@ -429,7 +381,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   <Icons.todo className="h-4 w-4" />
                   <span>{dict.form.types.todo.title}</span>
                 </div>
-                <span className="mt-0.5 block text-[10px] font-normal opacity-75">
+                <span className="mt-0.5 block text-xs font-normal opacity-75">
                   {dict.form.types.todo.sub}
                 </span>
               </button>
@@ -447,6 +399,8 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
             </Label>
             <Input
               id="item-title"
+              required
+              maxLength={64}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder={
@@ -456,7 +410,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                     ? dict.form.fields.quitPlaceholder
                     : dict.form.fields.todoPlaceholder
               }
-              className="text-xs"
+              className="text-base sm:text-sm"
             />
           </div>
 
@@ -473,7 +427,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                 <Label htmlFor="item-why" className="text-xs font-semibold">
                   {dict.form.fields.whyTitle}
                 </Label>
-                <span className="text-[10px] text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {dict.form.fields.whyTag}
                 </span>
               </div>
@@ -486,7 +440,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                     ? dict.form.fields.whyHabitPlaceholder
                     : dict.form.fields.whyQuitPlaceholder
                 }
-                className="text-xs"
+                className="text-base sm:text-sm"
               />
             </div>
           )}
@@ -502,7 +456,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   >
                     {dict.form.fields.triggerTitle}
                   </Label>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {dict.form.fields.triggerTag}
                   </span>
                 </div>
@@ -511,7 +465,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   value={triggerCue}
                   onChange={(e) => setTriggerCue(e.target.value)}
                   placeholder={dict.form.fields.triggerPlaceholder}
-                  className="bg-background text-xs"
+                  className="bg-background text-base sm:text-sm"
                 />
               </div>
 
@@ -519,7 +473,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                 <Label className="text-xs font-semibold text-emerald-900 dark:text-emerald-200">
                   {dict.form.fields.freqTitle}
                 </Label>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {[
                     { id: "DAILY", label: dict.form.fields.freqDaily },
                     { id: "WEEKDAYS", label: dict.form.fields.freqWeekdays },
@@ -530,8 +484,9 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                       key={f.id}
                       type="button"
                       onClick={() => setTargetFrequency(f.id as any)}
+                      aria-pressed={targetFrequency === f.id}
                       className={cn(
-                        "rounded-md border p-2 text-center text-xs font-medium transition-all",
+                        "min-h-11 rounded-md border p-2 text-center text-sm font-medium transition-all",
                         targetFrequency === f.id
                           ? "shadow-xs border-emerald-600 bg-emerald-600 font-semibold text-white"
                           : "border-border bg-background text-muted-foreground hover:bg-muted"
@@ -571,18 +526,21 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                       type="button"
                       onClick={() => {
                         setUnitType(u.id as HabitUnitType)
-                        if (u.id === "TIME") setUnitLabel("分钟")
-                        if (u.id === "COUNT") setUnitLabel("个")
+                        if (u.id === "TIME")
+                          setUnitLabel(locale === "zh" ? "分钟" : "minutes")
+                        if (u.id === "COUNT")
+                          setUnitLabel(locale === "zh" ? "个" : "items")
                       }}
+                      aria-pressed={unitType === u.id}
                       className={cn(
-                        "rounded-lg border p-2 text-center text-xs font-medium transition-all",
+                        "min-h-11 rounded-lg border p-2 text-center text-sm font-medium transition-all",
                         unitType === u.id
                           ? "shadow-xs border-emerald-600 bg-emerald-600 font-semibold text-white"
                           : "border-border bg-background text-muted-foreground hover:bg-muted"
                       )}
                     >
                       <div>{u.label}</div>
-                      <span className="mt-0.5 block text-[10px] opacity-80">
+                      <span className="mt-0.5 block text-xs opacity-80">
                         {u.sub}
                       </span>
                     </button>
@@ -601,13 +559,14 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                       <Input
                         id="form-target-amount"
                         type="number"
-                        min="1"
+                        min="0.01"
+                        max="1000000"
+                        step="any"
+                        required
                         value={targetAmount}
-                        onChange={(e) =>
-                          setTargetAmount(Number(e.target.value) || 0)
-                        }
+                        onChange={(e) => setTargetAmount(e.target.value)}
                         placeholder="例如：20"
-                        className="bg-background text-xs"
+                        className="bg-background text-base sm:text-sm"
                       />
                     </div>
                     <div className="space-y-1">
@@ -626,7 +585,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                             ? dict.form.fields.unitLabelTimePlaceholder
                             : dict.form.fields.unitLabelCountPlaceholder
                         }
-                        className="bg-background text-xs"
+                        className="bg-background text-base sm:text-sm"
                       />
                     </div>
                   </div>
@@ -646,7 +605,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   >
                     {dict.form.fields.quitContextTitle}
                   </Label>
-                  <span className="text-[10px] text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {dict.form.fields.quitContextTag}
                   </span>
                 </div>
@@ -655,7 +614,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   value={contextTags}
                   onChange={(e) => setContextTags(e.target.value)}
                   placeholder={dict.form.fields.quitContextPlaceholder}
-                  className="bg-background text-xs"
+                  className="bg-background text-base sm:text-sm"
                 />
               </div>
 
@@ -666,7 +625,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                 >
                   {dict.form.fields.quitRiskWindowTitle}
                 </Label>
-                <p className="text-[11px] leading-relaxed text-amber-900/80 dark:text-amber-200/80">
+                <p className="text-xs leading-relaxed text-amber-900/80 dark:text-amber-200/80">
                   {dict.form.fields.quitRiskWindowSub}
                 </p>
                 <Input
@@ -674,7 +633,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   value={highRiskWindow}
                   onChange={(e) => setHighRiskWindow(e.target.value)}
                   placeholder={dict.form.fields.quitRiskWindowPlaceholder}
-                  className="bg-background text-xs"
+                  className="bg-background text-base sm:text-sm"
                 />
               </div>
             </div>
@@ -695,7 +654,7 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="bg-background text-xs"
+                  className="bg-background text-base sm:text-sm"
                 />
               </div>
 
@@ -713,8 +672,9 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                       key={r.id}
                       type="button"
                       onClick={() => setTodoRecurring(r.id as any)}
+                      aria-pressed={todoRecurring === r.id}
                       className={cn(
-                        "rounded-md border p-2 text-center text-xs font-medium transition-all",
+                        "min-h-11 rounded-md border p-2 text-center text-sm font-medium transition-all",
                         todoRecurring === r.id
                           ? "shadow-xs border-blue-600 bg-blue-600 font-semibold text-white"
                           : "border-border bg-background text-muted-foreground hover:bg-muted"
@@ -733,12 +693,13 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
             <Label className="text-xs font-semibold">
               {dict.form.fields.layerTitle}
             </Label>
-            <div className="grid grid-cols-4 gap-2 sm:grid-cols-7">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {LAYER_LIST.map((l) => (
                 <button
                   key={l.key}
                   type="button"
                   onClick={() => setLayer(l.key as Layer)}
+                  aria-pressed={layer === l.key}
                   className={cn(
                     "flex flex-col items-center gap-1 rounded-lg border p-2 text-center text-xs font-medium transition-all",
                     layer === l.key
@@ -750,15 +711,18 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                     className="h-2 w-2 rounded-full"
                     style={{ backgroundColor: l.color }}
                   />
-                  <span className="w-full truncate font-semibold">
-                    {l.zhLabel}
+                  <span className="w-full break-words font-semibold">
+                    {locale === "zh" ? l.zhLabel : l.label}
                   </span>
                 </button>
               ))}
             </div>
 
             <div className="space-y-1.5 pt-2">
-              <Label className="text-xs font-semibold">
+              <Label
+                htmlFor="item-custom-category"
+                className="text-sm font-semibold"
+              >
                 {dict.form.fields.customCategoryTitle}
               </Label>
               {categories.length > 0 && (
@@ -771,8 +735,11 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                         setSelectedCategoryName(c.name)
                         setCustomCatInput("")
                       }}
+                      aria-pressed={
+                        selectedCategoryName === c.name && !customCatInput
+                      }
                       className={cn(
-                        "rounded-md border px-2.5 py-1 text-xs transition-colors",
+                        "min-h-11 rounded-md border px-2.5 py-2 text-sm transition-colors",
                         selectedCategoryName === c.name && !customCatInput
                           ? "border-primary bg-primary font-semibold text-primary-foreground"
                           : "border-border text-muted-foreground hover:bg-muted"
@@ -784,10 +751,12 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
                 </div>
               )}
               <Input
+                id="item-custom-category"
+                maxLength={32}
                 value={customCatInput}
                 onChange={(e) => setCustomCatInput(e.target.value)}
                 placeholder={dict.form.fields.customCategoryPlaceholder}
-                className="text-xs"
+                className="text-base sm:text-sm"
               />
             </div>
           </div>
@@ -816,10 +785,11 @@ export function ItemForm({ initialDraft, initialItem, mode }: ItemFormProps) {
           variant="outline"
           onClick={() => router.back()}
           disabled={isLoading}
+          className="min-h-11"
         >
           {dict.common.actions.cancel}
         </Button>
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading} className="min-h-11">
           {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
           <span>
             {mode === "edit"
