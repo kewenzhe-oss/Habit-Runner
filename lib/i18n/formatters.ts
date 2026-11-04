@@ -1,7 +1,7 @@
 import { Locale } from "./index"
 
 /**
- * Standard Locale-aware formatting utilities for URUS / IotaWise
+ * Standard Locale-aware formatting utilities for habit-running
  */
 
 const LOCALE_MAP: Record<Locale, string> = {

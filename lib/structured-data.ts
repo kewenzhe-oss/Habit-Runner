@@ -15,7 +15,7 @@ export function createOrganizationJsonLd(): JsonLd {
     url: siteConfig.url.base,
     logo: {
       "@type": "ImageObject",
-      url: toCanonicalUrl("/pwa-target-512-20260828.png"),
+      url: toCanonicalUrl("/pwa-promise-512-20261104.png"),
       width: 512,
       height: 512,
     },

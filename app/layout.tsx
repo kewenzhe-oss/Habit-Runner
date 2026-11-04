@@ -58,24 +58,24 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon-target-20260828.ico",
+        url: "/favicon-promise-20261104.ico",
         type: "image/x-icon",
       },
       {
-        url: "/favicon-target-16-20260828.png",
+        url: "/favicon-promise-16-20261104.png",
         type: "image/png",
         sizes: "16x16",
       },
       {
-        url: "/favicon-target-32-20260828.png",
+        url: "/favicon-promise-32-20261104.png",
         type: "image/png",
         sizes: "32x32",
       },
     ],
-    shortcut: "/favicon-target-20260828.ico",
+    shortcut: "/favicon-promise-20261104.ico",
     apple: [
       {
-        url: "/apple-touch-target-20260828.png",
+        url: "/apple-touch-promise-20261104.png",
         type: "image/png",
         sizes: "180x180",
       },
@@ -84,13 +84,13 @@ export const metadata: Metadata = {
       {
         rel: "mask-icon",
         url: "/safari-pinned-tab.svg",
-        color: "#DC2626",
+        color: "#000000",
       },
     ],
   },
-  manifest: "/site-target-20260828.webmanifest",
+  manifest: "/site-promise-20261104.webmanifest",
   other: {
-    "msapplication-TileColor": "#DC2626",
+    "msapplication-TileColor": "#000000",
     "msapplication-config": "/browserconfig.xml",
   },
 }

@@ -1,4 +1,4 @@
-"""Generate all Habit Runner app icons from the canonical red target mark."""
+"""Generate all Habit Runner app icons from the promise mark: an open arc around a central anchor."""
 
 from pathlib import Path
 
@@ -9,9 +9,13 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC = ROOT / "public"
 APP = ROOT / "app"
 RED = "#DC2626"
-WHITE = "#FFFFFF"
+BLACK = "#000000"
 SUPERSAMPLE = 8
-VERSION = "20260828"
+VERSION = "20261104"
+ARC_SWEEP = 300
+ARC_OUTER_RATIO = 0.336
+ARC_STROKE_RATIO = 0.086
+ANCHOR_RATIO = 0.078
 
 
 def render_icon(size: int, rounded: bool) -> Image.Image:
@@ -24,35 +28,26 @@ def render_icon(size: int, rounded: bool) -> Image.Image:
         draw.rounded_rectangle(
             (0, 0, canvas_size - 1, canvas_size - 1),
             radius=radius,
-            fill=RED,
+            fill=BLACK,
         )
     else:
-        draw.rectangle((0, 0, canvas_size - 1, canvas_size - 1), fill=RED)
+        draw.rectangle((0, 0, canvas_size - 1, canvas_size - 1), fill=BLACK)
 
     center = canvas_size / 2
-    stroke = max(SUPERSAMPLE, round(canvas_size * 0.078))
-    for radius_ratio in (0.328, 0.191):
-        radius = canvas_size * radius_ratio
-        draw.ellipse(
-            (
-                center - radius,
-                center - radius,
-                center + radius,
-                center + radius,
-            ),
-            outline=WHITE,
-            width=stroke,
-        )
+    outer = canvas_size * ARC_OUTER_RATIO
+    stroke = max(SUPERSAMPLE, round(canvas_size * ARC_STROKE_RATIO))
+    draw.arc(
+        (center - outer, center - outer, center + outer, center + outer),
+        start=0,
+        end=ARC_SWEEP,
+        fill=RED,
+        width=stroke,
+    )
 
-    center_radius = canvas_size * 0.055
+    anchor = canvas_size * ANCHOR_RATIO
     draw.ellipse(
-        (
-            center - center_radius,
-            center - center_radius,
-            center + center_radius,
-            center + center_radius,
-        ),
-        fill=WHITE,
+        (center - anchor, center - anchor, center + anchor, center + anchor),
+        fill=RED,
     )
 
     return image.resize((size, size), Image.Resampling.LANCZOS)
@@ -69,18 +64,18 @@ def main() -> None:
     save_png(APP, "apple-icon.png", 180, rounded=False)
 
     for name, size, rounded in (
-        (f"favicon-target-16-{VERSION}.png", 16, True),
-        (f"favicon-target-32-{VERSION}.png", 32, True),
-        (f"apple-touch-target-{VERSION}.png", 180, False),
-        (f"pwa-target-192-{VERSION}.png", 192, False),
-        (f"pwa-target-512-{VERSION}.png", 512, False),
-        (f"mstile-target-150-{VERSION}.png", 150, False),
+        (f"favicon-promise-16-{VERSION}.png", 16, True),
+        (f"favicon-promise-32-{VERSION}.png", 32, True),
+        (f"apple-touch-promise-{VERSION}.png", 180, False),
+        (f"pwa-promise-192-{VERSION}.png", 192, False),
+        (f"pwa-promise-512-{VERSION}.png", 512, False),
+        (f"mstile-promise-150-{VERSION}.png", 150, False),
     ):
         save_png(PUBLIC, name, size, rounded)
 
     ico_source = render_icon(256, rounded=True)
     ico_source.save(
-        PUBLIC / f"favicon-target-{VERSION}.ico",
+        PUBLIC / f"favicon-promise-{VERSION}.ico",
         format="ICO",
         sizes=[(16, 16), (32, 32), (48, 48)],
     )

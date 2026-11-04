@@ -97,13 +97,13 @@ export default function Navbar({
               className="flex items-center gap-2 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <Image
-                src="/habit-runner-target-20260828.svg"
+                src="/habit-runner-mark-20261104.svg"
                 alt=""
                 aria-hidden="true"
-                width={32}
-                height={32}
+                width={24}
+                height={24}
                 priority
-                className="h-8 w-8 rounded-lg shadow-sm"
+                className="h-6 w-6 shrink-0"
               />
               <span className="hidden text-base font-bold tracking-tight text-foreground min-[360px]:inline">
                 {dict.nav.brand || siteConfig.name}
