@@ -84,7 +84,7 @@ describe("quick add usability", () => {
     fireEvent.change(screen.getByLabelText("习惯名称 *"), {
       target: { value: "阅读" },
     })
-    fireEvent.click(screen.getByRole("link", { name: /完整高级配置/ }))
+    fireEvent.click(screen.getByRole("link", { name: /完整设置/ }))
     const draft = JSON.parse(
       sessionStorage.getItem("quick_add_transfer_draft") || "null"
     )

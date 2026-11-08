@@ -4,6 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ItemDetailDTO } from "@/types"
+import { categoryLabel as localizeCategory } from "@/lib/category-label"
 import { cn } from "@/lib/utils"
 import { useI18n, formatLocalizedDate } from "@/lib/i18n"
 import { buttonVariants } from "@/components/ui/button"
@@ -56,7 +57,9 @@ export function TodoDetailView({ item }: TodoDetailViewProps) {
     }
   }
 
-  const categoryLabel = item.customCategory || item.layer
+  const categoryLabel = (item.category && item.customCategory === item.category.name
+    ? localizeCategory(item.category, locale)
+    : item.customCategory) || item.layer
 
   return (
     <div className="space-y-6">

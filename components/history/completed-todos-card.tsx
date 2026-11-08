@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { CompletedTodoSummary } from "@/lib/api/history"
+import { categoryLabel } from "@/lib/category-label"
 import { useI18n, formatLocalizedDate } from "@/lib/i18n"
 import { Icons } from "@/components/icons"
 
@@ -41,7 +42,7 @@ export function CompletedTodosCard({
               </span>
               {todo.customCategory && (
                 <span className="text-[10px] text-muted-foreground/60">
-                  {todo.customCategory}
+                  {categoryLabel({ name: todo.customCategory, icon: todo.categoryIcon }, locale)}
                 </span>
               )}
             </div>

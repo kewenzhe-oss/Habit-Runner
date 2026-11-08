@@ -68,6 +68,7 @@ export type CompletedTodoSummary = {
   id: string
   title: string
   customCategory: string | null
+  categoryIcon?: string | null
   colorCode: string | null
   completedDate: string | null
   dueDate: string | null
@@ -148,7 +149,7 @@ export async function getActivityHistoryData(
         status: "COMPLETED",
       },
       include: {
-        category: { select: { name: true } },
+        category: { select: { name: true, icon: true } },
         checkIns: {
           where: { status: "COMPLETED" },
           orderBy: { date: "desc" },
@@ -397,6 +398,7 @@ export async function getActivityHistoryData(
       id: t.id,
       title: t.title,
       customCategory: t.category?.name || t.customCategory || null,
+      categoryIcon: t.category?.icon || null,
       colorCode: t.colorCode,
       completedDate:
         t.checkIns[0]?.date || t.updatedAt.toISOString().split("T")[0],

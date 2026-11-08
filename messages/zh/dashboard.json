@@ -4,12 +4,12 @@
     "subtitle": "保持你的生活节律"
   },
   "compass": {
-    "badgeInProgress": "今日进行中 · 已完成 {checked}/{total}",
-    "titleInProgress": "今日还剩 {count} 项日常",
+    "badgeInProgress": "今日进行中 · 已记录 {checked}/{total}",
+    "titleInProgress": "今日还有 {count} 项待记录",
     "dayDesc": "今天时间还很充裕，按你的节奏来。",
     "nightDesc": "今晚时间不多了，做个微行动或者早点休息吧。",
-    "badgeCompleted": "今日日常已达成 · {total}/{total}",
-    "titleCompleted": "今天的日常已全部完成",
+    "badgeCompleted": "今日日常已记录 · {total}/{total}",
+    "titleCompleted": "今天的日常已全部记录",
     "completedDesc": "今天的节律已稳稳达成，享受放松时间。",
     "badgeRest": "今日主动休整",
     "titleRest": "今天处于主动休整状态",
@@ -24,7 +24,7 @@
     "copyQuote": "复制金句",
     "quoteCopied": "金句已复制到剪贴板",
     "dailyWisdom": "每日灵感",
-    "progressLabel": "今日日常进度",
+    "progressLabel": "今日日常记录进度",
     "expandWisdom": "每日灵感"
   },
   "energySelector": {

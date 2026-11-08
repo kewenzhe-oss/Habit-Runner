@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { categoryLabel } from "@/lib/category-label"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ItemPriority, Layer } from "@/types"
@@ -40,6 +41,7 @@ import { RecommendedToolUrlField } from "@/components/items/recommended-tool-url
 interface Category {
   id: string
   name: string
+  icon?: string | null
   colorCode?: string | null
 }
 
@@ -81,6 +83,13 @@ export function QuickAddHabitModal({
   const [unitLabel, setUnitLabel] = React.useState(
     locale === "zh" ? "分钟" : "minutes"
   )
+  React.useEffect(() => {
+    setUnitLabel((current) => {
+      if (current === "分钟" || current === "minutes") return locale === "zh" ? "分钟" : "minutes"
+      if (current === "个" || current === "items") return locale === "zh" ? "个" : "items"
+      return current
+    })
+  }, [locale])
   const [contextTags, setContextTags] = React.useState("")
   const [highRiskWindow, setHighRiskWindow] = React.useState("")
   const [todoRecurring, setTodoRecurring] = React.useState<
@@ -818,7 +827,7 @@ export function QuickAddHabitModal({
                               : "border-border bg-background text-muted-foreground hover:bg-muted"
                           )}
                         >
-                          {cat.name}
+                          {categoryLabel(cat, locale)}
                         </button>
                       ))}
                     </div>

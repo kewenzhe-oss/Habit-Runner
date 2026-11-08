@@ -5,6 +5,7 @@ import Link from "next/link"
 import { EnergyLevel, TodayItemDTO } from "@/types"
 
 import { isTodoCompleted, recommendForEnergy } from "@/lib/domain/dashboard"
+import { categoryLabel } from "@/lib/category-label"
 import { sortWithinStatusGroup } from "@/lib/domain/item-order"
 import { useI18n } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
@@ -22,6 +23,7 @@ import { TodayCompassCard } from "./today-compass-card"
 interface Category {
   id: string
   name: string
+  icon?: string | null
   colorCode?: string | null
 }
 
@@ -44,7 +46,7 @@ export function HabitList({
   dateStr,
   userEmail,
 }: HabitListProps) {
-  const { dict, format } = useI18n()
+  const { dict, format, locale } = useI18n()
   const secDict = dict.dashboard.sections
   const {
     items: savedItems,
@@ -272,7 +274,7 @@ export function HabitList({
                     style={{ backgroundColor: cat.colorCode }}
                   />
                 )}
-                <span>{cat.name}</span>
+                <span>{categoryLabel(cat, locale)}</span>
               </button>
             ))}
           </div>

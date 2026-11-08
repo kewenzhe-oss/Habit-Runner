@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ItemDetailDTO, Layer } from "@/types"
 import { ItemTrendData } from "@/lib/api/trends"
 import { LAYERS } from "@/config/layers"
+import { categoryLabel as localizeCategory } from "@/lib/category-label"
 import { cn } from "@/lib/utils"
 import { useI18n, formatLocalizedDate } from "@/lib/i18n"
 import { buttonVariants } from "@/components/ui/button"
@@ -41,7 +42,9 @@ export function ItemDetailView({
 
   const layerInfo = LAYERS[item.layer as Layer] || LAYERS.BODY
   const categoryLabel =
-    item.customCategory ||
+    (item.category && item.customCategory === item.category.name
+      ? localizeCategory(item.category, locale)
+      : item.customCategory) ||
     (locale === "zh" ? layerInfo.zhLabel : layerInfo.label)
   const totalCheckInsCount =
     item.checkIns?.filter(

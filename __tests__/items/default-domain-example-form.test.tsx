@@ -89,7 +89,7 @@ describe("life-layer default URL examples", () => {
     )
 
     fireEvent.click(screen.getByRole("button", { name: "打开快速新建" }))
-    fireEvent.click(screen.getByText("更多补充配置（动机、触发提示、分类等）"))
+    fireEvent.click(screen.getByText("更多选项"))
     fireEvent.click(screen.getByRole("button", { name: "决策与方向" }))
 
     expect(

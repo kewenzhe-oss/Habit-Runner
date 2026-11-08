@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { categoryLabel } from "@/lib/category-label"
 import { useI18n } from "@/lib/i18n"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,6 +20,7 @@ import { Icons } from "@/components/icons"
 interface Category {
   id: string
   name: string
+  icon?: string | null
   colorCode?: string | null
 }
 
@@ -45,7 +47,7 @@ export function CategoryManagerModal({
   categories,
   onRefresh,
 }: CategoryManagerModalProps) {
-  const { dict, format } = useI18n()
+  const { dict, format, locale } = useI18n()
   const [newCatName, setNewCatName] = React.useState("")
   const [selectedColor, setSelectedColor] = React.useState("#10B981")
   const [editingId, setEditingId] = React.useState<string | null>(null)
@@ -238,7 +240,7 @@ export function CategoryManagerModal({
                         style={{ backgroundColor: cat.colorCode || "#8B5CF6" }}
                       />
                       <span className="font-medium text-foreground">
-                        {cat.name}
+                        {categoryLabel(cat, locale)}
                       </span>
                     </div>
                   )}
@@ -247,7 +249,7 @@ export function CategoryManagerModal({
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
-                        aria-label={format(dict.dashboard.categories.renameAria, { name: cat.name })}
+                        aria-label={format(dict.dashboard.categories.renameAria, { name: categoryLabel(cat, locale) })}
                         onClick={() => {
                           setEditingId(cat.id)
                           setEditName(cat.name)
@@ -258,8 +260,8 @@ export function CategoryManagerModal({
                       </button>
                       <button
                         type="button"
-                        aria-label={format(dict.dashboard.categories.deleteAria, { name: cat.name })}
-                        onClick={() => handleDelete(cat.id, cat.name)}
+                        aria-label={format(dict.dashboard.categories.deleteAria, { name: categoryLabel(cat, locale) })}
+                        onClick={() => handleDelete(cat.id, categoryLabel(cat, locale))}
                         className="min-h-11 rounded-md px-3 text-xs text-red-600 hover:bg-red-500/10 hover:text-red-700"
                       >
                         {dict.common.actions.delete}

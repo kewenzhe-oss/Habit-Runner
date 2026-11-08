@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { ItemDetailDTO, ItemPriority, Layer } from "@/types"
 
 import { LAYER_LIST } from "@/config/layers"
+import { categoryLabel } from "@/lib/category-label"
 import { getDefaultDomainExample } from "@/lib/defaultDomainExamples"
 import { buildQuickAddItemPayload } from "@/lib/domain/quick-add-item"
 import { useI18n } from "@/lib/i18n"
@@ -32,6 +33,7 @@ import { RecommendedToolUrlField } from "@/components/items/recommended-tool-url
 interface Category {
   id: string
   name: string
+  icon?: string | null
 }
 
 export type HabitUnitType = "TIME" | "COUNT" | "BINARY"
@@ -745,7 +747,7 @@ export function ItemForm({
                           : "border-border text-muted-foreground hover:bg-muted"
                       )}
                     >
-                      {c.name}
+                      {categoryLabel(c, locale)}
                     </button>
                   ))}
                 </div>

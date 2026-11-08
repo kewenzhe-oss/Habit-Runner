@@ -115,13 +115,8 @@ export function TodayCompassCard({
   )
   const totalHabitsCount = habitItems.length
 
-  const completedHabits = habitItems.filter(
-    (i) =>
-      i.todayCheckIn?.status === "COMPLETED" ||
-      i.todayCheckIn?.status === "KEPT"
-  )
   const restHabits = habitItems.filter((i) => i.todayCheckIn?.status === "REST")
-  const checkedInHabitsCount = completedHabits.length + restHabits.length
+  const checkedInHabitsCount = habitItems.filter((i) => !!i.todayCheckIn).length
   const pendingHabitsCount = totalHabitsCount - checkedInHabitsCount
 
   const pendingTodos = items.filter(
@@ -288,7 +283,7 @@ export function TodayCompassCard({
           </div>
         </div>
 
-        <details className="border-t pt-2 text-sm">
+        <details open className="border-t pt-2 text-sm">
           <summary className="min-h-11 cursor-pointer py-3 font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             {compassDict.dailyWisdom}
           </summary>

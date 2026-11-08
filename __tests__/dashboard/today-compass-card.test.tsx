@@ -69,7 +69,7 @@ describe("TodayCompassCard", () => {
       />
     )
 
-    expect(screen.getByText(/今日还剩 1 项日常/)).toBeInTheDocument()
+    expect(screen.getByText(/今日还有 1 项待记录/)).toBeInTheDocument()
     expect(screen.getByText(/今日进行中/)).toBeInTheDocument()
     expect(screen.getByText(/另有 1 个待办任务待处理/)).toBeInTheDocument()
     // Must NOT render individual habit title
@@ -94,8 +94,26 @@ describe("TodayCompassCard", () => {
       />
     )
 
-    expect(screen.getByText("今天的日常已全部完成")).toBeInTheDocument()
-    expect(screen.getByText(/今日日常已达成/)).toBeInTheDocument()
+    expect(screen.getByText("今天的日常已全部记录")).toBeInTheDocument()
+    expect(screen.getByText(/今日日常已记录/)).toBeInTheDocument()
+  })
+
+  test("counts a lapsed quit habit as recorded without calling it completed", () => {
+    const lapsedHabit: TodayItemDTO = {
+      ...mockHabit1,
+      type: "QUIT_HABIT",
+      todayCheckIn: { id: "lapse", status: "LAPSED", actualEnergy: null },
+    }
+    const { rerender } = render(
+      <TodayCompassCard items={[lapsedHabit, mockHabit1]} dailyEnergy="NORMAL" dateStr="2026-08-28" />
+    )
+    expect(screen.getByText(/已记录 1\/2/)).toBeInTheDocument()
+    expect(screen.getByText("今日还有 1 项待记录")).toBeInTheDocument()
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1")
+
+    rerender(<TodayCompassCard items={[lapsedHabit]} dailyEnergy="NORMAL" dateStr="2026-08-28" />)
+    expect(screen.getByText("今天的日常已全部记录")).toBeInTheDocument()
+    expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow", "1")
   })
 
   test("renders REST state when daily energy is set to REST", () => {
@@ -129,9 +147,10 @@ describe("TodayCompassCard", () => {
     const blockquote = container.querySelector("blockquote")
     expect(blockquote).toBeInTheDocument()
     expect(blockquote?.textContent).toBeTruthy()
+    expect(blockquote).toBeVisible()
+    await user.click(screen.getByText("每日灵感"))
     expect(blockquote).not.toBeVisible()
     await user.click(screen.getByText("每日灵感"))
-    expect(blockquote).toBeVisible()
 
     const copyButton = screen.getByRole("button", { name: /复制金句/i })
     await user.click(copyButton)

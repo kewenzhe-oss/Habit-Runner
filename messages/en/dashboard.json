@@ -4,12 +4,12 @@
     "subtitle": "Keep your daily rhythm"
   },
   "compass": {
-    "badgeInProgress": "In Progress · {checked}/{total} done",
-    "titleInProgress": "{count} daily routine{s} remaining today",
+    "badgeInProgress": "In Progress · {checked}/{total} recorded",
+    "titleInProgress": "{count} routine{s} left to record today",
     "dayDesc": "Plenty of time today. Proceed steadily at your own pace.",
     "nightDesc": "Running late tonight. A micro action or resting is great.",
-    "badgeCompleted": "Daily Routines Completed · {total}/{total}",
-    "titleCompleted": "All daily routines completed",
+    "badgeCompleted": "Daily Routines Recorded · {total}/{total}",
+    "titleCompleted": "All daily routines recorded",
     "completedDesc": "Today's rhythm is set. Wrap up with ease and enjoy your time.",
     "badgeRest": "Rest Mode Active",
     "titleRest": "Today is an intentional rest day",
@@ -20,11 +20,11 @@
     "badgeEmpty": "Getting Started",
     "titleEmpty": "Start your first daily routine",
     "emptyDesc": "Add routines you want to cultivate. Your rhythm will grow with every check-in.",
-    "shuffleQuote": "New quote",
+    "shuffleQuote": "Next",
     "copyQuote": "Copy quote",
     "quoteCopied": "Quote copied to clipboard",
     "dailyWisdom": "Daily Wisdom",
-    "progressLabel": "Today’s routine progress",
+    "progressLabel": "Today’s routine recording progress",
     "expandWisdom": "Daily inspiration"
   },
   "energySelector": {
