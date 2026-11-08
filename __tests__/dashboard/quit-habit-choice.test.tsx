@@ -75,6 +75,7 @@ it("changes a recorded KEPT choice to LAPSED through quit-status", async () => {
   const kept = screen.getByRole("button", { name: "做到了" })
   const lapsed = screen.getByRole("button", { name: "没做到" })
   expect(screen.getByText("今天做到了吗？")).toBeInTheDocument()
+  expect(screen.getByRole("status")).toHaveTextContent("已记录：做到了")
   expect(kept).toHaveAttribute("aria-pressed", "true")
   expect(lapsed).toHaveAttribute("aria-pressed", "false")
 
@@ -83,6 +84,7 @@ it("changes a recorded KEPT choice to LAPSED through quit-status", async () => {
   expect(lapsed).toHaveAttribute("aria-pressed", "true")
   expect(kept).toHaveAttribute("aria-pressed", "false")
   expect(lapsed).toBeDisabled()
+  expect(screen.getByRole("status")).toHaveTextContent("保存中")
   expect(global.fetch).toHaveBeenCalledWith(
     "/api/items/quit_habit_1/quit-status",
     expect.objectContaining({
@@ -104,6 +106,7 @@ it("changes a recorded KEPT choice to LAPSED through quit-status", async () => {
     })
     await request.promise
   })
+  expect(screen.getByRole("status")).toHaveTextContent("已记录：没做到")
 })
 
 it("changes a recorded LAPSED choice to KEPT through quit-status", async () => {
@@ -129,12 +132,14 @@ it("changes a recorded LAPSED choice to KEPT through quit-status", async () => {
   const lapsed = screen.getByRole("button", { name: "没做到" })
   expect(kept).toHaveAttribute("aria-pressed", "false")
   expect(lapsed).toHaveAttribute("aria-pressed", "true")
+  expect(screen.getByRole("status")).toHaveTextContent("已记录：没做到")
 
   await act(async () => {
     fireEvent.click(kept)
   })
 
   expect(kept).toHaveAttribute("aria-pressed", "true")
+  expect(screen.getByRole("status")).toHaveTextContent("已记录：做到了")
   expect(lapsed).toHaveAttribute("aria-pressed", "false")
   expect(global.fetch).toHaveBeenCalledWith(
     "/api/items/quit_habit_1/quit-status",

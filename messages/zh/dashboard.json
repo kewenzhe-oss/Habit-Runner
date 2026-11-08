@@ -144,7 +144,9 @@
     "streakLabel": "连续 {count} 天",
     "targetLabel": "目标 {amount} {unit}",
     "weekTrace": "本周记录",
-    "quitQuestion": "今天做到了吗？"
+    "quitQuestion": "今天做到了吗？",
+    "quitKeptRecorded": "已记录：做到了 · 可更改",
+    "quitLapsedRecorded": "已记录：没做到 · 可更改"
   },
   "migration": {
     "bannerTitle": "检测到 {count} 条本地未同步数据",

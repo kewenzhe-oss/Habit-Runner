@@ -549,12 +549,13 @@ export function HabitItem({
                   disabled={isLoading}
                   aria-pressed={checkInStatus === "KEPT"}
                   className={cn(
-                    "min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
+                    "inline-flex min-h-11 min-w-20 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
                     checkInStatus === "KEPT"
                       ? "border-emerald-700 bg-emerald-50 text-emerald-900 dark:border-emerald-500 dark:bg-emerald-950 dark:text-emerald-200"
                       : "border-input hover:bg-muted"
                   )}
                 >
+                  {checkInStatus === "KEPT" && <Icons.check aria-hidden="true" className="h-4 w-4" />}
                   {itemCopy.quitKeptButton}
                 </button>
                 <button
@@ -563,15 +564,25 @@ export function HabitItem({
                   disabled={isLoading}
                   aria-pressed={checkInStatus === "LAPSED"}
                   className={cn(
-                    "min-h-11 min-w-20 flex-1 whitespace-nowrap rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
+                    "inline-flex min-h-11 min-w-20 flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
                     checkInStatus === "LAPSED"
                       ? "border-foreground bg-foreground text-background"
                       : "border-input hover:bg-muted"
                   )}
                 >
+                  {checkInStatus === "LAPSED" && <Icons.check aria-hidden="true" className="h-4 w-4" />}
                   {itemCopy.quitLapsedButton}
                 </button>
               </div>
+              <p role="status" aria-live="polite" className="text-xs text-muted-foreground">
+                {isLoading
+                  ? dict.dashboard.energySelector.saving
+                  : checkInStatus === "KEPT"
+                    ? itemCopy.quitKeptRecorded
+                    : checkInStatus === "LAPSED"
+                      ? itemCopy.quitLapsedRecorded
+                      : ""}
+              </p>
             </div>
           )}
           {item.type === "TODO" && (

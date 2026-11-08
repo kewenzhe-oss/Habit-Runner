@@ -144,7 +144,9 @@
     "streakLabel": "{count}-day streak",
     "targetLabel": "Goal: {amount} {unit}",
     "weekTrace": "This week trace",
-    "quitQuestion": "Did you meet your goal today?"
+    "quitQuestion": "Did you meet your goal today?",
+    "quitKeptRecorded": "Recorded: Yes · You can change this",
+    "quitLapsedRecorded": "Recorded: No · You can change this"
   },
   "migration": {
     "bannerTitle": "{count} un-synced local items detected",
