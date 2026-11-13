@@ -16,6 +16,7 @@ export const CROSS_DOMAIN_LIST = [
 ] as const
 
 const DEFAULT_ROLLUP_GA_ID = "G-NZ2V582QTN"
+const DEFAULT_PROJECT_GA_ID = "G-4GDXXMXR7V"
 const DEFAULT_PROJECT_NAME = "habit_runner"
 const DEFAULT_COGNITIVE_LAYER = "Utility"
 const DEFAULT_UMAMI_WEBSITE_ID = "c01f1c91-fac2-41cc-b0af-0148d52d2db7"
@@ -60,7 +61,7 @@ export function getAnalyticsConfig() {
   const rawProjectGaId =
     process.env.NEXT_PUBLIC_GA_PROJECT_ID?.trim() ||
     process.env.NEXT_PUBLIC_GA_ID?.trim() ||
-    ""
+    DEFAULT_PROJECT_GA_ID
   const projectName =
     process.env.NEXT_PUBLIC_GA_PROJECT_NAME?.trim() || DEFAULT_PROJECT_NAME
   const cognitiveLayer =

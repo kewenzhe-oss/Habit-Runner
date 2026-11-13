@@ -34,11 +34,12 @@ describe("PostSoma analytics config for habit_runner", () => {
     expect(shouldEnableAnalytics("production", "habits.dpdns.org")).toBe(true)
   })
 
-  it("defaults to Global Roll-up + Umami when project GA4 ID is PENDING", () => {
-    process.env.NEXT_PUBLIC_GA_PROJECT_ID = "PENDING"
+  it("defaults to dedicated project GA4 + Global Roll-up + Umami when env is unset", () => {
+    delete process.env.NEXT_PUBLIC_GA_PROJECT_ID
+    delete process.env.NEXT_PUBLIC_GA_ID
     const cfg = getAnalyticsConfig()
     expect(cfg.rollupGaId).toBe("G-NZ2V582QTN")
-    expect(cfg.projectGaId).toBe("")
+    expect(cfg.projectGaId).toBe("G-4GDXXMXR7V")
     expect(cfg.projectName).toBe("habit_runner")
     expect(cfg.cognitiveLayer).toBe("Utility")
     expect(cfg.umamiWebsiteId).toBe("c01f1c91-fac2-41cc-b0af-0148d52d2db7")
@@ -46,5 +47,12 @@ describe("PostSoma analytics config for habit_runner", () => {
       "https://pulse.postsoma-2050.website/pulse.js"
     )
     expect(cfg.crossDomains).toContain("habits.dpdns.org")
+  })
+
+  it("disables project GA4 when explicitly overridden to PENDING", () => {
+    process.env.NEXT_PUBLIC_GA_PROJECT_ID = "PENDING"
+    const cfg = getAnalyticsConfig()
+    expect(cfg.rollupGaId).toBe("G-NZ2V582QTN")
+    expect(cfg.projectGaId).toBe("")
   })
 })
