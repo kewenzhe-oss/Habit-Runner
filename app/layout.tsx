@@ -11,6 +11,7 @@ import {
 } from "@/lib/structured-data"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
+import { PostSomaAnalytics } from "@/components/analytics/post-soma-analytics"
 import { StructuredData } from "@/components/seo/structured-data"
 import { ThemeProvider } from "@/components/theme-provider"
 
@@ -117,6 +118,18 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           type="text/markdown"
           title="Habit Runner machine-readable summary"
         />
+        <link
+          rel="alternate"
+          type="text/plain"
+          href="/llms.txt"
+          title="LLMs.txt"
+        />
+        <link
+          rel="alternate"
+          type="text/plain"
+          href="/llms-full.txt"
+          title="LLMs-full.txt"
+        />
         <StructuredData
           id="habit-runner-organization"
           data={createOrganizationJsonLd()}
@@ -143,6 +156,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </div>
           <Toaster />
         </ThemeProvider>
+        <PostSomaAnalytics />
       </body>
     </html>
   )

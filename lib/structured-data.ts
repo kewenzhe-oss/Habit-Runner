@@ -128,3 +128,45 @@ export function createSearchResultsPageJsonLd(query: string): JsonLd {
     inLanguage: "en",
   }
 }
+
+export function createFaqJsonLd(): JsonLd {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": toCanonicalUrl("/#faq"),
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is Habit Runner's 4-tier energy-adaptive system?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Habit Runner lets you choose High, Normal, Low, or Rest actions based on the energy you actually have today, so low-energy days and conscious rest keep your rhythm intact without binary streak guilt.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How are habits, reduction behaviors, and tasks tracked differently?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Habits record repeated positive actions, reduction behaviors log maintained days and lapses as neutral awareness, and tasks represent finite one-off items with completion states.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Are personal habit logs and user workspaces indexed by search engines?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "No. Personal routes (/dashboard, /today, /items, /insights, /settings, /signin, /signup) are blocked in robots.txt and carry page-level noindex metadata.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Is Habit Runner open source?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. Habit Runner is open-source under the MIT license on GitHub and supports self-hosting with PostgreSQL and NextAuth.",
+        },
+      },
+    ],
+  }
+}

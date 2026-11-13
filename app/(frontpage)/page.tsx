@@ -2,7 +2,10 @@ import { Metadata } from "next"
 
 import { buildPageMetadata } from "@/lib/seo"
 import { getCurrentUser } from "@/lib/session"
-import { createWebApplicationJsonLd } from "@/lib/structured-data"
+import {
+  createFaqJsonLd,
+  createWebApplicationJsonLd,
+} from "@/lib/structured-data"
 import AdaptiveRhythmSection from "@/components/pages/adaptive-rhythm-section"
 import Hero from "@/components/pages/hero"
 import OpenSource from "@/components/pages/opensource"
@@ -27,6 +30,7 @@ export default async function Home() {
         id="habit-runner-web-application"
         data={createWebApplicationJsonLd()}
       />
+      <StructuredData id="habit-runner-faq" data={createFaqJsonLd()} />
       {/* 1. Hero: Today Action Workspace (Visual 1) */}
       <Hero isAuthenticated={Boolean(user?.id)} />
 
